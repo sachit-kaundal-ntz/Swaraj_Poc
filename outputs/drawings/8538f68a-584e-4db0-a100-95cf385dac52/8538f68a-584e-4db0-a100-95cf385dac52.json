@@ -1,0 +1,301 @@
+{
+  "task_id": "8538f68a-584e-4db0-a100-95cf385dac52",
+  "filename": "8538f68a-584e-4db0-a100-95cf385dac52_gear_img2.jpg",
+  "file_size": 483937,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "mechanical",
+      "component_type": "sprocket",
+      "part_name": "SPROCKET (DRIVE)",
+      "drawing_number": "810-101-104",
+      "revision": "0",
+      "scale": "1:2",
+      "date_created": "03/10/2003",
+      "date_revised": null,
+      "sheet_info": "1 OF 1",
+      "company": "S V ROBOTICS & AUTOMATION INDIA PVT LTD.",
+      "drawn_by": "KSJ",
+      "checked_by": "KSJ",
+      "approved_by": null,
+      "material_specification": "REFER NOTE",
+      "standards_referenced": []
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": 50,
+        "unit": "mm",
+        "tolerance": null
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": 137,
+        "unit": "mm",
+        "tolerance": null
+      },
+      "other_critical_dimensions": [
+        {
+          "feature": "overall outer diameter",
+          "value": 137,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        },
+        {
+          "feature": "pitch circle diameter (P.C.D.)",
+          "value": 123.3,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        },
+        {
+          "feature": "bore diameter",
+          "value": 35,
+          "units": "mm",
+          "tolerance": "H7",
+          "position": "centered"
+        },
+        {
+          "feature": "hub outer diameter",
+          "value": 83,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        },
+        {
+          "feature": "flange outer diameter",
+          "value": 108,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        },
+        {
+          "feature": "axial width (overall)",
+          "value": 50,
+          "units": "mm",
+          "tolerance": null,
+          "position": "axial"
+        },
+        {
+          "feature": "axial width of teeth section",
+          "value": 16,
+          "units": "mm",
+          "tolerance": "+0.2",
+          "position": "axial, central"
+        },
+        {
+          "feature": "axial width of outer flanges",
+          "value": 7.5,
+          "units": "mm",
+          "tolerance": "±0.1",
+          "position": "axial, typical"
+        },
+        {
+          "feature": "axial width of inner flanges",
+          "value": 5,
+          "units": "mm",
+          "tolerance": null,
+          "position": "axial, typical"
+        },
+        {
+          "feature": "keyway width",
+          "value": 8,
+          "units": "mm",
+          "tolerance": "Js9",
+          "position": "radial"
+        },
+        {
+          "feature": "keyway depth from center",
+          "value": 38.3,
+          "units": "mm",
+          "tolerance": "+0.2",
+          "position": "radial"
+        },
+        {
+          "feature": "tooth tip radius",
+          "value": 141.62,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        },
+        {
+          "feature": "tooth root radius",
+          "value": 18.97,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        },
+        {
+          "feature": "roller seat diameter",
+          "value": 23,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial, on teeth"
+        },
+        {
+          "feature": "pitch between tooth centers",
+          "value": 38.1,
+          "units": "mm",
+          "tolerance": null,
+          "position": "angular"
+        },
+        {
+          "feature": "distance from center to tooth tip",
+          "value": 8.21,
+          "units": "mm",
+          "tolerance": null,
+          "position": "radial"
+        }
+      ]
+    },
+    "geometric_decomposition": {
+      "base_shapes": [
+        {
+          "shape_type": "cylinder",
+          "description": "main hub body",
+          "dimensions": {
+            "outer_diameter": 83,
+            "height": 50
+          },
+          "units": "mm",
+          "position": "centered",
+          "additive_or_subtractive": "additive"
+        },
+        {
+          "shape_type": "cylinder",
+          "description": "sprocket teeth base",
+          "dimensions": {
+            "outer_diameter": 137,
+            "height": 16
+          },
+          "units": "mm",
+          "position": "axial, central",
+          "additive_or_subtractive": "additive"
+        },
+        {
+          "shape_type": "cylinder",
+          "description": "outer flanges (2x)",
+          "dimensions": {
+            "outer_diameter": 108,
+            "height": 7.5
+          },
+          "units": "mm",
+          "position": "axial, on both sides of teeth section",
+          "additive_or_subtractive": "additive"
+        }
+      ],
+      "subtracted_features": [
+        {
+          "feature_type": "bore",
+          "shape": "circular",
+          "quantity": 1,
+          "dimensions": {
+            "diameter": 35,
+            "depth": "through"
+          },
+          "units": "mm",
+          "location": "center",
+          "additive_or_subtractive": "subtractive"
+        },
+        {
+          "feature_type": "keyway",
+          "shape": "rectangular slot",
+          "quantity": 1,
+          "dimensions": {
+            "width": 8,
+            "depth": "from center 38.3",
+            "length": "through"
+          },
+          "units": "mm",
+          "location": "radial, aligned with bore",
+          "additive_or_subtractive": "subtractive"
+        },
+        {
+          "feature_type": "sprocket teeth profile",
+          "shape": "complex profile",
+          "quantity": 10,
+          "dimensions": {
+            "PCD": 123.3,
+            "outer_radius": 141.62,
+            "root_radius": 18.97,
+            "roller_diameter": 23,
+            "pitch": 38.1
+          },
+          "units": "mm",
+          "location": "radial, around teeth section",
+          "additive_or_subtractive": "subtractive"
+        },
+        {
+          "feature_type": "chamfer",
+          "shape": "conical",
+          "quantity": "unspecified",
+          "dimensions": {
+            "size": 0.5,
+            "angle": 45
+          },
+          "units": "mm",
+          "location": "unspecified sharp edges",
+          "additive_or_subtractive": "subtractive"
+        }
+      ]
+    },
+    "manufacturing_notes": {
+      "surface_finish": "Rough cut (Δ), Clean Mill/Turn (▽), Grind (▽▽), Lapp (▽▽▽)",
+      "heat_treatment": null,
+      "coating": null,
+      "special_instructions": [
+        "INSERT HAS TO BE PRESS FITTED IN TO SPROCKET",
+        "ALL DRILLED & TAPED HOLES CENTER",
+        "DISTANCES TO BE MAINTENED WITHIN ±0.2",
+        "UNSPCIFIED CHAMFER 0.5*45°",
+        "REMOVE ALL SHARP EDGES"
+      ]
+    },
+    "gd_t_symbols": [
+      {
+        "feature": "bore",
+        "symbol": "H7",
+        "tolerance": "ISO fit H7"
+      },
+      {
+        "feature": "keyway width",
+        "symbol": "Js9",
+        "tolerance": "ISO fit Js9"
+      }
+    ],
+    "material_and_properties": {
+      "material": "P.P./DERLINE (for Sprocket), M.S. (for Insert)",
+      "mechanical_properties": null
+    },
+    "title_block_notes": [
+      "Qty. For One Assembly=2 No's.",
+      "Total No of Assemblys=2 No's",
+      "Total Qty. =4 No's",
+      "PERMISSIBLE DEVIATIONS FOR LINEAR DIMENSIONS: 0.5 TO 6 ±0.1, 3 TO 30 ±0.2, 30 TO 120 ±0.3, 120 TO 400 ±0.5, 400 TO 1000 ±0.8, 1000 TO 2000 ±1.2, 2000 TO 4000 ±2",
+      "ALL DIMENSIONS ARE IN MM",
+      "A4-THIS IS A CAD DRAWING",
+      "DO NOT REVISE MANUALLY. DO NOT TAKE REPRODUCIBLE",
+      "SPROKET DATA: NO OF TEETH = 10, P.C.D.=Ø123.3, O.D.=Ø137"
+    ],
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 994,
+        "image_tokens": 774,
+        "total_input_tokens": 1768
+      },
+      "output_tokens": 2395,
+      "output_token_limit": 8000,
+      "total_tokens": 4163,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 1773,
+        "height": 2535,
+        "total_pixels": 4494555,
+        "format": "JPEG"
+      },
+      "response_truncated": false
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-22T16:07:46.276814"
+}

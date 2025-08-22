@@ -1,0 +1,169 @@
+{
+  "task_id": "93da25a7-c3bf-4ca5-87bb-73ac310454de",
+  "filename": "93da25a7-c3bf-4ca5-87bb-73ac310454de_1 1.png",
+  "file_size": 1197445,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "mechanical",
+      "component_type": "spur gear",
+      "part_name": "Stael/Spur Gear",
+      "drawing_number": "KHJ 203-6202D",
+      "revision": null,
+      "scale": "1:1.5",
+      "date_created": null,
+      "date_revised": null,
+      "sheet_info": null,
+      "company": "The Gear Company",
+      "drawn_by": null,
+      "checked_by": null,
+      "approved_by": null,
+      "material_specification": "J",
+      "standards_referenced": []
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": 30,
+        "unit": "mm",
+        "tolerance": null
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": 124,
+        "unit": "mm",
+        "tolerance": null
+      },
+      "other_critical_dimensions": [
+        {
+          "feature": "bore diameter",
+          "value": 17,
+          "units": "mm",
+          "tolerance": null,
+          "position": "centered"
+        },
+        {
+          "feature": "step diameter",
+          "value": 20,
+          "units": "mm",
+          "tolerance": null,
+          "position": "axial"
+        },
+        {
+          "feature": "keyway width",
+          "value": 5,
+          "units": "mm",
+          "tolerance": null,
+          "position": "axial"
+        },
+        {
+          "feature": "keyway depth",
+          "value": 2,
+          "units": "mm",
+          "tolerance": null,
+          "position": "from bore surface"
+        },
+        {
+          "feature": "keyway length",
+          "value": 10,
+          "units": "mm",
+          "tolerance": null,
+          "position": "axial"
+        }
+      ]
+    },
+    "geometric_decomposition": {
+      "base_shapes": [
+        {
+          "shape_type": "cylinder",
+          "description": "main gear body",
+          "dimensions": {
+            "outer_diameter": 124,
+            "height": 20
+          },
+          "units": "mm",
+          "position": "axial",
+          "additive_or_subtractive": "additive"
+        },
+        {
+          "shape_type": "cylinder",
+          "description": "hub/step",
+          "dimensions": {
+            "outer_diameter": 20,
+            "height": 10
+          },
+          "units": "mm",
+          "position": "axial",
+          "additive_or_subtractive": "additive"
+        }
+      ],
+      "subtracted_features": [
+        {
+          "feature_type": "bore",
+          "shape": "circular",
+          "quantity": 1,
+          "dimensions": {
+            "diameter": 17,
+            "depth": 30
+          },
+          "units": "mm",
+          "location": "centered",
+          "additive_or_subtractive": "subtractive"
+        },
+        {
+          "feature_type": "keyway",
+          "shape": "rectangular slot",
+          "quantity": 1,
+          "dimensions": {
+            "width": 5,
+            "depth": 2,
+            "length": 10
+          },
+          "units": "mm",
+          "location": "axial, within 10mm section, from bore surface",
+          "additive_or_subtractive": "subtractive"
+        }
+      ]
+    },
+    "manufacturing_notes": {
+      "surface_finish": "M5 (indicated on outer diameter and keyway, interpretation as surface finish code)",
+      "heat_treatment": "28 (from 'Hent 74% Quarated' field in gear data table)",
+      "coating": "Black oxide optionally applied on secondary-operated parts (for J Series products)",
+      "special_instructions": [
+        "The precision grade of gears after secondary operation is equivalent to the classification for the 1b process."
+      ]
+    },
+    "gd_t_symbols": [],
+    "material_and_properties": {
+      "material": "J",
+      "mechanical_properties": {
+        "hardness": "28 (from 'Protectots Bespyll', 'Goudar Otimefor', 'Redeience Moderloll' fields in gear data table)"
+      }
+    },
+    "title_block_notes": [
+      "For J Series products, without black oxide is optionally applied on secondary-operated parts",
+      "The precision rade of gears after secondary operation is equivalent to the clalassific at for the 1b process.",
+      "Tolerance Table: Dimensions (mm) | Imm (mn) - (l/3 6/mm): 2.005, 6—3: 5.005, 0—28: 5.602, 118—19: 7.00L, 6.5—10: 7.005, 6.4—19: 1.006",
+      "Stael/Spur Gear Data: Module: M.5, Number of team: null, Phail ctroacits: Inomlnulicting.mg/be, Bimertur: Z., Protectots Bespyll: 28, Goudar Otimefor: 28, Redeience Moderloll: 28, Hent 74% Quarated: 28, Materiol: J, Boror New: null, Beleboloking: 1:3H, Agilqitsii: null, Boor bxe: null, IGG distom: null"
+    ],
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 994,
+        "image_tokens": 774,
+        "total_input_tokens": 1768
+      },
+      "output_tokens": 1366,
+      "output_token_limit": 8000,
+      "total_tokens": 3134,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 1536,
+        "height": 1024,
+        "total_pixels": 1572864,
+        "format": "PNG"
+      },
+      "response_truncated": false
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-22T16:26:55.227723"
+}

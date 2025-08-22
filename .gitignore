@@ -5,4 +5,4 @@ __pycache__/
 output
 uploads
 logs
-venv/
+venv3.12.7/

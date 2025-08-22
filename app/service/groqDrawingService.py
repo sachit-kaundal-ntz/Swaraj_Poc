@@ -48,7 +48,8 @@ class GroqTechnicalDrawingExtractionService:
             if not text:
                 return 0
             
-        
+            # Groq doesn't have a direct token counting API like Gemini
+            # Using estimation method
             return self.estimate_tokens(text)
             
         except Exception as e:
@@ -90,6 +91,7 @@ class GroqTechnicalDrawingExtractionService:
                 
             pixels = width * height
             
+            # Groq vision model token estimation (adjusted for Groq's patterns)
             if pixels <= 512 * 512:
                 return 300  
             elif pixels <= 1024 * 1024:
@@ -129,9 +131,11 @@ class GroqTechnicalDrawingExtractionService:
             with open(image_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
             
+            # Get image format for proper MIME type
             with Image.open(image_path) as img:
                 image_format = img.format.lower()
             
+            # Create data URL
             mime_type = f"image/{image_format}" if image_format in ['jpeg', 'jpg', 'png', 'gif', 'webp'] else "image/jpeg"
             data_url = f"data:{mime_type};base64,{encoded_string}"
             
@@ -248,6 +252,21 @@ class GroqTechnicalDrawingExtractionService:
                 - Bill of materials (if present)
                 - Property tables
                 - Specification tables
+            
+            11. GEOMETRIC DECOMPOSITION FOR VOLUME CALCULATION:
+                - Treat the gear as ONE single coherent 3D object
+                - Break it down into fundamental primitives (cylinder, pipe, cuboid, cone, extrusion, etc.)
+                - For gears: include gear blank (cylinder), hub (cylinder), bore (pipe/subtraction), keyways (slot subtraction), teeth (cylindrical/extruded protrusions), chamfers, and fillets
+                - For each primitive: record ALL given dimensions (outer diameter, inner diameter, height/thickness, position, angles, tooth spacing, etc.)
+                - Specify whether each feature is additive (solid material) or subtractive (hole, slot, bore, relief, undercut)
+                - Detail every subtractive feature separately (each hole, keyway, bore step, slot, undercut, relief)
+                - Provide gear tooth-level details if available (tooth count, pitch circle diameter, base circle, root circle, addendum, dedendum, whole depth)
+                - Sequence the shapes in logical order of construction
+                - Ensure ALL geometric features required for exact VOLUME calculation are included
+
+            12. FINAL SHAPE DESCRIPTION:
+                - Provide a plain-text step-by-step explanation of how the 3D gear is formed from primitives
+                - Ensure this description is complete enough to allow accurate 3D volume reconstruction without referring back to the drawing
 
             ENHANCED UNIVERSAL JSON OUTPUT STRUCTURE:
             ```json
@@ -371,10 +390,31 @@ class GroqTechnicalDrawingExtractionService:
                     "inspection_requirements": ["list of inspection callouts"],
                     "critical_dimensions": ["list of dimensions marked as critical"],
                     "functional_requirements": ["any functional specifications noted"]
+                },
+                "geometric_decomposition": {
+                    "base_shapes": [
+                        {
+                            "shape_type": "cylinder/pipe/etc",
+                            "description": "gear blank / hub / teeth",
+                            "dimensions": {"outer_diameter": "...", "inner_diameter": "...", "height": "..."},
+                            "position": "axial/centered/etc",
+                            "additive_or_subtractive": "additive"
+                        }
+                    ],
+                    "subtracted_features": [
+                        {
+                            "feature_type": "bore/keyway/hole/etc",
+                            "shape": "pipe/slot/etc",
+                            "quantity": "number of features",
+                            "dimensions": {"diameter": "...", "depth": "...", "width": "..."},
+                            "location": "center/radial position",
+                            "additive_or_subtractive": "subtractive"
+                        }
+                    ],
+                    "final_shape_description": "Plain-text step-by-step description of gear construction"
+                    
                 }
-            }
             ```
-
             PRECISION REQUIREMENTS:
             - Record ALL visible text exactly as written
             - Capture ALL dimension values with exact decimal precision shown
@@ -400,8 +440,10 @@ class GroqTechnicalDrawingExtractionService:
             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path)
             logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, Image: {input_token_info['image_tokens']}, Total: {input_token_info['total_input_tokens']}")
             
+            # Encode image to base64
             image_data_url = await self.upload_image_to_gemini(image_path)
             
+            # Create messages for Groq API
             messages = [
                 {
                     "role": "user",
@@ -420,8 +462,9 @@ class GroqTechnicalDrawingExtractionService:
                 }
             ]
             
+            # Make API call to Groq
             response = client.chat.completions.create(
-                model="meta-llama/llama-4-scout-17b-16e-instruct", 
+                model="meta-llama/llama-4-scout-17b-16e-instruct",  # or "llama-3.2-11b-vision-preview"
                 messages=messages,
                 temperature=0.0,
                 max_tokens=8000
@@ -429,11 +472,13 @@ class GroqTechnicalDrawingExtractionService:
             
             response_text = response.choices[0].message.content.strip()
             
+            # Extract token usage from response
             output_tokens = getattr(response.usage, 'completion_tokens', 0) if hasattr(response, 'usage') else self.count_tokens_accurate(response_text)
             total_tokens = input_token_info['total_input_tokens'] + output_tokens
             
             logger.info(f"Token usage - Input: {input_token_info['total_input_tokens']}, Output: {output_tokens}, Total: {total_tokens}")
             
+            # Clean up JSON formatting
             if response_text.startswith("```json"):
                 response_text = response_text[7:-3].strip()
             elif response_text.startswith("```"):

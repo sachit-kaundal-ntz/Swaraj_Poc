@@ -27,7 +27,7 @@ UPLOAD_DIR = "uploads/drawings"
 OUTPUT_DIR = "outputs/drawings"
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  
-MIN_FILE_SIZE = 1 * 1024 * 1024
+MIN_FILE_SIZE = 1 * 1024 
  
 # Ensure directories exist
 os.makedirs(UPLOAD_DIR, exist_ok=True)
