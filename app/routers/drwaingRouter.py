@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from requests import Session
 from app.schemas.drawingSchema import DrawingProcessingResult, DrawingProcessingStatus, DrawingUploadResponse
-from app.service.techinalDrawingService import TechnicalDrawingExtractionService
+from app.service.techinalDrawingService2 import TechnicalDrawingExtractionService
 from app.log.logger import get_logger
 from app.database.db import get_db
 from typing import Optional, Tuple

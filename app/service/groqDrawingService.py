@@ -157,285 +157,175 @@ class GroqTechnicalDrawingExtractionService:
             logger.info(f"Starting technical drawing extraction for: {image_path}")
             
             PROMPT = """
-            You are an expert engineering drawing analysis system with comprehensive knowledge of technical drawings, engineering standards (ISO, ANSI, DIN, ASME), GD&T (Geometric Dimensioning and Tolerancing), manufacturing processes, and precision measurement. Analyze this technical drawing with absolute precision and extract ALL visible specifications and information.
+You are an expert engineering drawing analysis system with comprehensive knowledge of technical drawings, engineering standards (ISO, ANSI, DIN, ASME), GD&T, and mechanical design.
+Your task: Analyze the provided engineering drawing and extract structured information into a JSON object.
+IMPORTANT RULES:
+- Respond ONLY with valid JSON.
+- Do not include markdown code fences, comments, or extra text.
+- Ensure all braces/brackets are properly closed.
+- Do not truncate.
+- If information is missing in the drawing, use null.
+- Keep all values consistent and machine-readable.
+- Apply a hardcoded tolerance of +4mm to ALL dimensional values in the geometric_decomposition section.
+- Calculate volumes for each geometric shape using appropriate formulas (π × r² × h for cylinders, l × w × h for rectangular shapes, etc.).
+- Show both original dimensions and dimensions with 4mm tolerance added.
+- Calculate volumes for both original and tolerance-adjusted dimensions.
+JSON SCHEMA:
+{
+  "drawing_metadata": {
+    "drawing_type": "mechanical/architectural/electrical/...",
+    "component_type": "gear/shaft/bracket/housing/assembly/...",
+    "part_name": "full name of the part",
+    "drawing_number": "unique drawing number",
+    "revision": "revision code",
+    "scale": "e.g. 1:2",
+    "date_created": "DD/MM/YYYY",
+    "date_revised": "DD/MM/YYYY",
+    "sheet_info": "e.g. 1 OF 3",
+    "company": "company name",
+    "drawn_by": "drafter initials",
+    "checked_by": "checker initials",
+    "approved_by": "approver initials",
+    "material_specification": "material type or reference",
+    "standards_referenced": ["list of referenced standards"]
+  },
+  "overall_dimensions": {
+    "length": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
+    "width": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
+    "height": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
+    "diameter": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
+    "other_critical_dimensions": [
+      {
+        "feature": "hole/pocket/keyway/slot/etc",
+        "value": "numeric",
+        "units": "mm/inch",
+        "tolerance": "±...",
+        "position": "axial/centered/etc"
+      }
+    ]
+  },
+  "geometric_decomposition": {
+    "tolerance_applied": {
+      "value": 4,
+      "unit": "mm",
+      "note": "Hardcoded tolerance applied to all dimensions"
+    },
+    "base_shapes": [
+      {
+        "shape_type": "cylinder/pipe/rectangular_prism/cone/etc",
+        "description": "gear blank/hub/teeth/housing/etc",
+        "dimensions": {
+          "outer_diameter": "original_value", 
+          "outer_diameter_with_tolerance": "original_value + 4",
+          "inner_diameter": "original_value", 
+          "inner_diameter_with_tolerance": "original_value + 4",
+          "height": "original_value", 
+          "height_with_tolerance": "original_value + 4",
+          "length": "original_value", 
+          "length_with_tolerance": "original_value + 4",
+          "width": "original_value", 
+          "width_with_tolerance": "original_value + 4"
+        },
+        "units": "mm/inch/etc",
+        "position": "axial/centered/radial/etc",
+        "additive_or_subtractive": "additive",
+        "volume": {
+          "original_volume": {
+            "value": "calculated_from_original_dimensions",
+            "unit": "mm³",
+            "calculation": "formula_with_original_numbers",
+            "formula": "general_formula_used"
+          },
+          "volume_with_tolerance": {
+            "value": "calculated_from_tolerance_dimensions",
+            "unit": "mm³",
+            "calculation": "formula_with_tolerance_numbers",
+            "formula": "general_formula_used",
+            "tolerance_effect": "difference_in_volume"
+          }
+        }
+      }
+    ],
+    "subtracted_features": [
+      {
+        "feature_type": "bore/keyway/hole/pocket/slot/groove/etc",
+        "shape": "pipe/slot/rectangular/circular/etc",
+        "quantity": "number of features",
+        "dimensions": {
+          "diameter": "original_value", 
+          "diameter_with_tolerance": "original_value + 4",
+          "depth": "original_value", 
+          "depth_with_tolerance": "original_value + 4",
+          "width": "original_value", 
+          "width_with_tolerance": "original_value + 4",
+          "length": "original_value", 
+          "length_with_tolerance": "original_value + 4"
+        },
+        "units": "mm/inch/etc",
+        "location": "center/radial position/angular position",
+        "additive_or_subtractive": "subtractive",
+        "volume": {
+          "original_volume": {
+            "value": "calculated_from_original_dimensions",
+            "unit": "mm³",
+            "calculation": "formula_with_original_numbers",
+            "formula": "general_formula_used"
+          },
+          "volume_with_tolerance": {
+            "value": "calculated_from_tolerance_dimensions",
+            "unit": "mm³",
+            "calculation": "formula_with_tolerance_numbers",
+            "formula": "general_formula_used",
+            "tolerance_effect": "difference_in_volume"
+          }
+        }
+      }
+    ],
+    "volume_summary": {
+      "original_volumes": {
+        "total_additive": "sum_of_all_additive_original_volumes",
+        "total_subtractive": "sum_of_all_subtractive_original_volumes",
+        "net_volume": "total_additive - total_subtractive"
+      },
+      "volumes_with_tolerance": {
+        "total_additive": "sum_of_all_additive_tolerance_volumes",
+        "total_subtractive": "sum_of_all_subtractive_tolerance_volumes",
+        "net_volume": "total_additive - total_subtractive",
+        "volume_increase_due_to_tolerance": "difference_from_original_net_volume"
+      },
+      "tolerance_impact": {
+        "percentage_increase": "percentage_change_in_volume",
+        "absolute_increase": "absolute_volume_increase",
+        "unit": "mm³"
+      }
+    }
+  },
+  "manufacturing_notes": {
+    "surface_finish": "e.g. Ra 1.6",
+    "heat_treatment": "carburizing/tempering/etc",
+    "coating": "zinc/nickel/paint/etc",
+    "special_instructions": ["array of notes"]
+  },
+  "gd_t_symbols": [
+    {"feature": "datum/axis/surface", "symbol": "⌀/⏐/⏥/∥/etc", "tolerance": "value"}
+  ],
+  "material_and_properties": {
+    "material": "e.g. SAE 1045 steel",
+    "mechanical_properties": {"yield_strength": "...", "hardness": "..."}
+  },
+  "title_block_notes": ["list of textual notes"]
+}
 
-            CRITICAL EXTRACTION PROTOCOL:
-            - Extract ONLY explicitly visible values - NO calculations or derivations unless clearly requested
-            - Preserve exact numeric values, decimal places, and units as displayed
-            - Record dimension symbols (⌀, R, □, ±, ∅) exactly as shown
-            - Mark unclear text as "unclear_text" rather than guessing
-            - Focus on all manufacturing-critical dimensions, tolerances, and specifications
-            - Identify the type of drawing/component first (mechanical part, electrical schematic, architectural plan, etc.)
-
-            COMPREHENSIVE TECHNICAL DRAWING EXTRACTION:
-
-            1. DRAWING IDENTIFICATION & METADATA:
-               - Drawing title/part name - exact text from title block
-               - Drawing number - complete part number or drawing ID
-               - Revision level - current revision letter/number
-               - Date - creation/revision dates
-               - Scale - drawing scale (1:1, 1:2, 2:1, etc.)
-               - Sheet number - current sheet and total sheets
-               - Company/organization name
-               - Drawn by/checked by/approved by signatures
-               - Material specification - exact callout
-               - Standards referenced (ISO, ANSI, DIN, ASME, etc.)
-
-            2. COMPONENT TYPE IDENTIFICATION:
-               - Primary component type (gear, bearing, shaft, housing, bracket, circuit board, etc.)
-               - Secondary features (keyways, splines, threads, holes, slots, etc.)
-               - Assembly or individual part designation
-               - Function description if provided
-
-            3. DIMENSIONAL ANALYSIS:
-               - Overall dimensions (length, width, height, diameter)
-               - Critical functional dimensions
-               - Feature dimensions (hole diameters, thread specifications, groove dimensions)
-               - Reference dimensions (marked with parentheses)
-               - Basic dimensions (marked with rectangles)
-               - Dimension chains and relationships
-
-            4. TOLERANCE SPECIFICATIONS:
-               - Linear tolerances (±0.005, +0.000/-0.005, etc.)
-               - Angular tolerances (±30', ±1°, etc.)
-               - Bilateral and unilateral tolerances
-               - Fit specifications (H7/g6, RC1, LC2, etc.)
-               - General tolerance notes
-               - Special tolerance callouts
-
-            5. GEOMETRIC TOLERANCES (GD&T):
-               - Form tolerances (straightness, flatness, circularity, cylindricity)
-               - Orientation tolerances (perpendicularity, angularity, parallelism)
-               - Location tolerances (position, concentricity, symmetry)
-               - Runout tolerances (circular runout, total runout)
-               - Profile tolerances (line profile, surface profile)
-               - Datum references and datum feature symbols
-               - Material condition modifiers (MMC, LMC, RFS)
-               - Composite tolerances and multiple single-segment tolerances
-
-            6. SURFACE SPECIFICATIONS:
-               - Surface roughness symbols and values (Ra, Rz, Rt)
-               - Surface texture directions and lay patterns
-               - Machining allowances
-               - Coating specifications
-               - Heat treatment requirements
-               - Hardness specifications (HRC, HB, HV)
-
-            7. FEATURE CALLOUTS:
-               - Threaded features (M10x1.5, 1/4-20 UNC, etc.)
-               - Chamfers and fillets (dimensions and angles)
-               - Keyways and keyseats (dimensions and standards)
-               - Splines (tooth count, module, pressure angle)
-               - Knurling specifications (type, pitch, form)
-               - Holes (through, blind, counterbored, countersunk)
-
-            8. SECTION VIEWS AND DETAILS:
-               - Section view identifications (A-A, B-B, etc.)
-               - Section scale if different from main drawing
-               - Detail view callouts and scales
-               - Hidden line conventions
-               - Break line representations
-               - Auxiliary view information
-
-            9. MANUFACTURING NOTES:
-               - Machining operations specified
-               - Assembly instructions
-               - Inspection requirements
-               - Special handling notes
-               - Tool requirements
-               - Finish specifications
-
-            10. TABLES AND SPECIFICATIONS:
-                - Hole tables with coordinates and sizes
-                - Bend tables for sheet metal
-                - Revision history tables
-                - Bill of materials (if present)
-                - Property tables
-                - Specification tables
-            
-            11. GEOMETRIC DECOMPOSITION FOR VOLUME CALCULATION:
-                - Treat the gear as ONE single coherent 3D object
-                - Break it down into fundamental primitives (cylinder, pipe, cuboid, cone, extrusion, etc.)
-                - For gears: include gear blank (cylinder), hub (cylinder), bore (pipe/subtraction), keyways (slot subtraction), teeth (cylindrical/extruded protrusions), chamfers, and fillets
-                - For each primitive: record ALL given dimensions (outer diameter, inner diameter, height/thickness, position, angles, tooth spacing, etc.)
-                - Specify whether each feature is additive (solid material) or subtractive (hole, slot, bore, relief, undercut)
-                - Detail every subtractive feature separately (each hole, keyway, bore step, slot, undercut, relief)
-                - Provide gear tooth-level details if available (tooth count, pitch circle diameter, base circle, root circle, addendum, dedendum, whole depth)
-                - Sequence the shapes in logical order of construction
-                - Ensure ALL geometric features required for exact VOLUME calculation are included
-
-            12. FINAL SHAPE DESCRIPTION:
-                - Provide a plain-text step-by-step explanation of how the 3D gear is formed from primitives
-                - Ensure this description is complete enough to allow accurate 3D volume reconstruction without referring back to the drawing
-
-            ENHANCED UNIVERSAL JSON OUTPUT STRUCTURE:
-            ```json
-            {
-                "drawing_metadata": {
-                    "drawing_type": "mechanical/electrical/architectural/etc",
-                    "component_type": "primary component identification",
-                    "part_name": "exact title from drawing",
-                    "drawing_number": "complete drawing/part number",
-                    "revision": "revision level",
-                    "scale": "drawing scale",
-                    "date_created": "creation date",
-                    "date_revised": "latest revision date",
-                    "sheet_info": "current sheet / total sheets",
-                    "company": "company/organization name",
-                    "drawn_by": "drafter name",
-                    "checked_by": "checker name", 
-                    "approved_by": "approver name",
-                    "material_specification": "exact material callout",
-                    "standards_referenced": ["list of standards mentioned"]
-                },
-                "overall_dimensions": {
-                    "length": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-                    "width": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-                    "height": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-                    "diameter": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-                    "other_critical_dimensions": [
-                        {"feature": "description", "value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown", "location": "where_dimensioned"}
-                    ]
-                },
-                "feature_dimensions": [
-                    {
-                        "feature_type": "hole/thread/groove/chamfer/etc",
-                        "feature_description": "detailed description",
-                        "dimensions": {
-                            "primary": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-                            "secondary": {"value": "if_applicable", "unit": "mm/inch", "tolerance": "if_shown"}
-                        },
-                        "location": {"x": "coordinate", "y": "coordinate", "reference": "datum_or_edge"},
-                        "specification": "thread spec, hole type, etc.",
-                        "quantity": "number of features"
-                    }
-                ],
-                "tolerances": {
-                    "general_tolerances": {
-                        "linear": "±value and unit",
-                        "angular": "±value and unit",
-                        "standard_reference": "ISO 2768-m, etc."
-                    },
-                    "specific_tolerances": [
-                        {"feature": "description", "tolerance": "exact_tolerance", "type": "bilateral/unilateral/limit"}
-                    ]
-                },
-                "geometric_tolerances": [
-                    {
-                        "feature": "feature description",
-                        "tolerance_type": "straightness/flatness/position/etc",
-                        "tolerance_value": "exact_value",
-                        "tolerance_zone": "description",
-                        "datum_references": ["A", "B", "C"],
-                        "material_condition": "MMC/LMC/RFS",
-                        "location": "where_specified_on_drawing"
-                    }
-                ],
-                "surface_specifications": [
-                    {
-                        "feature": "surface description",
-                        "roughness_value": "Ra/Rz value",
-                        "roughness_unit": "micrometers/microinches",
-                        "surface_symbol": "symbol description",
-                        "machining_requirement": "if_specified",
-                        "coating": "if_specified"
-                    }
-                ],
-                "threaded_features": [
-                    {
-                        "thread_specification": "M10x1.5, 1/4-20 UNC, etc.",
-                        "thread_class": "6H, 2B, etc.",
-                        "thread_length": "depth for blind holes",
-                        "location": "position on part",
-                        "quantity": "number of threads"
-                    }
-                ],
-                "section_views": [
-                    {
-                        "section_identifier": "A-A, B-B, DETAIL A, etc.",
-                        "section_scale": "scale if different from main",
-                        "section_type": "full section/half section/offset section/detail",
-                        "cutting_plane_location": "where section is taken",
-                        "dimensions_shown": [
-                            {"feature": "description", "value": "exact_value", "unit": "unit", "tolerance": "if_shown"}
-                        ]
-                    }
-                ],
-                "manufacturing_notes": [
-                    {
-                        "note_text": "exact text of note",
-                        "note_type": "machining/assembly/inspection/general",
-                        "applies_to": "which features the note applies to",
-                        "location_on_drawing": "where note is positioned"
-                    }
-                ],
-                "tables_and_data": [
-                    {
-                        "table_type": "hole table/bend table/revision history/etc",
-                        "table_title": "exact table title",
-                        "column_headers": ["list of column headers"],
-                        "table_data": [
-                            {"column1": "value1", "column2": "value2", "etc": "etc"}
-                        ]
-                    }
-                ],
-                "material_and_treatment": {
-                    "base_material": "exact material specification",
-                    "heat_treatment": "treatment specification if shown",
-                    "hardness_requirement": "hardness specification if shown",
-                    "coating": "coating specification if shown",
-                    "finish": "surface finish requirements"
-                },
-                "quality_requirements": {
-                    "inspection_requirements": ["list of inspection callouts"],
-                    "critical_dimensions": ["list of dimensions marked as critical"],
-                    "functional_requirements": ["any functional specifications noted"]
-                },
-                "geometric_decomposition": {
-                    "base_shapes": [
-                        {
-                            "shape_type": "cylinder/pipe/etc",
-                            "description": "gear blank / hub / teeth",
-                            "dimensions": {"outer_diameter": "...", "inner_diameter": "...", "height": "..."},
-                            "position": "axial/centered/etc",
-                            "additive_or_subtractive": "additive"
-                        }
-                    ],
-                    "subtracted_features": [
-                        {
-                            "feature_type": "bore/keyway/hole/etc",
-                            "shape": "pipe/slot/etc",
-                            "quantity": "number of features",
-                            "dimensions": {"diameter": "...", "depth": "...", "width": "..."},
-                            "location": "center/radial position",
-                            "additive_or_subtractive": "subtractive"
-                        }
-                    ],
-                    "final_shape_description": "Plain-text step-by-step description of gear construction"
-                    
-                }
-            ```
-            PRECISION REQUIREMENTS:
-            - Record ALL visible text exactly as written
-            - Capture ALL dimension values with exact decimal precision shown
-            - Extract ALL tolerance notations in their complete form
-            - Record ALL symbols and special characters exactly
-            - Note ALL line types and their meanings (hidden, center, dimension, etc.)
-            - Capture ALL notes, regardless of size or location
-            - Extract ALL coordinate dimensions and their reference points
-            - Record ALL view relationships and section indicators
-
-            ADAPTIVE ANALYSIS:
-            - If this is a mechanical part: focus on machining dimensions, fits, tolerances
-            - If this is an electrical drawing: focus on component values, connections, specifications  
-            - If this is an architectural plan: focus on room dimensions, annotations, scales
-            - If this is a civil/structural drawing: focus on structural dimensions, materials, load specifications
-            - If this contains multiple drawing types: analyze each appropriately
-
-            This analysis is for precision manufacturing/construction - extract every technical detail visible for production, machining, assembly, and quality control purposes.
-            
-            Respond ONLY with the JSON structure, no additional text or formatting.
-            """
+VOLUME CALCULATION INSTRUCTIONS:
+- For cylinders: use π × r² × h (where r = diameter/2)
+- For rectangular shapes: use length × width × height
+- For complex profiles: use appropriate geometric approximations
+- For holes/bores: calculate as cylinders
+- For keyways: calculate as rectangular slots
+- Always show the actual calculation with numbers substituted
+- Calculate both original and tolerance-adjusted volumes
+- Show the volume difference due to tolerance
+"""
             
             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path)
             logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, Image: {input_token_info['image_tokens']}, Total: {input_token_info['total_input_tokens']}")

@@ -1,0 +1,220 @@
+{
+  "task_id": "91fa0889-008d-4240-8737-c20ae84232c9",
+  "filename": "91fa0889-008d-4240-8737-c20ae84232c9_image (5).png",
+  "file_size": 169251,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "Transmission Gear Detail",
+      "part_name": "TRANSMISSION GEAR",
+      "drawing_number": "18"
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": "2.625",
+        "unit": "inches"
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": "4.000",
+        "unit": "inches"
+      }
+    },
+    "geometric_decomposition": {
+      "tolerance_applied": {
+        "value": 4,
+        "unit": "mm"
+      },
+      "base_shapes": [
+        {
+          "shape_type": "Cylinder",
+          "dimensions": {
+            "diameter": {
+              "value": "4.000",
+              "unit": "inches"
+            },
+            "length": {
+              "value": "2.625",
+              "unit": "inches"
+            }
+          },
+          "diameter_with_tolerance": {
+            "value": "4.15748",
+            "unit": "inches"
+          },
+          "length_with_tolerance": {
+            "value": "2.78248",
+            "unit": "inches"
+          },
+          "volume": {
+            "value": "32.987",
+            "unit": "cubic inches"
+          },
+          "volume_with_tolerance": {
+            "value": "37.769",
+            "unit": "cubic inches"
+          }
+        }
+      ],
+      "subtracted_features": [
+        {
+          "feature_type": "Cylindrical Bore",
+          "dimensions": {
+            "diameter": {
+              "value": "1.500",
+              "unit": "inches"
+            },
+            "depth": {
+              "value": "2.625",
+              "unit": "inches"
+            }
+          },
+          "diameter_with_tolerance": {
+            "value": "1.65748",
+            "unit": "inches"
+          },
+          "depth_with_tolerance": {
+            "value": "2.78248",
+            "unit": "inches"
+          },
+          "volume": {
+            "value": "4.637",
+            "unit": "cubic inches"
+          },
+          "volume_with_tolerance": {
+            "value": "5.999",
+            "unit": "cubic inches"
+          }
+        },
+        {
+          "feature_type": "Rectangular Keyway",
+          "dimensions": {
+            "width": {
+              "value": "0.192",
+              "unit": "inches"
+            },
+            "depth": {
+              "value": "0.096",
+              "unit": "inches"
+            },
+            "length": {
+              "value": "2.625",
+              "unit": "inches"
+            }
+          },
+          "width_with_tolerance": {
+            "value": "0.34948",
+            "unit": "inches"
+          },
+          "depth_with_tolerance": {
+            "value": "0.25348",
+            "unit": "inches"
+          },
+          "length_with_tolerance": {
+            "value": "2.78248",
+            "unit": "inches"
+          },
+          "volume": {
+            "value": "0.048",
+            "unit": "cubic inches"
+          },
+          "volume_with_tolerance": {
+            "value": "0.246",
+            "unit": "cubic inches"
+          }
+        },
+        {
+          "feature_type": "Annular Recess",
+          "dimensions": {
+            "outer_diameter": {
+              "value": "2.000",
+              "unit": "inches"
+            },
+            "inner_diameter": {
+              "value": "1.500",
+              "unit": "inches"
+            },
+            "depth": {
+              "value": "0.9065",
+              "unit": "inches"
+            }
+          },
+          "outer_diameter_with_tolerance": {
+            "value": "2.15748",
+            "unit": "inches"
+          },
+          "inner_diameter_with_tolerance": {
+            "value": "1.65748",
+            "unit": "inches"
+          },
+          "depth_with_tolerance": {
+            "value": "1.06398",
+            "unit": "inches"
+          },
+          "volume": {
+            "value": "2.494",
+            "unit": "cubic inches"
+          },
+          "volume_with_tolerance": {
+            "value": "3.190",
+            "unit": "cubic inches"
+          }
+        },
+        {
+          "feature_type": "Gear Teeth",
+          "dimensions": {
+            "number_of_teeth": {
+              "value": "32",
+              "unit": "count"
+            },
+            "pitch_diameter": {
+              "value": "3.500",
+              "unit": "inches"
+            },
+            "outer_diameter": {
+              "value": "4.000",
+              "unit": "inches"
+            },
+            "tooth_profile_radius_1": {
+              "value": "2.125",
+              "unit": "inches"
+            },
+            "tooth_profile_radius_2": {
+              "value": "2.375",
+              "unit": "inches"
+            },
+            "tooth_root_radius_1": {
+              "value": "0.500",
+              "unit": "inches"
+            },
+            "tooth_root_radius_2": {
+              "value": "0.380",
+              "unit": "inches"
+            }
+          },
+          "volume": null,
+          "volume_with_tolerance": null
+        }
+      ]
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 252,
+        "image_tokens": 516,
+        "total_input_tokens": 768
+      },
+      "output_tokens": 1487,
+      "output_token_limit": 16384,
+      "total_tokens": 2255,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 1430,
+        "height": 544,
+        "total_pixels": 777920,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-23T18:14:17.974864"
+}
