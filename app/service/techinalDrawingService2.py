@@ -1806,21 +1806,265 @@ class TechnicalDrawingExtractionService:
 
             # Simplified prompt to reduce token usage
             PROMPT = """
-            You are an expert in technical drawings. Extract data into JSON per this schema:
+            You are an expert engineering drawing analysis system with comprehensive knowledge of technical drawings, engineering standards (ISO, ANSI, DIN, ASME), GD&T (Geometric Dimensioning and Tolerancing), manufacturing processes, and precision measurement. Analyze this technical drawing with absolute precision and extract ALL visible specifications and information.
+ 
+            CRITICAL EXTRACTION PROTOCOL:
+            - Extract ONLY explicitly visible values - NO calculations or derivations unless clearly requested
+            - Preserve exact numeric values, decimal places, and units as displayed
+            - Record dimension symbols (⌀, R, □, ±, ∅) exactly as shown
+            - Mark unclear text as "unclear_text" rather than guessing
+            - Focus on all manufacturing-critical dimensions, tolerances, and specifications
+            - Identify the type of drawing/component first (mechanical part, electrical schematic, architectural plan, etc.)
+            - All drawings in the drawing refers to the same mechenical part (eg. Gear)
+ 
+            COMPREHENSIVE TECHNICAL DRAWING EXTRACTION:
+ 
+            1. DRAWING IDENTIFICATION & METADATA:
+               - Drawing title/part name - exact text from title block
+               - Drawing number - complete part number or drawing ID
+               - Revision level - current revision letter/number
+               - Date - creation/revision dates
+               - Scale - drawing scale (1:1, 1:2, 2:1, etc.)
+               - Sheet number - current sheet and total sheets
+               - Company/organization name
+               - Drawn by/checked by/approved by signatures
+               - Material specification - exact callout
+               - Standards referenced (ISO, ANSI, DIN, ASME, etc.)
+ 
+            2. COMPONENT TYPE IDENTIFICATION:
+               - Primary component type (gear, bearing, shaft, housing, bracket, circuit board, etc.)
+               - Secondary features (keyways, splines, threads, holes, slots, etc.)
+               - Assembly or individual part designation
+               - Function description if provided
+ 
+            3. DIMENSIONAL ANALYSIS:
+               - Overall dimensions (length, width, height, diameter)
+               - Critical functional dimensions
+               - Feature dimensions (hole diameters, thread specifications, groove dimensions)
+               - Reference dimensions (marked with parentheses)
+               - Basic dimensions (marked with rectangles)
+               - Dimension chains and relationships
+ 
+            4. TOLERANCE SPECIFICATIONS:
+               - Linear tolerances (±0.005, +0.000/-0.005, etc.)
+               - Angular tolerances (±30', ±1°, etc.)
+               - Bilateral and unilateral tolerances
+               - Fit specifications (H7/g6, RC1, LC2, etc.)
+               - General tolerance notes
+               - Special tolerance callouts
+ 
+            5. GEOMETRIC TOLERANCES (GD&T):
+               - Form tolerances (straightness, flatness, circularity, cylindricity)
+               - Orientation tolerances (perpendicularity, angularity, parallelism)
+               - Location tolerances (position, concentricity, symmetry)
+               - Runout tolerances (circular runout, total runout)
+               - Profile tolerances (line profile, surface profile)
+               - Datum references and datum feature symbols
+               - Material condition modifiers (MMC, LMC, RFS)
+               - Composite tolerances and multiple single-segment tolerances
+ 
+            6. SURFACE SPECIFICATIONS:
+               - Surface roughness symbols and values (Ra, Rz, Rt)
+               - Surface texture directions and lay patterns
+               - Machining allowances
+               - Coating specifications
+               - Heat treatment requirements
+               - Hardness specifications (HRC, HB, HV)
+ 
+            7. FEATURE CALLOUTS:
+               - Threaded features (M10x1.5, 1/4-20 UNC, etc.)
+               - Chamfers and fillets (dimensions and angles)
+               - Keyways and keyseats (dimensions and standards)
+               - Splines (tooth count, module, pressure angle)
+               - Knurling specifications (type, pitch, form)
+               - Holes (through, blind, counterbored, countersunk)
+ 
+            8. SECTION VIEWS AND DETAILS:
+               - Section view identifications (A-A, B-B, etc.)
+               - Section scale if different from main drawing
+               - Detail view callouts and scales
+               - Hidden line conventions
+               - Break line representations
+               - Auxiliary view information
+ 
+            9. MANUFACTURING NOTES:
+               - Machining operations specified
+               - Assembly instructions
+               - Inspection requirements
+               - Special handling notes
+               - Tool requirements
+               - Finish specifications
+ 
+            10. TABLES AND SPECIFICATIONS:
+                - Hole tables with coordinates and sizes
+                - Bend tables for sheet metal
+                - Revision history tables
+                - Bill of materials (if present)
+                - Property tables
+                - Specification tables
+
+            11. GEOMETRIC DECOMPOSITION:
+                - Identify the primary 3D geometric shape that the entire object fits into (cube, cuboid, cylinder, pipe, etc.)
+                - Only give the name of the shape - no additional explanation.
+                - Give exact dimensions of this primary shape (length, width, height, diameter, etc.) with units.
+                - If the object is a combination of multiple primary shapes identify a shape that most closely resembles the overall object.
+ 
+            ENHANCED UNIVERSAL JSON OUTPUT STRUCTURE:
+            ```json
             {
-                "drawing_metadata": {"drawing_type": "...", "part_name": "...", "drawing_number": "..."},
-                "overall_dimensions": {"length": {"value": "...", "unit": "..."}, "width": {...}, "height": {...}, "diameter": {...}},
+                "drawing_metadata": {
+                    "drawing_type": "mechanical/electrical/architectural/etc",
+                    "component_type": "primary component identification",
+                    "part_name": "exact title from drawing",
+                    "drawing_number": "complete drawing/part number",
+                    "revision": "revision level",
+                    "scale": "drawing scale",
+                    "date_created": "creation date",
+                    "date_revised": "latest revision date",
+                    "sheet_info": "current sheet / total sheets",
+                    "company": "company/organization name",
+                    "drawn_by": "drafter name",
+                    "checked_by": "checker name",
+                    "approved_by": "approver name",
+                    "material_specification": "exact material callout",
+                    "standards_referenced": ["list of standards mentioned"]
+                },
+                "overall_dimensions": {
+                    "length": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "width": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "height": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "diameter": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "other_critical_dimensions": [
+                        {"feature": "description", "value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown", "location": "where_dimensioned"}
+                    ]
+                },
+                "feature_dimensions": [
+                    {
+                        "feature_type": "hole/thread/groove/chamfer/etc",
+                        "feature_description": "detailed description",
+                        "dimensions": {
+                            "primary": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                            "secondary": {"value": "if_applicable", "unit": "mm/inch", "tolerance": "if_shown"}
+                        },
+                        "location": {"x": "coordinate", "y": "coordinate", "reference": "datum_or_edge"},
+                        "specification": "thread spec, hole type, etc.",
+                        "quantity": "number of features"
+                    }
+                ],
+                "tolerances": {
+                    "general_tolerances": {
+                        "linear": "±value and unit",
+                        "angular": "±value and unit",
+                        "standard_reference": "ISO 2768-m, etc."
+                    },
+                    "specific_tolerances": [
+                        {"feature": "description", "tolerance": "exact_tolerance", "type": "bilateral/unilateral/limit"}
+                    ]
+                },
+                "geometric_tolerances": [
+                    {
+                        "feature": "feature description",
+                        "tolerance_type": "straightness/flatness/position/etc",
+                        "tolerance_value": "exact_value",
+                        "tolerance_zone": "description",
+                        "datum_references": ["A", "B", "C"],
+                        "material_condition": "MMC/LMC/RFS",
+                        "location": "where_specified_on_drawing"
+                    }
+                ],
+                "surface_specifications": [
+                    {
+                        "feature": "surface description",
+                        "roughness_value": "Ra/Rz value",
+                        "roughness_unit": "micrometers/microinches",
+                        "surface_symbol": "symbol description",
+                        "machining_requirement": "if_specified",
+                        "coating": "if_specified"
+                    }
+                ],
+                "threaded_features": [
+                    {
+                        "thread_specification": "M10x1.5, 1/4-20 UNC, etc.",
+                        "thread_class": "6H, 2B, etc.",
+                        "thread_length": "depth for blind holes",
+                        "location": "position on part",
+                        "quantity": "number of threads"
+                    }
+                ],
+                "section_views": [
+                    {
+                        "section_identifier": "A-A, B-B, DETAIL A, etc.",
+                        "section_scale": "scale if different from main",
+                        "section_type": "full section/half section/offset section/detail",
+                        "cutting_plane_location": "where section is taken",
+                        "dimensions_shown": [
+                            {"feature": "description", "value": "exact_value", "unit": "unit", "tolerance": "if_shown"}
+                        ]
+                    }
+                ],
+                "manufacturing_notes": [
+                    {
+                        "note_text": "exact text of note",
+                        "note_type": "machining/assembly/inspection/general",
+                        "applies_to": "which features the note applies to",
+                        "location_on_drawing": "where note is positioned"
+                    }
+                ],
+                "tables_and_data": [
+                    {
+                        "table_type": "hole table/bend table/revision history/etc",
+                        "table_title": "exact table title",
+                        "column_headers": ["list of column headers"],
+                        "table_data": [
+                            {"column1": "value1", "column2": "value2", "etc": "etc"}
+                        ]
+                    }
+                ],
+                "material_and_treatment": {
+                    "base_material": "exact material specification",
+                    "heat_treatment": "treatment specification if shown",
+                    "hardness_requirement": "hardness specification if shown",
+                    "coating": "coating specification if shown",
+                    "finish": "surface finish requirements"
+                },
+                "quality_requirements": {
+                    "inspection_requirements": ["list of inspection callouts"],
+                    "critical_dimensions": ["list of dimensions marked as critical"],
+                    "functional_requirements": ["any functional specifications noted"]
+                },
                 "geometric_decomposition": {
-                    "tolerance_applied": {"value": 4, "unit": "mm"},
-                    "base_shapes": [{"shape_type": "...", "dimensions": {"length": "...", "length_with_tolerance": "...+4"}, "volume": {...}}],
-                    "subtracted_features": [{"feature_type": "...", "dimensions": {"depth": "...", "depth_with_tolerance": "...+4"}, "volume": {...}}]
-                }
+                    "3d shape": "primary geometric shape (cube, cuboid, cylinder, pipe etc.)",
+                    "dimentions": {"length": {"value": "exact_value", "unit": "mm/inch"}, 
+                                    "width": {"value": "exact_value", "unit": "mm/inch"}, 
+                                    "height": {"value": "exact_value", "unit": "mm/inch"}, 
+                                    "diameter": {"value": "exact_value", "unit": "mm/inch"},
+                                    ... etc. }
+                    }
+
             }
-            - Use null for missing data.
-            - Apply +4mm tolerance to all dimensions.
-            - Calculate volumes (cylinders: π × r² × h, rectangles: l × w × h).
-            - Respond with valid JSON only.
+            ```
+ 
+            PRECISION REQUIREMENTS:
+            - Record ALL visible text exactly as written
+            - Capture ALL dimension values with exact decimal precision shown
+            - Extract ALL tolerance notations in their complete form
+            - Record ALL symbols and special characters exactly
+            - Note ALL line types and their meanings (hidden, center, dimension, etc.)
+            - Capture ALL notes, regardless of size or location
+            - Extract ALL coordinate dimensions and their reference points
+            - Record ALL view relationships and section indicators
+ 
+            ADAPTIVE ANALYSIS:
+            - If this is a mechanical part: focus on machining dimensions, fits, tolerances
+            - If this is an electrical drawing: focus on component values, connections, specifications  
+            - If this is an architectural plan: focus on room dimensions, annotations, scales
+            - If this is a civil/structural drawing: focus on structural dimensions, materials, load specifications
+            - If this contains multiple drawing types: analyze each appropriately
+ 
+            This analysis is for precision manufacturing/construction - extract every technical detail visible for production, machining, assembly, and quality control purposes.
             """
+           
+ 
 
             # Preprocess image with additional simplification
             image_path = self.preprocess_image(image_path, output_path=f"simplified_{os.path.basename(image_path)}")
