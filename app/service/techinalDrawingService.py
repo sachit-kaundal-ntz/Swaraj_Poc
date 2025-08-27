@@ -201,7 +201,7 @@ class TechnicalDrawingExtractionService:
                - material_specification: material callout
                - standards_referenced: [] (JSON array)
 
-            2. OVERALL DIMENSIONS:
+            2. OVERALL DIMENSIONS: 
                - length, width, height, diameter: {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"}
                - other_critical_dimensions: [{"feature": "description", "value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown", "location": "where_dimensioned"}]
 
