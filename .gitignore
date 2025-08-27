@@ -6,3 +6,5 @@ output
 uploads
 logs
 venv/
+outputs
+newoutput 

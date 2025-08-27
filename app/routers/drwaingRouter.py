@@ -16,20 +16,16 @@ from typing import Optional, Tuple
 
 logger = get_logger(__name__)
  
-# Initialize router
 router = APIRouter(prefix="/api/google", tags=["GOOGLE Technical Drawings"])
  
-# Initialize service (no database required)
 drawing_service = TechnicalDrawingExtractionService()
  
-# Configuration
 UPLOAD_DIR = "uploads/drawings"
 OUTPUT_DIR = "outputs/drawings"
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  
 MIN_FILE_SIZE = 1 * 1024 * 1024
  
-# Ensure directories exist
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
  
@@ -74,7 +70,6 @@ async def upload_technical_drawing(
     db: Session = Depends(get_db)
 ):
     try:
-        # Validate basic file properties
         if not file.filename:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -88,7 +83,6 @@ async def upload_technical_drawing(
                 detail=error_message
             )
 
-        # Read file content and validate size
         content = await file.read()
         file_size = len(content)
         
@@ -103,14 +97,11 @@ async def upload_technical_drawing(
                 detail=f"File too large. Maximum size: {MAX_FILE_SIZE/1024/1024}MB"
             )
 
-        # Generate unique task ID
         task_id = str(uuid.uuid4())
         file_path = os.path.join(UPLOAD_DIR, f"{task_id}_{file.filename}")
 
-        # Ensure upload directory exists
         os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-        # Save file
         try:
             with open(file_path, "wb") as f:
                 f.write(content)
@@ -120,11 +111,9 @@ async def upload_technical_drawing(
                 detail=f"Could not save file: {str(e)}"
             )
 
-        # Create output directory
         task_output_dir = os.path.join(OUTPUT_DIR, task_id)
         os.makedirs(task_output_dir, exist_ok=True)
 
-        # Add background task with error handling for token limit
         try:
             background_tasks.add_task(
                 process_drawing_background,
@@ -152,7 +141,6 @@ async def upload_technical_drawing(
         )
 
     except HTTPException as he:
-        # Handle token limit exceeded specifically
         if he.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE:
             logger.error(f"Token limit exceeded for file {file.filename}")
         raise he
