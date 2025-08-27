@@ -7,12 +7,10 @@ from typing import Optional, List
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Query, Depends, status, Body
 from fastapi.responses import FileResponse
 from pathlib import Path
-from requests import Session
 from app.schemas.drawingSchema import DrawingProcessingResult, DrawingProcessingStatus, DrawingUploadResponse
 from app.service.techinalDrawingService2 import TechnicalDrawingExtractionService
 from app.service.volume_calculation_service import extract_dimensions_and_calculate_volumes, calculate_net_volume
 from app.log.logger import get_logger
-from app.database.db import get_db
 from typing import Optional, Tuple
 from app.service.volume_calculation_service import (
     extract_dimensions_and_calculate_volumes, 
@@ -80,8 +78,7 @@ async def process_drawing_background(task_id: str, file_path: str, output_dir: s
 @router.post("/upload", response_model=DrawingUploadResponse)
 async def upload_technical_drawing(
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    file: UploadFile = File(...)
 ):
     try:
         # Validate basic file properties
@@ -140,8 +137,7 @@ async def upload_technical_drawing(
                 process_drawing_background,
                 task_id,
                 file_path,
-                task_output_dir,
-                db
+                task_output_dir
             )
         except ValueError as e:
             if "Token limit exceeded" in str(e):
