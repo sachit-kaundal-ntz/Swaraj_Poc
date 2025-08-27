@@ -1,14 +1,15 @@
-
 # import os
 # import uuid
 # import json
 # import csv
 # import traceback
+# import re
 # from datetime import datetime
 # from dotenv import load_dotenv
 # import google.generativeai as genai
+# from google.generativeai import types
 # from typing import Dict, List, Optional, Any
-# from PIL import Image
+# from PIL import Image, ImageEnhance
 # import base64
 # import io
 # from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +22,8 @@
  
 # class TechnicalDrawingExtractionService:
 #     MAX_ALLOWED_INPUT_TOKENS = 10000  # Input token limit
-#     MAX_ALLOWED_OUTPUT_TOKENS = 8000
+#     MAX_ALLOWED_OUTPUT_TOKENS = 8192
+    
 #     def __init__(self):
 #         self.processed_files = {}  
    
@@ -38,6 +40,176 @@
 #             text = text.encode('ascii', errors='ignore').decode('ascii')
        
 #         return text.strip()
+    
+#     def sanitize_for_json(self, obj: Any) -> Any:
+#         """Recursively convert sets to lists and ensure JSON-serializable output."""
+#         if isinstance(obj, set):
+#             return sorted(list(obj))
+#         elif isinstance(obj, dict):
+#             return {k: self.sanitize_for_json(v) for k, v in obj.items()}
+#         elif isinstance(obj, list):
+#             return [self.sanitize_for_json(item) for item in obj]
+#         elif isinstance(obj, tuple):
+#             return [self.sanitize_for_json(item) for item in obj]
+#         else:
+#             return obj
+    
+#     def preprocess_image(self, image_path: str, output_path: str = None) -> str:
+#         """Preprocess image to reduce noise and safety filter triggers."""
+#         try:
+#             with Image.open(image_path) as img:
+#                 logger.info(f"Original image dimensions: {img.size}, format: {img.format}")
+#                 # Convert to grayscale
+#                 img = img.convert("L")
+#                 # Increase contrast
+#                 enhancer = ImageEnhance.Contrast(img)
+#                 img = enhancer.enhance(2.0)
+#                 # Sharpen image
+#                 enhancer = ImageEnhance.Sharpness(img)
+#                 img = enhancer.enhance(2.0)
+#                 # Removed Gaussian Blur to preserve text clarity
+#                 if output_path is None:
+#                     output_path = f"preprocessed_{os.path.basename(image_path)}"
+#                 img.save(output_path)
+#                 logger.info(f"Preprocessed image saved to: {output_path}, dimensions: {img.size}, format: {img.format}")
+#                 return output_path
+#         except Exception as e:
+#             logger.error(f"Image preprocessing failed: {str(e)}")
+#             return image_path
+
+#     def attempt_fix_json(self, text: str) -> str:
+#         """Attempt to fix incomplete JSON."""
+#         try:
+#             text = text.rstrip(',')
+#             open_braces = text.count('{')
+#             close_braces = text.count('}')
+#             open_brackets = text.count('[')
+#             close_brackets = text.count(']')
+#             for _ in range(open_brackets - close_brackets):
+#                 text += ']'
+#             for _ in range(open_braces - close_braces):
+#                 text += '}'
+#             if text.count('"') % 2 == 1:
+#                 text += '"'
+#             return text
+#         except Exception as e:
+#             logger.warning(f"Failed to fix JSON: {str(e)}")
+#             return text
+
+#     def validate_and_fix_json(self, json_text: str) -> str:
+#         """Validate and attempt to fix common JSON issues"""
+#         try:
+#             # Clean the text first
+#             json_text = self.clean_text(json_text)
+            
+#             # Remove markdown code fences if present
+#             if json_text.startswith("```json"):
+#                 json_text = json_text[7:].strip()
+#             elif json_text.startswith("```"):
+#                 json_text = json_text[3:].strip()
+            
+#             if json_text.endswith("```"):
+#                 json_text = json_text[:-3].strip()
+            
+#             # Try to parse as-is first
+#             try:
+#                 json.loads(json_text)
+#                 return json_text
+#             except json.JSONDecodeError:
+#                 pass
+            
+#             # Common fixes
+#             # 1. Fix unterminated strings by finding unmatched quotes
+#             fixed_text = self._fix_unterminated_strings(json_text)
+            
+#             # 2. Fix missing closing braces/brackets
+#             fixed_text = self._fix_missing_brackets(fixed_text)
+            
+#             # 3. Remove trailing commas
+#             fixed_text = self._remove_trailing_commas(fixed_text)
+            
+#             # 4. Fix control characters
+#             fixed_text = self._fix_control_characters(fixed_text)
+            
+#             # Test the fixed version
+#             json.loads(fixed_text)
+#             return fixed_text
+            
+#         except Exception as e:
+#             logger.warning(f"JSON validation/fix failed: {str(e)}")
+#             # If all fixes fail, return a minimal valid JSON with error info
+#             return json.dumps({
+#                 "error": "JSON parsing failed - response was malformed",
+#                 "original_error": str(e),
+#                 "partial_response": json_text[:500] + "..." if len(json_text) > 500 else json_text
+#             })
+    
+#     def _fix_unterminated_strings(self, text: str) -> str:
+#         """Fix unterminated strings in JSON"""
+#         try:
+#             lines = text.split('\n')
+#             fixed_lines = []
+            
+#             for line in lines:
+#                 # Find strings that start with quote but don't end with quote
+#                 if line.count('"') % 2 == 1:  # Odd number of quotes
+#                     # Find the last quote and check if it's escaped
+#                     last_quote_pos = line.rfind('"')
+#                     if last_quote_pos > 0 and line[last_quote_pos-1] != '\\':
+#                         # Add closing quote at end of line (before any trailing comma/brace)
+#                         line = line.rstrip()
+#                         if line.endswith(',') or line.endswith('}') or line.endswith(']'):
+#                             line = line[:-1] + '"' + line[-1]
+#                         else:
+#                             line = line + '"'
+                
+#                 fixed_lines.append(line)
+            
+#             return '\n'.join(fixed_lines)
+#         except Exception:
+#             return text
+    
+#     def _fix_missing_brackets(self, text: str) -> str:
+#         """Fix missing closing brackets/braces"""
+#         try:
+#             # Count opening and closing brackets
+#             open_braces = text.count('{')
+#             close_braces = text.count('}')
+#             open_brackets = text.count('[')
+#             close_brackets = text.count(']')
+            
+#             # Add missing closing braces
+#             while close_braces < open_braces:
+#                 text += '}'
+#                 close_braces += 1
+            
+#             # Add missing closing brackets
+#             while close_brackets < open_brackets:
+#                 text += ']'
+#                 close_brackets += 1
+            
+#             return text
+#         except Exception:
+#             return text
+    
+#     def _remove_trailing_commas(self, text: str) -> str:
+#         """Remove trailing commas that make JSON invalid"""
+#         try:
+#             # Remove commas before closing braces/brackets
+#             text = re.sub(r',\s*}', '}', text)
+#             text = re.sub(r',\s*]', ']', text)
+#             return text
+#         except Exception:
+#             return text
+    
+#     def _fix_control_characters(self, text: str) -> str:
+#         """Fix control characters that break JSON parsing"""
+#         try:
+#             # Remove or escape problematic control characters
+#             text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+#             return text
+#         except Exception:
+#             return text
  
 #     def count_tokens_accurate(self, text: str) -> int:
 #         """
@@ -143,298 +315,37 @@
 #             logger.error(f"Failed to upload image to Gemini: {str(e)}")
 #             logger.error(f"Traceback: {traceback.format_exc()}")
 #             raise Exception(f"Image upload failed: {str(e)}")
- 
-
 #     async def extract_technical_drawing_data(self, image_path: str) -> Dict:
-#         """Extract technical drawing data from image using Gemini - Universal Version"""
+#         """Extract technical drawing data from image using Gemini."""
 #         try:
 #             logger.info(f"Starting technical drawing extraction for: {image_path}")
-           
+
+#             # Simplified prompt to reduce token usage
 #             PROMPT = """
-#             You are an expert engineering drawing analysis system with comprehensive knowledge of technical drawings, engineering standards (ISO, ANSI, DIN, ASME), GD&T (Geometric Dimensioning and Tolerancing), manufacturing processes, and precision measurement. Analyze this technical drawing with absolute precision and extract ALL visible specifications and information.
-
-#             CRITICAL EXTRACTION PROTOCOL:
-#             - Extract ONLY explicitly visible values - NO calculations or derivations unless clearly requested
-#             - Preserve exact numeric values, decimal places, and units as displayed
-#             - Record dimension symbols (⌀, R, □, ±, ∅) exactly as shown
-#             - Mark unclear text as "unclear_text" rather than guessing
-#             - Focus on all manufacturing-critical dimensions, tolerances, and specifications
-#             - Identify the type of drawing/component first (mechanical part, electrical schematic, architectural plan, etc.)
-
-#             COMPREHENSIVE TECHNICAL DRAWING EXTRACTION:
-
-#             1. DRAWING IDENTIFICATION & METADATA:
-#                - Drawing title/part name - exact text from title block
-#                - Drawing number - complete part number or drawing ID
-#                - Revision level - current revision letter/number
-#                - Date - creation/revision dates
-#                - Scale - drawing scale (1:1, 1:2, 2:1, etc.)
-#                - Sheet number - current sheet and total sheets
-#                - Company/organization name
-#                - Drawn by/checked by/approved by signatures
-#                - Material specification - exact callout
-#                - Standards referenced (ISO, ANSI, DIN, ASME, etc.)
-
-#             2. COMPONENT TYPE IDENTIFICATION:
-#                - Primary component type (gear, bearing, shaft, housing, bracket, circuit board, etc.)
-#                - Secondary features (keyways, splines, threads, holes, slots, etc.)
-#                - Assembly or individual part designation
-#                - Function description if provided
-
-#             3. DIMENSIONAL ANALYSIS:
-#                - Overall dimensions (length, width, height, diameter)
-#                - Critical functional dimensions
-#                - Feature dimensions (hole diameters, thread specifications, groove dimensions)
-#                - Reference dimensions (marked with parentheses)
-#                - Basic dimensions (marked with rectangles)
-#                - Dimension chains and relationships
-
-#             4. TOLERANCE SPECIFICATIONS:
-#                - Linear tolerances (±0.005, +0.000/-0.005, etc.)
-#                - Angular tolerances (±30', ±1°, etc.)
-#                - Bilateral and unilateral tolerances
-#                - Fit specifications (H7/g6, RC1, LC2, etc.)
-#                - General tolerance notes
-#                - Special tolerance callouts
-
-#             5. GEOMETRIC TOLERANCES (GD&T):
-#                - Form tolerances (straightness, flatness, circularity, cylindricity)
-#                - Orientation tolerances (perpendicularity, angularity, parallelism)
-#                - Location tolerances (position, concentricity, symmetry)
-#                - Runout tolerances (circular runout, total runout)
-#                - Profile tolerances (line profile, surface profile)
-#                - Datum references and datum feature symbols
-#                - Material condition modifiers (MMC, LMC, RFS)
-#                - Composite tolerances and multiple single-segment tolerances
-
-#             6. SURFACE SPECIFICATIONS:
-#                - Surface roughness symbols and values (Ra, Rz, Rt)
-#                - Surface texture directions and lay patterns
-#                - Machining allowances
-#                - Coating specifications
-#                - Heat treatment requirements
-#                - Hardness specifications (HRC, HB, HV)
-
-#             7. FEATURE CALLOUTS:
-#                - Threaded features (M10x1.5, 1/4-20 UNC, etc.)
-#                - Chamfers and fillets (dimensions and angles)
-#                - Keyways and keyseats (dimensions and standards)
-#                - Splines (tooth count, module, pressure angle)
-#                - Knurling specifications (type, pitch, form)
-#                - Holes (through, blind, counterbored, countersunk)
-
-#             8. SECTION VIEWS AND DETAILS:
-#                - Section view identifications (A-A, B-B, etc.)
-#                - Section scale if different from main drawing
-#                - Detail view callouts and scales
-#                - Hidden line conventions
-#                - Break line representations
-#                - Auxiliary view information
-
-#             9. MANUFACTURING NOTES:
-#                - Machining operations specified
-#                - Assembly instructions
-#                - Inspection requirements
-#                - Special handling notes
-#                - Tool requirements
-#                - Finish specifications
-
-#             10. TABLES AND SPECIFICATIONS:
-#                 - Hole tables with coordinates and sizes
-#                 - Bend tables for sheet metal
-#                 - Revision history tables
-#                 - Bill of materials (if present)
-#                 - Property tables
-#                 - Specification tables
-            
-#             11. GEOMETRIC DECOMPOSITION FOR VOLUME CALCULATION:
-#                 - Treat the gear as ONE single coherent 3D object
-#                 - Break it down into fundamental primitives (cylinder, pipe, cuboid, cone, extrusion, etc.)
-#                 - For gears: include gear blank (cylinder), hub (cylinder), bore (pipe/subtraction), keyways (slot subtraction), teeth (cylindrical/extruded protrusions), chamfers, and fillets
-#                 - For each primitive: record ALL given dimensions (outer diameter, inner diameter, height/thickness, position, angles, tooth spacing, etc.)
-#                 - Specify whether each feature is additive (solid material) or subtractive (hole, slot, bore, relief, undercut)
-#                 - Detail every subtractive feature separately (each hole, keyway, bore step, slot, undercut, relief)
-#                 - Provide gear tooth-level details if available (tooth count, pitch circle diameter, base circle, root circle, addendum, dedendum, whole depth)
-#                 - Sequence the shapes in logical order of construction
-#                 - Ensure ALL geometric features required for exact VOLUME calculation are included
-
-#             12. FINAL SHAPE DESCRIPTION:
-#                 - Provide a plain-text step-by-step explanation of how the 3D gear is formed from primitives
-#                 - Ensure this description is complete enough to allow accurate 3D volume reconstruction without referring back to the drawing
-
-#             ENHANCED UNIVERSAL JSON OUTPUT STRUCTURE:
-#             ```json
+#             You are an expert in technical drawings. Extract data into JSON per this schema:
 #             {
-#                 "drawing_metadata": {
-#                     "drawing_type": "mechanical/electrical/architectural/etc",
-#                     "component_type": "primary component identification",
-#                     "part_name": "exact title from drawing",
-#                     "drawing_number": "complete drawing/part number",
-#                     "revision": "revision level",
-#                     "scale": "drawing scale",
-#                     "date_created": "creation date",
-#                     "date_revised": "latest revision date",
-#                     "sheet_info": "current sheet / total sheets",
-#                     "company": "company/organization name",
-#                     "drawn_by": "drafter name",
-#                     "checked_by": "checker name", 
-#                     "approved_by": "approver name",
-#                     "material_specification": "exact material callout",
-#                     "standards_referenced": ["list of standards mentioned"]
-#                 },
-#                 "overall_dimensions": {
-#                     "length": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-#                     "width": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-#                     "height": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-#                     "diameter": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-#                     "other_critical_dimensions": [
-#                         {"feature": "description", "value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown", "location": "where_dimensioned"}
-#                     ]
-#                 },
-#                 "feature_dimensions": [
-#                     {
-#                         "feature_type": "hole/thread/groove/chamfer/etc",
-#                         "feature_description": "detailed description",
-#                         "dimensions": {
-#                             "primary": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
-#                             "secondary": {"value": "if_applicable", "unit": "mm/inch", "tolerance": "if_shown"}
-#                         },
-#                         "location": {"x": "coordinate", "y": "coordinate", "reference": "datum_or_edge"},
-#                         "specification": "thread spec, hole type, etc.",
-#                         "quantity": "number of features"
-#                     }
-#                 ],
-#                 "tolerances": {
-#                     "general_tolerances": {
-#                         "linear": "±value and unit",
-#                         "angular": "±value and unit",
-#                         "standard_reference": "ISO 2768-m, etc."
-#                     },
-#                     "specific_tolerances": [
-#                         {"feature": "description", "tolerance": "exact_tolerance", "type": "bilateral/unilateral/limit"}
-#                     ]
-#                 },
-#                 "geometric_tolerances": [
-#                     {
-#                         "feature": "feature description",
-#                         "tolerance_type": "straightness/flatness/position/etc",
-#                         "tolerance_value": "exact_value",
-#                         "tolerance_zone": "description",
-#                         "datum_references": ["A", "B", "C"],
-#                         "material_condition": "MMC/LMC/RFS",
-#                         "location": "where_specified_on_drawing"
-#                     }
-#                 ],
-#                 "surface_specifications": [
-#                     {
-#                         "feature": "surface description",
-#                         "roughness_value": "Ra/Rz value",
-#                         "roughness_unit": "micrometers/microinches",
-#                         "surface_symbol": "symbol description",
-#                         "machining_requirement": "if_specified",
-#                         "coating": "if_specified"
-#                     }
-#                 ],
-#                 "threaded_features": [
-#                     {
-#                         "thread_specification": "M10x1.5, 1/4-20 UNC, etc.",
-#                         "thread_class": "6H, 2B, etc.",
-#                         "thread_length": "depth for blind holes",
-#                         "location": "position on part",
-#                         "quantity": "number of threads"
-#                     }
-#                 ],
-#                 "section_views": [
-#                     {
-#                         "section_identifier": "A-A, B-B, DETAIL A, etc.",
-#                         "section_scale": "scale if different from main",
-#                         "section_type": "full section/half section/offset section/detail",
-#                         "cutting_plane_location": "where section is taken",
-#                         "dimensions_shown": [
-#                             {"feature": "description", "value": "exact_value", "unit": "unit", "tolerance": "if_shown"}
-#                         ]
-#                     }
-#                 ],
-#                 "manufacturing_notes": [
-#                     {
-#                         "note_text": "exact text of note",
-#                         "note_type": "machining/assembly/inspection/general",
-#                         "applies_to": "which features the note applies to",
-#                         "location_on_drawing": "where note is positioned"
-#                     }
-#                 ],
-#                 "tables_and_data": [
-#                     {
-#                         "table_type": "hole table/bend table/revision history/etc",
-#                         "table_title": "exact table title",
-#                         "column_headers": ["list of column headers"],
-#                         "table_data": [
-#                             {"column1": "value1", "column2": "value2", "etc": "etc"}
-#                         ]
-#                     }
-#                 ],
-#                 "material_and_treatment": {
-#                     "base_material": "exact material specification",
-#                     "heat_treatment": "treatment specification if shown",
-#                     "hardness_requirement": "hardness specification if shown",
-#                     "coating": "coating specification if shown",
-#                     "finish": "surface finish requirements"
-#                 },
-#                 "quality_requirements": {
-#                     "inspection_requirements": ["list of inspection callouts"],
-#                     "critical_dimensions": ["list of dimensions marked as critical"],
-#                     "functional_requirements": ["any functional specifications noted"]
-#                 },
+#                 "drawing_metadata": {"drawing_type": "...", "part_name": "...", "drawing_number": "..."},
+#                 "overall_dimensions": {"length": {"value": "...", "unit": "..."}, "width": {...}, "height": {...}, "diameter": {...}},
 #                 "geometric_decomposition": {
-#                     "base_shapes": [
-#                         {
-#                             "shape_type": "cylinder/pipe/etc",
-#                             "description": "gear blank / hub / teeth",
-#                             "dimensions": {"outer_diameter": "...", "inner_diameter": "...", "height": "..."},
-#                             "units" : "mm/inch etc"
-#                             "position": "axial/centered/etc",
-#                             "additive_or_subtractive": "additive"
-#                         }
-#                     ],
-#                     "subtracted_features": [
-#                         {
-#                             "feature_type": "bore/keyway/hole/etc",
-#                             "shape": "pipe/slot/etc",
-#                             "quantity": "number of features",
-#                             "dimensions": {"diameter": "...", "depth": "...", "width": "..."},
-#                             "location": "center/radial position",
-#                             "additive_or_subtractive": "subtractive"
-#                         }
-#                     ]
-#                     },
-#                     "final_shape_description": "Plain-text step-by-step description of gear construction"
-                    
+#                     "tolerance_applied": {"value": 4, "unit": "mm"},
+#                     "base_shapes": [{"shape_type": "...", "dimensions": {"length": "...", "length_with_tolerance": "...+4"}, "volume": {...}}],
+#                     "subtracted_features": [{"feature_type": "...", "dimensions": {"depth": "...", "depth_with_tolerance": "...+4"}, "volume": {...}}]
 #                 }
-#             ```
-#             PRECISION REQUIREMENTS:
-#             - Record ALL visible text exactly as written
-#             - Capture ALL dimension values with exact decimal precision shown
-#             - Extract ALL tolerance notations in their complete form
-#             - Record ALL symbols and special characters exactly
-#             - Note ALL line types and their meanings (hidden, center, dimension, etc.)
-#             - Capture ALL notes, regardless of size or location
-#             - Extract ALL coordinate dimensions and their reference points
-#             - Record ALL view relationships and section indicators
-
-#             ADAPTIVE ANALYSIS:
-#             - If this is a mechanical part: focus on machining dimensions, fits, tolerances
-#             - If this is an electrical drawing: focus on component values, connections, specifications  
-#             - If this is an architectural plan: focus on room dimensions, annotations, scales
-#             - If this is a civil/structural drawing: focus on structural dimensions, materials, load specifications
-#             - If this contains multiple drawing types: analyze each appropriately
-
-#             This analysis is for precision manufacturing/construction - extract every technical detail visible for production, machining, assembly, and quality control purposes.
-            
-#             Respond ONLY with the JSON structure, no additional text or formatting.
+#             }
+#             - Use null for missing data.
+#             - Apply +4mm tolerance to all dimensions.
+#             - Calculate volumes (cylinders: π × r² × h, rectangles: l × w × h).
+#             - Respond with valid JSON only.
 #             """
-            
-           
-#             # Check input token limit
+
+#             # Preprocess image with additional simplification
+#             image_path = self.preprocess_image(image_path, output_path=f"simplified_{os.path.basename(image_path)}")
+#             with Image.open(image_path) as img:
+#                 if img.size[0] * img.size[1] > 1024 * 1024:  # Reduce resolution if too large
+#                     img = img.resize((1024, 1024), Image.Resampling.LANCZOS)
+#                     img.save(image_path)
+
+#             # Check token limit with adjusted prompt
 #             try:
 #                 input_token_info = self.count_total_tokens_for_request(PROMPT, image_path)
 #             except ValueError as e:
@@ -443,98 +354,158 @@
 #                     "error": str(e),
 #                     "token_limit_exceeded": True,
 #                     "file": os.path.basename(image_path),
-#                     "token_usage": {
-#                         "error": str(e),
-#                         "token_counting_method": "gemini_api_with_estimation_fallback"
-#                     }
+#                     "token_usage": {"error": str(e), "token_counting_method": "gemini_api_with_estimation_fallback"}
 #                 }
-            
-#             logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, "
-#                       f"Image: {input_token_info['image_tokens']}, "
-#                       f"Total: {input_token_info['total_input_tokens']}")
-           
+
+#             logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, Image: {input_token_info['image_tokens']}, Total: {input_token_info['total_input_tokens']}")
+
+#             # Verify image
+#             image_dims = self._get_image_dimensions(image_path)
+#             logger.info(f"Image details: {image_dims}")
+#             if "error" in image_dims:
+#                 raise ValueError(f"Invalid image: {image_dims['error']}")
+
 #             uploaded_file = await self.upload_image_to_gemini(image_path)
-           
-#             # Add response token limit to generation config
-#             response = model.generate_content(
-#                 [PROMPT, uploaded_file],
-#                 generation_config={
-#                     "temperature": 0.0,
-#                     "max_output_tokens": self.MAX_ALLOWED_OUTPUT_TOKENS
-#                 }
-#             )
-            
-#             response_text = response.text.strip()
-#             output_tokens = self.count_tokens_accurate(response_text)
-            
-#             # Check if response was truncated due to token limit
-#             if output_tokens >= self.MAX_ALLOWED_OUTPUT_TOKENS * 0.95:  # 95% threshold
-#                 logger.warning(f"Response may be truncated near token limit. "
-#                               f"Output tokens: {output_tokens}/{self.MAX_ALLOWED_OUTPUT_TOKENS}")
-#                 response_text += "\n[WARNING: Response may be truncated due to token limit]"
-           
-#             total_tokens = input_token_info['total_input_tokens'] + output_tokens
-           
-#             logger.info(f"Token usage - Input: {input_token_info['total_input_tokens']}, "
-#                        f"Output: {output_tokens}, Total: {total_tokens}")
-           
-#             if response_text.startswith("```json"):
-#                 response_text = response_text[7:-3].strip()
-#             elif response_text.startswith("```"):
-#                 response_text = response_text[3:-3].strip()
-           
-#             parsed_data = json.loads(response_text)
-#             logger.info("Successfully parsed JSON response from Gemini")
-           
-#             parsed_data["token_usage"] = {
-#                 "input_tokens": {
-#                     "prompt_tokens": input_token_info['prompt_tokens'],
-#                     "image_tokens": input_token_info['image_tokens'],
-#                     "total_input_tokens": input_token_info['total_input_tokens']
-#                 },
-#                 "output_tokens": output_tokens,
-#                 "output_token_limit": self.MAX_ALLOWED_OUTPUT_TOKENS,
-#                 "total_tokens": total_tokens,
-#                 "token_counting_method": "gemini_api_with_estimation_fallback",
-#                 "image_dimensions": self._get_image_dimensions(image_path)
-#             }
-           
-#             return parsed_data
-           
-        
-#         except json.JSONDecodeError as e:
-#             logger.error(f"JSON parsing error: {str(e)}")
-#             logger.error(f"Response text: {response_text[:1000]}...")
-           
-#             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path) if 'PROMPT' in locals() else {"prompt_tokens": 0, "image_tokens": 0, "total_input_tokens": 0}
-#             output_tokens = self.count_tokens_accurate(response_text) if 'response_text' in locals() else 0
-           
-#             return {
-#                 "error": f"Invalid JSON response from AI model: {str(e)}",
-#                 "extracted_data": {},
-#                 "token_usage": {
-#                     "input_tokens": input_token_info,
-#                     "output_tokens": output_tokens,
-#                     "total_tokens": input_token_info.get('total_input_tokens', 0) + output_tokens,
-#                     "token_counting_method": "gemini_api_with_estimation_fallback"
-#                 }
-#             }
+
+#             # Enhanced retry logic
+#             max_retries = 4
+#             response_text = None
+#             for attempt in range(max_retries):
+#                 try:
+#                     safety_settings = [
+#                         types.SafetySettingDict(category=cat, threshold=types.HarmBlockThreshold.BLOCK_NONE)
+#                         for cat in [
+#                             types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+#                             types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+#                             types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+#                             types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT
+#                         ]
+#                     ]
+#                     # Increase max_output_tokens to avoid truncation
+#                     response = model.generate_content(
+#                         [PROMPT, uploaded_file],
+#                         generation_config={
+#                             "temperature": 0.0,
+#                             "max_output_tokens": 16384  # Doubled to handle larger responses
+#                         },
+#                         safety_settings=safety_settings
+#                     )
+
+#                     logger.info(f"Attempt {attempt+1} - Response candidates: {response.candidates}")
+#                     logger.info(f"Attempt {attempt+1} - Prompt feedback: {response.prompt_feedback}")
+#                     if response.prompt_feedback:
+#                         for rating in response.prompt_feedback.safety_ratings:
+#                             logger.info(f"Attempt {attempt+1} - Safety rating: {rating.category} - {rating.probability}")
+
+#                     if not response.candidates or not response.candidates[0].content.parts:
+#                         finish_reason = response.candidates[0].finish_reason if response.candidates else "unknown"
+#                         logger.error(f"Attempt {attempt+1} - No valid response parts. Finish reason: {finish_reason}")
+#                         if finish_reason == 2 and attempt < max_retries - 1:
+#                             logger.info(f"Retrying due to safety filter block (finish_reason: 2), attempt {attempt+1}/{max_retries}")
+#                             import time; time.sleep(2)  # Add delay to avoid rapid retries
+#                             continue
+#                         logger.warning(f"Returning empty JSON due to finish_reason: {finish_reason}")
+#                         return {
+#                             "drawing_metadata": {"drawing_type": None, "part_name": None, "drawing_number": None},
+#                             "overall_dimensions": {"length": {"value": None, "unit": None}, "width": {"value": None, "unit": None}, "height": {"value": None, "unit": None}, "diameter": {"value": None, "unit": None}},
+#                             "geometric_decomposition": {
+#                                 "tolerance_applied": {"value": 4, "unit": "mm"},
+#                                 "base_shapes": [],
+#                                 "subtracted_features": []
+#                             },
+#                             "token_usage": {"input_tokens": input_token_info, "output_tokens": 0, "total_tokens": input_token_info.get('total_input_tokens', 0)}
+#                         }
+#                     response_text = response.text.strip()
+#                     logger.info(f"Attempt {attempt+1} - Raw response text: {response_text[:2000]}...")
+
+#                     if response_text.startswith("```json"):
+#                         response_text = response_text[7:].strip()
+#                     if response_text.endswith("```"):
+#                         response_text = response_text[:-3].strip()
+
+#                     if not response_text:
+#                         logger.error(f"Attempt {attempt+1} - Empty response text")
+#                         if attempt == max_retries - 1:
+#                             return {"error": "Empty response from AI model", "file": os.path.basename(image_path), "token_usage": {"input_tokens": input_token_info, "output_tokens": 0, "total_tokens": input_token_info.get('total_input_tokens', 0)}}
+#                         continue
+
+#                     fixed_response_text = self.attempt_fix_json(response_text)
+#                     logger.info(f"Attempt {attempt+1} - Fixed response text: {fixed_response_text[:2000]}...")
+
+#                     if not (fixed_response_text.startswith('{') and fixed_response_text.endswith('}')):
+#                         logger.error(f"Attempt {attempt+1} - Response is not a valid JSON object: {fixed_response_text[:2000]}...")
+#                         if attempt == max_retries - 1:
+#                             raise json.JSONDecodeError("Invalid JSON structure", fixed_response_text, 0)
+#                         continue
+
+#                     output_tokens = self.count_tokens_accurate(fixed_response_text)
+#                     parsed_data = json.loads(fixed_response_text)
+#                     parsed_data = self.sanitize_for_json(parsed_data)
+
+#                     total_tokens = input_token_info['total_input_tokens'] + output_tokens
+#                     parsed_data["token_usage"] = {
+#                         "input_tokens": input_token_info,
+#                         "output_tokens": output_tokens,
+#                         "output_token_limit": 16384,
+#                         "total_tokens": total_tokens,
+#                         "token_counting_method": "gemini_api_with_estimation_fallback",
+#                         "image_dimensions": image_dims
+#                     }
+#                     return parsed_data
+
+#                 except json.JSONDecodeError as e:
+#                     logger.error(f"Attempt {attempt+1} - JSON parsing error: {str(e)}")
+#                     if attempt == max_retries - 1:
+#                         return {"error": f"Invalid JSON response: {str(e)}", "raw_response": response_text[:2000] if response_text else "", "token_usage": {"input_tokens": input_token_info, "output_tokens": 0, "total_tokens": input_token_info.get('total_input_tokens', 0)}}
+#                 except Exception as e:
+#                     logger.error(f"Attempt {attempt+1} - Unexpected error: {str(e)}")
+#                     if attempt == max_retries - 1:
+#                         return {"error": f"Unexpected error: {str(e)}", "file": os.path.basename(image_path), "token_usage": {"input_tokens": input_token_info, "output_tokens": 0, "total_tokens": input_token_info.get('total_input_tokens', 0)}}
+
 #         except Exception as e:
 #             logger.error(f"Technical drawing extraction failed: {str(e)}")
-#             logger.error(f"Traceback: {traceback.format_exc()}")
-           
 #             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path) if 'PROMPT' in locals() else {"prompt_tokens": 0, "image_tokens": 0, "total_input_tokens": 0}
-           
-#             return {
-#                 "error": str(e),
-#                 "file": os.path.basename(image_path),
-#                 "token_usage": {
-#                     "input_tokens": input_token_info,
-#                     "output_tokens": 0,
-#                     "total_tokens": input_token_info.get('total_input_tokens', 0),
-#                     "token_counting_method": "gemini_api_with_estimation_fallback"
-#                 }
+#             return {"error": str(e), "file": os.path.basename(image_path), "token_usage": {"input_tokens": input_token_info, "output_tokens": 0, "total_tokens": input_token_info.get('total_input_tokens', 0)}}
+#     def _attempt_partial_extraction(self, response_text: str) -> Dict:
+#         """Attempt to extract partial information from malformed JSON response"""
+#         try:
+#             partial_data = {}
+            
+#             # Try to extract key information using regex patterns
+#             patterns = {
+#                 'drawing_number': r'"drawing_number"\s*:\s*"([^"]+)"',
+#                 'part_name': r'"part_name"\s*:\s*"([^"]+)"',
+#                 'company': r'"company"\s*:\s*"([^"]+)"',
+#                 'material': r'"material"\s*:\s*"([^"]+)"',
+#                 'scale': r'"scale"\s*:\s*"([^"]+)"'
 #             }
+            
+#             for key, pattern in patterns.items():
+#                 match = re.search(pattern, response_text, re.IGNORECASE)
+#                 if match:
+#                     partial_data[key] = match.group(1)
+            
+#             # Try to extract numeric dimensions
+#             dimension_patterns = {
+#                 'length': r'"length"\s*:\s*{\s*"value"\s*:\s*"([^"]+)"',
+#                 'width': r'"width"\s*:\s*{\s*"value"\s*:\s*"([^"]+)"',
+#                 'diameter': r'"diameter"\s*:\s*{\s*"value"\s*:\s*"([^"]+)"'
+#             }
+            
+#             dimensions = {}
+#             for key, pattern in dimension_patterns.items():
+#                 match = re.search(pattern, response_text, re.IGNORECASE)
+#                 if match:
+#                     dimensions[key] = match.group(1)
+            
+#             if dimensions:
+#                 partial_data['dimensions'] = dimensions
+            
+#             return partial_data if partial_data else {"note": "No extractable data found"}
+            
+#         except Exception as e:
+#             logger.warning(f"Partial extraction failed: {str(e)}")
+#             return {"note": "Partial extraction failed"}
    
 #     def _get_image_dimensions(self, image_path: str) -> Dict[str, Any]:
 #         """Get image dimensions for token calculation reference"""
@@ -871,7 +842,6 @@
 #             del self.processed_files[task_id]
 #             return True
 #         return False
- 
    
 #     def get_drawing_type_from_data(self, extracted_data: Dict) -> str:
 #         """Determine drawing type from extracted data"""
@@ -1032,6 +1002,7 @@
 #             lines.append("")
        
 #         return "\n".join(lines)
+
 
 import os
 import uuid
@@ -1350,455 +1321,6 @@ class TechnicalDrawingExtractionService:
             logger.error(f"Failed to upload image to Gemini: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise Exception(f"Image upload failed: {str(e)}")
-    # async def extract_technical_drawing_data(self, image_path: str) -> Dict:
-    #             """Extract technical drawing data from image using Gemini."""
-    #             try:
-    #                 logger.info(f"Starting technical drawing extraction for: {image_path}")
-
-    #                 PROMPT = """
-    #             You are an expert engineering drawing analysis system with comprehensive knowledge of technical drawings, engineering standards (ISO, ANSI, DIN, ASME), GD&T, and mechanical design.
-    #             Your task: Analyze the provided engineering drawing and extract structured information into a JSON object.
-    #             IMPORTANT RULES:
-    #             - Respond ONLY with valid JSON.
-    #             - Do not include markdown code fences, comments, or extra text.
-    #             - Ensure all braces/brackets are properly closed.
-    #             - Do not truncate.
-    #             - If information is missing in the drawing, use null.
-    #             - Keep all values consistent and machine-readable.
-    #             - Apply a hardcoded tolerance of +4mm to ALL dimensional values in the geometric_decomposition section.
-    #             - Calculate volumes for each geometric shape using appropriate formulas (π × r² × h for cylinders, l × w × h for rectangular shapes, etc.).
-    #             - Show both original dimensions and dimensions with 4mm tolerance added.
-    #             - Calculate volumes for both original and tolerance-adjusted dimensions.
-    #             JSON SCHEMA:
-    #             {
-    #             "drawing_metadata": {
-    #                 "drawing_type": "mechanical/architectural/electrical/...",
-    #                 "component_type": "gear/shaft/bracket/housing/assembly/...",
-    #                 "part_name": "full name of the part",
-    #                 "drawing_number": "unique drawing number",
-    #                 "revision": "revision code",
-    #                 "scale": "e.g. 1:2",
-    #                 "date_created": "DD/MM/YYYY",
-    #                 "date_revised": "DD/MM/YYYY",
-    #                 "sheet_info": "e.g. 1 OF 3",
-    #                 "company": "company name",
-    #                 "drawn_by": "drafter initials",
-    #                 "checked_by": "checker initials",
-    #                 "approved_by": "approver initials",
-    #                 "material_specification": "material type or reference",
-    #                 "standards_referenced": ["list of referenced standards"]
-    #             },
-    #             "overall_dimensions": {
-    #                 "length": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
-    #                 "width": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
-    #                 "height": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
-    #                 "diameter": {"value": "numeric", "unit": "mm/inch", "tolerance": "±..."},
-    #                 "other_critical_dimensions": [
-    #                 {
-    #                     "feature": "hole/pocket/keyway/slot/etc",
-    #                     "value": "numeric",
-    #                     "units": "mm/inch",
-    #                     "tolerance": "±...",
-    #                     "position": "axial/centered/etc"
-    #                 }
-    #                 ]
-    #             },
-    #             "geometric_decomposition": {
-    #                 "tolerance_applied": {
-    #                 "value": 4,
-    #                 "unit": "mm",
-    #                 "note": "Hardcoded tolerance applied to all dimensions"
-    #                 },
-    #                 "base_shapes": [
-    #                 {
-    #                     "shape_type": "cylinder/pipe/rectangular_prism/cone/etc",
-    #                     "description": "gear blank/hub/teeth/housing/etc",
-    #                     "dimensions": {
-    #                     "outer_diameter": "original_value", 
-    #                     "outer_diameter_with_tolerance": "original_value + 4",
-    #                     "inner_diameter": "original_value", 
-    #                     "inner_diameter_with_tolerance": "original_value + 4",
-    #                     "height": "original_value", 
-    #                     "height_with_tolerance": "original_value + 4",
-    #                     "length": "original_value", 
-    #                     "length_with_tolerance": "original_value + 4",
-    #                     "width": "original_value", 
-    #                     "width_with_tolerance": "original_value + 4"
-    #                     },
-    #                     "units": "mm/inch/etc",
-    #                     "position": "axial/centered/radial/etc",
-    #                     "additive_or_subtractive": "additive",
-    #                     "volume": {
-    #                     "original_volume": {
-    #                         "value": "calculated_from_original_dimensions",
-    #                         "unit": "mm³",
-    #                         "calculation": "formula_with_original_numbers",
-    #                         "formula": "general_formula_used"
-    #                     },
-    #                     "volume_with_tolerance": {
-    #                         "value": "calculated_from_tolerance_dimensions",
-    #                         "unit": "mm³",
-    #                         "calculation": "formula_with_tolerance_numbers",
-    #                         "formula": "general_formula_used",
-    #                         "tolerance_effect": "difference_in_volume"
-    #                     }
-    #                     }
-    #                 }
-    #                 ],
-    #                 "subtracted_features": [
-    #                 {
-    #                     "feature_type": "bore/keyway/hole/pocket/slot/groove/etc",
-    #                     "shape": "pipe/slot/rectangular/circular/etc",
-    #                     "quantity": "number of features",
-    #                     "dimensions": {
-    #                     "diameter": "original_value", 
-    #                     "diameter_with_tolerance": "original_value + 4",
-    #                     "depth": "original_value", 
-    #                     "depth_with_tolerance": "original_value + 4",
-    #                     "width": "original_value", 
-    #                     "width_with_tolerance": "original_value + 4",
-    #                     "length": "original_value", 
-    #                     "length_with_tolerance": "original_value + 4"
-    #                     },
-    #                     "units": "mm/inch/etc",
-    #                     "location": "center/radial position/angular position",
-    #                     "additive_or_subtractive": "subtractive",
-    #                     "volume": {
-    #                     "original_volume": {
-    #                         "value": "calculated_from_original_dimensions",
-    #                         "unit": "mm³",
-    #                         "calculation": "formula_with_original_numbers",
-    #                         "formula": "general_formula_used"
-    #                     },
-    #                     "volume_with_tolerance": {
-    #                         "value": "calculated_from_tolerance_dimensions",
-    #                         "unit": "mm³",
-    #                         "calculation": "formula_with_tolerance_numbers",
-    #                         "formula": "general_formula_used",
-    #                         "tolerance_effect": "difference_in_volume"
-    #                     }
-    #                     }
-    #                 }
-    #                 ],
-    #                 "volume_summary": {
-    #                 "original_volumes": {
-    #                     "total_additive": "sum_of_all_additive_original_volumes",
-    #                     "total_subtractive": "sum_of_all_subtractive_original_volumes",
-    #                     "net_volume": "total_additive - total_subtractive"
-    #                 },
-    #                 "volumes_with_tolerance": {
-    #                     "total_additive": "sum_of_all_additive_tolerance_volumes",
-    #                     "total_subtractive": "sum_of_all_subtractive_tolerance_volumes",
-    #                     "net_volume": "total_additive - total_subtractive",
-    #                     "volume_increase_due_to_tolerance": "difference_from_original_net_volume"
-    #                 },
-    #                 "tolerance_impact": {
-    #                     "percentage_increase": "percentage_change_in_volume",
-    #                     "absolute_increase": "absolute_volume_increase",
-    #                     "unit": "mm³"
-    #                 }
-    #                 }
-    #             },
-    #             "manufacturing_notes": {
-    #                 "surface_finish": "e.g. Ra 1.6",
-    #                 "heat_treatment": "carburizing/tempering/etc",
-    #                 "coating": "zinc/nickel/paint/etc",
-    #                 "special_instructions": ["array of notes"]
-    #             },
-    #             "gd_t_symbols": [
-    #                 {"feature": "datum/axis/surface", "symbol": "⌀/⏐/⏥/∥/etc", "tolerance": "value"}
-    #             ],
-    #             "material_and_properties": {
-    #                 "material": "e.g. SAE 1045 steel",
-    #                 "mechanical_properties": {"yield_strength": "...", "hardness": "..."}
-    #             },
-    #             "title_block_notes": ["list of textual notes"]
-    #             }
-
-    #             VOLUME CALCULATION INSTRUCTIONS:
-    #             - For cylinders: use π × r² × h (where r = diameter/2)
-    #             - For rectangular shapes: use length × width × height
-    #             - For complex profiles: use appropriate geometric approximations
-    #             - For holes/bores: calculate as cylinders
-    #             - For keyways: calculate as rectangular slots
-    #             - Always show the actual calculation with numbers substituted
-    #             - Calculate both original and tolerance-adjusted volumes
-    #             - Show the volume difference due to tolerance
-    #             """
-                    
-    #                 # Preprocess image
-    #                 image_path = self.preprocess_image(image_path)
-                    
-    #                 # Check token limit
-    #                 try:
-    #                     input_token_info = self.count_total_tokens_for_request(PROMPT, image_path)
-    #                 except ValueError as e:
-    #                     logger.error(f"Token limit exceeded: {str(e)}")
-    #                     return {
-    #                         "error": str(e),
-    #                         "token_limit_exceeded": True,
-    #                         "file": os.path.basename(image_path),
-    #                         "token_usage": {
-    #                             "error": str(e),
-    #                             "token_counting_method": "gemini_api_with_estimation_fallback"
-    #                         }
-    #                     }
-                    
-    #                 logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, "
-    #                             f"Image: {input_token_info['image_tokens']}, "
-    #                             f"Total: {input_token_info['total_input_tokens']}")
-                    
-    #                 # Verify image
-    #                 image_dims = self._get_image_dimensions(image_path)
-    #                 logger.info(f"Image details: {image_dims}")
-    #                 if "error" in image_dims:
-    #                     raise ValueError(f"Invalid image: {image_dims['error']}")
-                    
-    #                 uploaded_file = await self.upload_image_to_gemini(image_path)
-                    
-    #                 # Retry with adjusted safety settings
-    #                 max_retries = 4
-    #                 response_text = None
-    #                 for attempt in range(max_retries):
-    #                     try:
-    #                         safety_settings=[
-    #                             types.SafetySettingDict(
-    #                                 category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-    #                                 threshold=types.HarmBlockThreshold.BLOCK_NONE,  # least restrictive
-    #                             ),
-    #                             types.SafetySettingDict(
-    #                                 category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-    #                                 threshold=types.HarmBlockThreshold.BLOCK_NONE,
-    #                             ),
-    #                             types.SafetySettingDict(
-    #                                 category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-    #                                 threshold=types.HarmBlockThreshold.BLOCK_NONE,
-    #                             ),
-    #                             types.SafetySettingDict(
-    #                                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-    #                                 threshold=types.HarmBlockThreshold.BLOCK_NONE,
-    #                             ),
-    #                         ]
-    #                         response = model.generate_content(
-    #                             [PROMPT, uploaded_file],
-    #                             generation_config={
-    #                                 "temperature": 0.0,
-    #                                 "max_output_tokens": self.MAX_ALLOWED_OUTPUT_TOKENS
-    #                             },
-    #                             safety_settings=safety_settings
-    #                         )
-                            
-    #                         # Log response details
-    #                         logger.info(f"Attempt {attempt+1} - Response candidates: {response.candidates}")
-    #                         logger.info(f"Attempt {attempt+1} - Prompt feedback: {response.prompt_feedback}")
-    #                         if response.prompt_feedback:
-    #                             for rating in response.prompt_feedback.safety_ratings:
-    #                                 logger.info(f"Attempt {attempt+1} - Safety rating: {rating.category} - {rating.probability}")
-                            
-    #                         # Check for valid response parts
-    #                         if not response.candidates or not response.candidates[0].content.parts:
-    #                             finish_reason = response.candidates[0].finish_reason if response.candidates else "unknown"
-    #                             logger.error(f"Attempt {attempt+1} - No valid response parts. Finish reason: {finish_reason}")
-    #                             if finish_reason == 2 and attempt < max_retries - 1:
-    #                                 logger.info(f"Retrying due to safety filter block (finish_reason: 2), attempt {attempt+1}/{max_retries}")
-    #                                 continue
-    #                             logger.warning(f"Returning empty JSON as per prompt instructions due to finish_reason: {finish_reason}")
-    #                             return {
-    #                                 "drawing_metadata": {
-    #                                     "drawing_type": None,
-    #                                     "component_type": None,
-    #                                     "part_name": None,
-    #                                     "drawing_number": None,
-    #                                     "revision": None,
-    #                                     "scale": None,
-    #                                     "date_created": None,
-    #                                     "date_revised": None,
-    #                                     "sheet_info": None,
-    #                                     "company": None,
-    #                                     "drawn_by": None,
-    #                                     "checked_by": None,
-    #                                     "approved_by": None,
-    #                                     "material_specification": None,
-    #                                     "standards_referenced": []
-    #                                 },
-    #                                 "overall_dimensions": {
-    #                                     "length": {"value": None, "unit": None, "tolerance": None},
-    #                                     "width": {"value": None, "unit": None, "tolerance": None},
-    #                                     "height": {"value": None, "unit": None, "tolerance": None},
-    #                                     "diameter": {"value": None, "unit": None, "tolerance": None},
-    #                                     "other_critical_dimensions": []
-    #                                 },
-    #                                 "geometric_decomposition": {
-    #                                     "tolerance_applied": {
-    #                                         "value": 4,
-    #                                         "unit": "mm",
-    #                                         "note": "Hardcoded tolerance applied to all dimensions"
-    #                                     },
-    #                                     "base_shapes": [],
-    #                                     "subtracted_features": [],
-    #                                     "volume_summary": {
-    #                                         "original_volumes": {
-    #                                             "total_additive": None,
-    #                                             "total_subtractive": None,
-    #                                             "net_volume": None
-    #                                         },
-    #                                         "volumes_with_tolerance": {
-    #                                             "total_additive": None,
-    #                                             "total_subtractive": None,
-    #                                             "net_volume": None,
-    #                                             "volume_increase_due_to_tolerance": None
-    #                                         },
-    #                                         "tolerance_impact": {
-    #                                             "percentage_increase": None,
-    #                                             "absolute_increase": None,
-    #                                             "unit": "mm³"
-    #                                         }
-    #                                     }
-    #                                 },
-    #                                 "manufacturing_notes": {
-    #                                     "surface_finish": None,
-    #                                     "heat_treatment": None,
-    #                                     "coating": None,
-    #                                     "special_instructions": []
-    #                                 },
-    #                                 "gd_t_symbols": [],
-    #                                 "material_and_properties": {
-    #                                     "material": None,
-    #                                     "mechanical_properties": {
-    #                                         "yield_strength": None,
-    #                                         "hardness": None
-    #                                     }
-    #                                 },
-    #                                 "title_block_notes": [],
-    #                                 "token_usage": {
-    #                                     "input_tokens": input_token_info,
-    #                                     "output_tokens": 0,
-    #                                     "total_tokens": input_token_info.get('total_input_tokens', 0),
-    #                                     "token_counting_method": "gemini_api_with_estimation_fallback"
-    #                                 }
-    #                             }
-    #                         response_text = response.text.strip()
-    #                         logger.info(f"Attempt {attempt+1} - Raw response text: {response_text[:2000]}...")
-                            
-    #                         # Robust Markdown stripping
-    #                         if response_text.startswith("```json"):
-    #                             response_text = response_text[7:].strip()
-    #                             if response_text.endswith("```"):
-    #                                 response_text = response_text[:-3].strip()
-    #                         elif response_text.startswith("```"):
-    #                             response_text = response_text[3:].strip()
-    #                             if response_text.endswith("```"):
-    #                                 response_text = response_text[:-3].strip()
-                            
-    #                         # Check if response_text is empty
-    #                         if not response_text:
-    #                             logger.error(f"Attempt {attempt+1} - Empty response text")
-    #                             if attempt == max_retries - 1:
-    #                                 return {
-    #                                     "error": "Empty response from AI model",
-    #                                     "file": os.path.basename(image_path),
-    #                                     "raw_response": "",
-    #                                     "token_usage": {
-    #                                         "input_tokens": input_token_info,
-    #                                         "output_tokens": 0,
-    #                                         "total_tokens": input_token_info.get('total_input_tokens', 0),
-    #                                         "token_counting_method": "gemini_api_with_estimation_fallback"
-    #                                     }
-    #                                 }
-    #                             continue
-                            
-    #                         # Attempt to fix incomplete JSON
-    #                         fixed_response_text = self.attempt_fix_json(response_text)
-    #                         logger.info(f"Attempt {attempt+1} - Fixed response text: {fixed_response_text[:2000]}...")
-                            
-    #                         # Validate JSON structure
-    #                         if not (fixed_response_text.startswith('{') and fixed_response_text.endswith('}')):
-    #                             logger.error(f"Attempt {attempt+1} - Response is not a valid JSON object: {fixed_response_text[:2000]}...")
-    #                             if attempt == max_retries - 1:
-    #                                 raise json.JSONDecodeError("Invalid JSON structure", fixed_response_text, 0)
-    #                             continue
-                            
-    #                         output_tokens = self.count_tokens_accurate(fixed_response_text)
-    #                         if output_tokens >= self.MAX_ALLOWED_OUTPUT_TOKENS * 0.95:
-    #                             logger.warning(f"Attempt {attempt+1} - Response may be truncated. Output tokens: {output_tokens}/{self.MAX_ALLOWED_OUTPUT_TOKENS}")
-                            
-    #                         parsed_data = json.loads(fixed_response_text)
-    #                         logger.info(f"Attempt {attempt+1} - Successfully parsed JSON response from Gemini")
-                            
-    #                         # Sanitize parsed_data
-    #                         parsed_data = self.sanitize_for_json(parsed_data)
-                            
-    #                         total_tokens = input_token_info['total_input_tokens'] + output_tokens
-                            
-    #                         parsed_data["token_usage"] = {
-    #                             "input_tokens": input_token_info,
-    #                             "output_tokens": output_tokens,
-    #                             "output_token_limit": self.MAX_ALLOWED_OUTPUT_TOKENS,
-    #                             "total_tokens": total_tokens,
-    #                             "token_counting_method": "gemini_api_with_estimation_fallback",
-    #                             "image_dimensions": image_dims
-    #                         }
-                            
-    #                         return parsed_data
-                        
-    #                     except json.JSONDecodeError as e:
-    #                         logger.error(f"Attempt {attempt+1} - JSON parsing error: {str(e)}")
-    #                         logger.error(f"Attempt {attempt+1} - Response text: {response_text[:2000] if response_text else 'None'}...")
-    #                         if attempt == max_retries - 1:
-    #                             partial_data = {}
-    #                             try:
-    #                                 json_start = response_text.find('{') if response_text else -1
-    #                                 json_end = response_text.rfind('}') if response_text else -1
-    #                                 if json_start != -1 and json_end != -1 and json_end > json_start:
-    #                                     partial_json = response_text[json_start:json_end+1]
-    #                                     partial_json = self.attempt_fix_json(partial_json)
-    #                                     partial_data = json.loads(partial_json)
-    #                                     logger.info(f"Attempt {attempt+1} - Successfully parsed partial JSON")
-    #                             except Exception as pe:
-    #                                 logger.warning(f"Attempt {attempt+1} - Partial JSON parsing failed: {str(pe)}")
-    #                             return {
-    #                                 "error": f"Invalid JSON response from AI model: {str(e)}",
-    #                                 "extracted_data": self.sanitize_for_json(partial_data),
-    #                                 "raw_response": response_text[:2000] if response_text else "",
-    #                                 "token_usage": {
-    #                                     "input_tokens": input_token_info,
-    #                                     "output_tokens": output_tokens if 'output_tokens' in locals() else 0,
-    #                                     "total_tokens": input_token_info.get('total_input_tokens', 0) + (output_tokens if 'output_tokens' in locals() else 0),
-    #                                     "token_counting_method": "gemini_api_with_estimation_fallback"
-    #                                 }
-    #                             }
-    #                     except Exception as e:
-    #                         logger.error(f"Attempt {attempt+1} - Unexpected error: {str(e)}")
-    #                         logger.error(f"Traceback: {traceback.format_exc()}")
-    #                         if attempt == max_retries - 1:
-    #                             return {
-    #                                 "error": f"Unexpected error: {str(e)}",
-    #                                 "file": os.path.basename(image_path),
-    #                                 "raw_response": response_text[:2000] if response_text else "",
-    #                                 "token_usage": {
-    #                                     "input_tokens": input_token_info,
-    #                                     "output_tokens": 0,
-    #                                     "total_tokens": input_token_info.get('total_input_tokens', 0),
-    #                                     "token_counting_method": "gemini_api_with_estimation_fallback"
-    #                                 }
-    #                             }
-    #                         continue
-                    
-    #             except Exception as e:
-    #                 logger.error(f"Technical drawing extraction failed: {str(e)}")
-    #                 logger.error(f"Traceback: {traceback.format_exc()}")
-    #                 input_token_info = self.count_total_tokens_for_request(PROMPT, image_path) if 'PROMPT' in locals() else {"prompt_tokens": 0, "image_tokens": 0, "total_input_tokens": 0}
-    #                 return {
-    #                     "error": str(e),
-    #                     "file": os.path.basename(image_path),
-    #                     "raw_response": "",
-    #                     "token_usage": {
-    #                         "input_tokens": input_token_info,
-    #                         "output_tokens": 0,
-    #                         "total_tokens": input_token_info.get('total_input_tokens', 0),
-    #                         "token_counting_method": "gemini_api_with_estimation_fallback"
-    #                     }
-    #                 }
     async def extract_technical_drawing_data(self, image_path: str) -> Dict:
         """Extract technical drawing data from image using Gemini."""
         try:
@@ -1806,21 +1328,288 @@ class TechnicalDrawingExtractionService:
 
             # Simplified prompt to reduce token usage
             PROMPT = """
-            You are an expert in technical drawings. Extract data into JSON per this schema:
+            You are an expert engineering drawing analysis system with comprehensive knowledge of technical drawings, engineering standards (ISO, ANSI, DIN, ASME), GD&T (Geometric Dimensioning and Tolerancing), manufacturing processes, and precision measurement. Analyze this technical drawing with absolute precision and extract ALL visible specifications and information.
+
+            CRITICAL EXTRACTION PROTOCOL:
+            - Extract ONLY explicitly visible values - NO calculations or derivations unless clearly requested
+            - Preserve exact numeric values, decimal places, and units as displayed
+            - Record dimension symbols (⌀, R, □, ±, ∅) exactly as shown
+            - Mark unclear text as "unclear_text" rather than guessing
+            - Focus on all manufacturing-critical dimensions, tolerances, and specifications
+            - Identify the type of drawing/component first (mechanical part, electrical schematic, architectural plan, etc.)
+
+            COMPREHENSIVE TECHNICAL DRAWING EXTRACTION:
+
+            1. DRAWING IDENTIFICATION & METADATA:
+               - Drawing title/part name - exact text from title block
+               - Drawing number - complete part number or drawing ID
+               - Revision level - current revision letter/number
+               - Date - creation/revision dates
+               - Scale - drawing scale (1:1, 1:2, 2:1, etc.)
+               - Sheet number - current sheet and total sheets
+               - Company/organization name
+               - Drawn by/checked by/approved by signatures
+               - Material specification - exact callout
+               - Standards referenced (ISO, ANSI, DIN, ASME, etc.)
+
+            2. COMPONENT TYPE IDENTIFICATION:
+               - Primary component type (gear, bearing, shaft, housing, bracket, circuit board, etc.)
+               - Secondary features (keyways, splines, threads, holes, slots, etc.)
+               - Assembly or individual part designation
+               - Function description if provided
+
+            3. DIMENSIONAL ANALYSIS:
+               - Overall dimensions (length, width, height, diameter)
+               - Critical functional dimensions
+               - Feature dimensions (hole diameters, thread specifications, groove dimensions)
+               - Reference dimensions (marked with parentheses)
+               - Basic dimensions (marked with rectangles)
+               - Dimension chains and relationships
+
+            4. TOLERANCE SPECIFICATIONS:
+               - Linear tolerances (±0.005, +0.000/-0.005, etc.)
+               - Angular tolerances (±30', ±1°, etc.)
+               - Bilateral and unilateral tolerances
+               - Fit specifications (H7/g6, RC1, LC2, etc.)
+               - General tolerance notes
+               - Special tolerance callouts
+
+            5. GEOMETRIC TOLERANCES (GD&T):
+               - Form tolerances (straightness, flatness, circularity, cylindricity)
+               - Orientation tolerances (perpendicularity, angularity, parallelism)
+               - Location tolerances (position, concentricity, symmetry)
+               - Runout tolerances (circular runout, total runout)
+               - Profile tolerances (line profile, surface profile)
+               - Datum references and datum feature symbols
+               - Material condition modifiers (MMC, LMC, RFS)
+               - Composite tolerances and multiple single-segment tolerances
+
+            6. SURFACE SPECIFICATIONS:
+               - Surface roughness symbols and values (Ra, Rz, Rt)
+               - Surface texture directions and lay patterns
+               - Machining allowances
+               - Coating specifications
+               - Heat treatment requirements
+               - Hardness specifications (HRC, HB, HV)
+
+            7. FEATURE CALLOUTS:
+               - Threaded features (M10x1.5, 1/4-20 UNC, etc.)
+               - Chamfers and fillets (dimensions and angles)
+               - Keyways and keyseats (dimensions and standards)
+               - Splines (tooth count, module, pressure angle)
+               - Knurling specifications (type, pitch, form)
+               - Holes (through, blind, counterbored, countersunk)
+
+            8. SECTION VIEWS AND DETAILS:
+               - Section view identifications (A-A, B-B, etc.)
+               - Section scale if different from main drawing
+               - Detail view callouts and scales
+               - Hidden line conventions
+               - Break line representations
+               - Auxiliary view information
+
+            9. MANUFACTURING NOTES:
+               - Machining operations specified
+               - Assembly instructions
+               - Inspection requirements
+               - Special handling notes
+               - Tool requirements
+               - Finish specifications
+
+            10. TABLES AND SPECIFICATIONS:
+                - Hole tables with coordinates and sizes
+                - Bend tables for sheet metal
+                - Revision history tables
+                - Bill of materials (if present)
+                - Property tables
+                - Specification tables
+            
+            11. GEOMETRIC DECOMPOSITION FOR VOLUME CALCULATION:
+                - Treat the gear as ONE single coherent 3D object
+                - Break it down into fundamental primitives (cylinder, pipe, cuboid, cone, extrusion, etc.)
+                - For gears: include gear blank (cylinder), hub (cylinder), bore (pipe/subtraction), keyways (slot subtraction), teeth (cylindrical/extruded protrusions), chamfers, and fillets
+                - For each primitive: record ALL given dimensions (outer diameter, inner diameter, height/thickness, position, angles, tooth spacing, etc.)
+                - Specify whether each feature is additive (solid material) or subtractive (hole, slot, bore, relief, undercut)
+                - Detail every subtractive feature separately (each hole, keyway, bore step, slot, undercut, relief)
+                - Provide gear tooth-level details if available (tooth count, pitch circle diameter, base circle, root circle, addendum, dedendum, whole depth)
+                - Sequence the shapes in logical order of construction
+                - Ensure ALL geometric features required for exact VOLUME calculation are included
+
+            12. FINAL SHAPE DESCRIPTION:
+                - Provide a plain-text step-by-step explanation of how the 3D gear is formed from primitives
+                - Ensure this description is complete enough to allow accurate 3D volume reconstruction without referring back to the drawing
+
+            ENHANCED UNIVERSAL JSON OUTPUT STRUCTURE:
+            ```json
             {
-                "drawing_metadata": {"drawing_type": "...", "part_name": "...", "drawing_number": "..."},
-                "overall_dimensions": {"length": {"value": "...", "unit": "..."}, "width": {...}, "height": {...}, "diameter": {...}},
+                "drawing_metadata": {
+                    "drawing_type": "mechanical/electrical/architectural/etc",
+                    "component_type": "primary component identification",
+                    "part_name": "exact title from drawing",
+                    "drawing_number": "complete drawing/part number",
+                    "revision": "revision level",
+                    "scale": "drawing scale",
+                    "date_created": "creation date",
+                    "date_revised": "latest revision date",
+                    "sheet_info": "current sheet / total sheets",
+                    "company": "company/organization name",
+                    "drawn_by": "drafter name",
+                    "checked_by": "checker name", 
+                    "approved_by": "approver name",
+                    "material_specification": "exact material callout",
+                    "standards_referenced": ["list of standards mentioned"]
+                },
+                "overall_dimensions": {
+                    "length": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "width": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "height": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "diameter": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                    "other_critical_dimensions": [
+                        {"feature": "description", "value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown", "location": "where_dimensioned"}
+                    ]
+                },
+                "feature_dimensions": [
+                    {
+                        "feature_type": "hole/thread/groove/chamfer/etc",
+                        "feature_description": "detailed description",
+                        "dimensions": {
+                            "primary": {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"},
+                            "secondary": {"value": "if_applicable", "unit": "mm/inch", "tolerance": "if_shown"}
+                        },
+                        "location": {"x": "coordinate", "y": "coordinate", "reference": "datum_or_edge"},
+                        "specification": "thread spec, hole type, etc.",
+                        "quantity": "number of features"
+                    }
+                ],
+                "tolerances": {
+                    "general_tolerances": {
+                        "linear": "±value and unit",
+                        "angular": "±value and unit",
+                        "standard_reference": "ISO 2768-m, etc."
+                    },
+                    "specific_tolerances": [
+                        {"feature": "description", "tolerance": "exact_tolerance", "type": "bilateral/unilateral/limit"}
+                    ]
+                },
+                "geometric_tolerances": [
+                    {
+                        "feature": "feature description",
+                        "tolerance_type": "straightness/flatness/position/etc",
+                        "tolerance_value": "exact_value",
+                        "tolerance_zone": "description",
+                        "datum_references": ["A", "B", "C"],
+                        "material_condition": "MMC/LMC/RFS",
+                        "location": "where_specified_on_drawing"
+                    }
+                ],
+                "surface_specifications": [
+                    {
+                        "feature": "surface description",
+                        "roughness_value": "Ra/Rz value",
+                        "roughness_unit": "micrometers/microinches",
+                        "surface_symbol": "symbol description",
+                        "machining_requirement": "if_specified",
+                        "coating": "if_specified"
+                    }
+                ],
+                "threaded_features": [
+                    {
+                        "thread_specification": "M10x1.5, 1/4-20 UNC, etc.",
+                        "thread_class": "6H, 2B, etc.",
+                        "thread_length": "depth for blind holes",
+                        "location": "position on part",
+                        "quantity": "number of threads"
+                    }
+                ],
+                "section_views": [
+                    {
+                        "section_identifier": "A-A, B-B, DETAIL A, etc.",
+                        "section_scale": "scale if different from main",
+                        "section_type": "full section/half section/offset section/detail",
+                        "cutting_plane_location": "where section is taken",
+                        "dimensions_shown": [
+                            {"feature": "description", "value": "exact_value", "unit": "unit", "tolerance": "if_shown"}
+                        ]
+                    }
+                ],
+                "manufacturing_notes": [
+                    {
+                        "note_text": "exact text of note",
+                        "note_type": "machining/assembly/inspection/general",
+                        "applies_to": "which features the note applies to",
+                        "location_on_drawing": "where note is positioned"
+                    }
+                ],
+                "tables_and_data": [
+                    {
+                        "table_type": "hole table/bend table/revision history/etc",
+                        "table_title": "exact table title",
+                        "column_headers": ["list of column headers"],
+                        "table_data": [
+                            {"column1": "value1", "column2": "value2", "etc": "etc"}
+                        ]
+                    }
+                ],
+                "material_and_treatment": {
+                    "base_material": "exact material specification",
+                    "heat_treatment": "treatment specification if shown",
+                    "hardness_requirement": "hardness specification if shown",
+                    "coating": "coating specification if shown",
+                    "finish": "surface finish requirements"
+                },
+                "quality_requirements": {
+                    "inspection_requirements": ["list of inspection callouts"],
+                    "critical_dimensions": ["list of dimensions marked as critical"],
+                    "functional_requirements": ["any functional specifications noted"]
+                },
                 "geometric_decomposition": {
-                    "tolerance_applied": {"value": 4, "unit": "mm"},
-                    "base_shapes": [{"shape_type": "...", "dimensions": {"length": "...", "length_with_tolerance": "...+4"}, "volume": {...}}],
-                    "subtracted_features": [{"feature_type": "...", "dimensions": {"depth": "...", "depth_with_tolerance": "...+4"}, "volume": {...}}]
+                    "base_shapes": [
+                        {
+                            "shape_type": "cylinder/pipe/etc",
+                            "description": "gear blank / hub / teeth",
+                            "dimensions": {"outer_diameter": "...", "inner_diameter": "...", "height": "..."},
+                            "units" : "mm/inch etc"
+                            "position": "axial/centered/etc",
+                            "additive_or_subtractive": "additive"
+                        }
+                    ],
+                    "subtracted_features": [
+                        {
+                            "feature_type": "bore/keyway/hole/etc",
+                            "shape": "pipe/slot/etc",
+                            "quantity": "number of features",
+                            "dimensions": {"diameter": "...", "depth": "...", "width": "..."},
+                            "location": "center/radial position",
+                            "additive_or_subtractive": "subtractive"
+                        }
+                    ]
+                    },
+                    "final_shape_description": "Plain-text step-by-step description of gear construction"
+                    
                 }
-            }
-            - Use null for missing data.
-            - Apply +4mm tolerance to all dimensions.
-            - Calculate volumes (cylinders: π × r² × h, rectangles: l × w × h).
-            - Respond with valid JSON only.
+            ```
+            PRECISION REQUIREMENTS:
+            - Record ALL visible text exactly as written
+            - Capture ALL dimension values with exact decimal precision shown
+            - Extract ALL tolerance notations in their complete form
+            - Record ALL symbols and special characters exactly
+            - Note ALL line types and their meanings (hidden, center, dimension, etc.)
+            - Capture ALL notes, regardless of size or location
+            - Extract ALL coordinate dimensions and their reference points
+            - Record ALL view relationships and section indicators
+
+            ADAPTIVE ANALYSIS:
+            - If this is a mechanical part: focus on machining dimensions, fits, tolerances
+            - If this is an electrical drawing: focus on component values, connections, specifications  
+            - If this is an architectural plan: focus on room dimensions, annotations, scales
+            - If this is a civil/structural drawing: focus on structural dimensions, materials, load specifications
+            - If this contains multiple drawing types: analyze each appropriately
+
+            This analysis is for precision manufacturing/construction - extract every technical detail visible for production, machining, assembly, and quality control purposes.
+            
+            Respond ONLY with the JSON structure, no additional text or formatting.
             """
+            
 
             # Preprocess image with additional simplification
             image_path = self.preprocess_image(image_path, output_path=f"simplified_{os.path.basename(image_path)}")

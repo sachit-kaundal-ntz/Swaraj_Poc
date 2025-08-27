@@ -1,0 +1,677 @@
+{
+  "task_id": "d630e3c2-3909-4b74-a512-3a8446ba82da",
+  "filename": "d630e3c2-3909-4b74-a512-3a8446ba82da_gear1.jpg",
+  "file_size": 163749,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "mechanical",
+      "component_type": "gear",
+      "part_name": "IV Kademe Dişli Çark.",
+      "drawing_number": "VR-386",
+      "revision": "unspecified (revision table empty)",
+      "scale": "1:1",
+      "date_created": "25-4-1984",
+      "date_revised": "25-4-1984",
+      "sheet_info": "1 / 1",
+      "company": "unspecified",
+      "drawn_by": "Gülsuyu",
+      "checked_by": "SZ.Senel",
+      "approved_by": "İsmailoğlu",
+      "material_specification": "17CrNiMo6",
+      "standards_referenced": [
+        "Tolerans konulmamış boyutlar için Q20"
+      ]
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": "55",
+        "unit": "mm",
+        "tolerance": "+0.15/-0"
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": "216.5",
+        "unit": "mm",
+        "tolerance": "h9 (0.000/-0.115)"
+      },
+      "other_critical_dimensions": [
+        {
+          "feature": "Gear Face Width",
+          "value": "53",
+          "unit": "mm",
+          "tolerance": "unspecified",
+          "location": "Main Section View"
+        }
+      ]
+    },
+    "feature_dimensions": [
+      {
+        "feature_type": "bore",
+        "feature_description": "Central bore",
+        "dimensions": {
+          "primary": {
+            "value": "55",
+            "unit": "mm",
+            "tolerance": "H7 (+0.030/-0.000)"
+          },
+          "secondary": null
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "part center"
+        },
+        "specification": "Through bore",
+        "quantity": 1
+      },
+      {
+        "feature_type": "keyway",
+        "feature_description": "Keyway in bore",
+        "dimensions": {
+          "primary": {
+            "value": "16",
+            "unit": "mm",
+            "tolerance": "-0.006"
+          },
+          "secondary": {
+            "value": "9",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": {
+          "x": "offset from center",
+          "y": "offset from center",
+          "reference": "bore center"
+        },
+        "specification": "Width 16mm, Depth 9mm from bore surface",
+        "quantity": 1
+      },
+      {
+        "feature_type": "chamfer",
+        "feature_description": "Outer chamfer",
+        "dimensions": {
+          "primary": {
+            "value": "2",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": {
+            "value": "45",
+            "unit": "degrees",
+            "tolerance": "±15'"
+          }
+        },
+        "location": "Outer edge of gear face",
+        "specification": "2x45°",
+        "quantity": 1
+      },
+      {
+        "feature_type": "fillet",
+        "feature_description": "Internal fillet",
+        "dimensions": {
+          "primary": {
+            "value": "R3",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Junction of ⌀85 and ⌀194 diameters",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "fillet",
+        "feature_description": "Internal fillet",
+        "dimensions": {
+          "primary": {
+            "value": "R",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Junction of ⌀85 and ⌀216.5 diameters",
+        "specification": "Radius R (value not specified)",
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Hub diameter",
+        "dimensions": {
+          "primary": {
+            "value": "85",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Main Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Shoulder diameter",
+        "dimensions": {
+          "primary": {
+            "value": "194",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Main Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Pitch circle diameter (Taksimat dairesi çapı)",
+        "dimensions": {
+          "primary": {
+            "value": "210",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Gear Cutting Values Table",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Base circle diameter (Temel dairesi çapı)",
+        "dimensions": {
+          "primary": {
+            "value": "175",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Gear Cutting Values Table",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "length",
+        "feature_description": "Shoulder length",
+        "dimensions": {
+          "primary": {
+            "value": "2",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          "secondary": null
+        },
+        "location": "Main Section View",
+        "specification": null,
+        "quantity": 1
+      }
+    ],
+    "tolerances": {
+      "general_tolerances": {
+        "linear": "Q20 (for undimensioned sizes)",
+        "angular": "±15'",
+        "standard_reference": "unspecified (Q20 is not a standard ISO 2768 class)"
+      },
+      "specific_tolerances": [
+        {
+          "feature": "Dimension P9",
+          "tolerance": "-0.0018",
+          "type": "unilateral"
+        },
+        {
+          "feature": "Dimension 16 (likely keyway width)",
+          "tolerance": "-0.006",
+          "type": "unilateral"
+        },
+        {
+          "feature": "Diameter 55 (H7 fit)",
+          "tolerance": "+0.030/-0.000",
+          "type": "unilateral"
+        },
+        {
+          "feature": "Diameter 216.5 (h9 fit)",
+          "tolerance": "0.000/-0.115",
+          "type": "unilateral"
+        },
+        {
+          "feature": "Overall Length 55",
+          "tolerance": "+0.15/-0",
+          "type": "unilateral"
+        }
+      ]
+    },
+    "geometric_tolerances": [
+      {
+        "feature": "Face perpendicular to Datum A",
+        "tolerance_type": "perpendicularity",
+        "tolerance_value": "0.033",
+        "tolerance_zone": "diameter",
+        "datum_references": [
+          "A"
+        ],
+        "material_condition": "RFS (implied, no modifier)",
+        "location": "Left face of the gear"
+      },
+      {
+        "feature": "Diameter 216.5",
+        "tolerance_type": "circular runout / concentricity",
+        "tolerance_value": "0.034",
+        "tolerance_zone": "diameter",
+        "datum_references": [
+          "A"
+        ],
+        "material_condition": "RFS (implied, no modifier)",
+        "location": "Outer diameter of the gear"
+      },
+      {
+        "feature": "Datum A",
+        "tolerance_type": "datum feature",
+        "tolerance_value": null,
+        "tolerance_zone": null,
+        "datum_references": [],
+        "material_condition": null,
+        "location": "Center axis of ⌀55 H7 bore"
+      }
+    ],
+    "surface_specifications": [
+      {
+        "feature": "⌀55 H7 bore surface",
+        "roughness_value": "∇∇",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Machined surface (typically Ra 3.2 or better)",
+        "machining_requirement": null,
+        "coating": null
+      },
+      {
+        "feature": "Gear teeth surface",
+        "roughness_value": "∇∇∇",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Fine machined surface (typically Ra 1.6 or better)",
+        "machining_requirement": null,
+        "coating": null
+      },
+      {
+        "feature": "2x45° chamfer and R fillet",
+        "roughness_value": "∇",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Rough machined surface (typically Ra 6.3 or better)",
+        "machining_requirement": null,
+        "coating": null
+      }
+    ],
+    "threaded_features": [],
+    "section_views": [
+      {
+        "section_identifier": "Main View (implied A-A)",
+        "section_scale": "1:1",
+        "section_type": "full section",
+        "cutting_plane_location": "Through the center of the part",
+        "dimensions_shown": [
+          {
+            "feature": "Overall Length",
+            "value": "55",
+            "unit": "mm",
+            "tolerance": "+0.15/-0"
+          },
+          {
+            "feature": "Gear Face Width",
+            "value": "53",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Shoulder Length",
+            "value": "2",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Bore Diameter",
+            "value": "55",
+            "unit": "mm",
+            "tolerance": "H7"
+          },
+          {
+            "feature": "Hub Diameter",
+            "value": "85",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Shoulder Diameter",
+            "value": "194",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Outer Diameter",
+            "value": "216.5",
+            "unit": "mm",
+            "tolerance": "h9"
+          },
+          {
+            "feature": "Chamfer",
+            "value": "2x45°",
+            "unit": "mm/degrees",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Fillet",
+            "value": "R3",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Fillet",
+            "value": "R",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          }
+        ]
+      },
+      {
+        "section_identifier": "Side View",
+        "section_scale": "1:1",
+        "section_type": "orthographic projection",
+        "cutting_plane_location": "Orthogonal to main view",
+        "dimensions_shown": [
+          {
+            "feature": "Keyway Width",
+            "value": "16",
+            "unit": "mm",
+            "tolerance": "unspecified (but -0.006 in table)"
+          },
+          {
+            "feature": "Keyway Depth",
+            "value": "9",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Overall Diameter",
+            "value": "63.6",
+            "unit": "mm",
+            "tolerance": "+0.2/-0"
+          }
+        ]
+      }
+    ],
+    "manufacturing_notes": [
+      {
+        "note_text": "Tolerans konulmamış boyutlar için Q20",
+        "note_type": "general tolerance",
+        "applies_to": "All undimensioned features",
+        "location_on_drawing": "Top right 'NOT' section"
+      },
+      {
+        "note_text": "açılar : ±15'",
+        "note_type": "general tolerance",
+        "applies_to": "All angles",
+        "location_on_drawing": "Top right 'NOT' section"
+      },
+      {
+        "note_text": "Kabuk sertliği : 56±2 HRC",
+        "note_type": "heat treatment/material property",
+        "applies_to": "Case hardened layer",
+        "location_on_drawing": "Top right 'NOT' section"
+      },
+      {
+        "note_text": "Sert kabuk kalınlığı : 1 mm.",
+        "note_type": "heat treatment/material property",
+        "applies_to": "Case hardened layer",
+        "location_on_drawing": "Top right 'NOT' section"
+      },
+      {
+        "note_text": "Tane büyüklüğü : 6-7",
+        "note_type": "material property",
+        "applies_to": "Material grain structure",
+        "location_on_drawing": "Top right 'NOT' section"
+      },
+      {
+        "note_text": "Çekirdek sertliği : 25-35 HRC",
+        "note_type": "heat treatment/material property",
+        "applies_to": "Core material",
+        "location_on_drawing": "Top right 'NOT' section"
+      }
+    ],
+    "tables_and_data": [
+      {
+        "table_type": "gear_cutting_values",
+        "table_title": "DIŞ AÇMA DEĞERLERİ (Gear Cutting Values)",
+        "column_headers": [
+          "Sıra",
+          "Açıklamalar",
+          "İşaret",
+          "Değerler"
+        ],
+        "table_data": [
+          {
+            "Sıra": "1",
+            "Açıklamalar": "Diş adedi",
+            "İşaret": "z",
+            "Değerler": "42"
+          },
+          {
+            "Sıra": "2",
+            "Açıklamalar": "Normal modül",
+            "İşaret": "mno",
+            "Değerler": "5"
+          },
+          {
+            "Sıra": "3",
+            "Açıklamalar": "Normal kavrama açısı",
+            "İşaret": "αno",
+            "Değerler": "20°"
+          },
+          {
+            "Sıra": "4",
+            "Açıklamalar": "Temel Profil",
+            "İşaret": "hkw",
+            "Değerler": "6.25"
+          },
+          {
+            "Sıra": "5",
+            "Açıklamalar": "Taksimat helis açısı",
+            "İşaret": "βo",
+            "Değerler": "0°"
+          },
+          {
+            "Sıra": "6",
+            "Açıklamalar": "Helis yönü",
+            "İşaret": null,
+            "Değerler": "Düz"
+          },
+          {
+            "Sıra": "7",
+            "Açıklamalar": "Taksimat dairesi çapı",
+            "İşaret": "dg",
+            "Değerler": "210"
+          },
+          {
+            "Sıra": "8",
+            "Açıklamalar": "Temel dairesi çapı",
+            "İşaret": null,
+            "Değerler": "175"
+          },
+          {
+            "Sıra": "9",
+            "Açıklamalar": "Profil kaydırma",
+            "İşaret": "Xmno",
+            "Değerler": "-175"
+          },
+          {
+            "Sıra": "10",
+            "Açıklamalar": "Uç başı kısaltma",
+            "İşaret": "Kmno",
+            "Değerler": "000"
+          },
+          {
+            "Sıra": "11",
+            "Açıklamalar": "İşletme eksenler arası",
+            "İşaret": null,
+            "Değerler": "130.005"
+          }
+        ]
+      },
+      {
+        "table_type": "gear_control_values",
+        "table_title": "DİŞLİ KONTROL DEĞERLERİ (Gear Control Values)",
+        "column_headers": [
+          "Sıra",
+          "Açıklamalar",
+          "İşaret",
+          "Değerler"
+        ],
+        "table_data": [
+          {
+            "Sıra": "12",
+            "Açıklamalar": "Z diş üzerinde kesme mikromet ölç.taşlama",
+            "İşaret": "W5",
+            "Değerler": "69.167"
+          },
+          {
+            "Sıra": "13",
+            "Açıklamalar": "Dişli kumpas yüksekliği",
+            "İşaret": "K. diş qn, k. diş kalınlığı sn",
+            "Değerler": null
+          },
+          {
+            "Sıra": "14",
+            "Açıklamalar": "Dişli pim ölçüleri",
+            "İşaret": "kontrol çapı d, Pimler M, üstü çapı",
+            "Değerler": null
+          },
+          {
+            "Sıra": "15",
+            "Açıklamalar": "Toplam yuvarlanma h.Fi'",
+            "İşaret": null,
+            "Değerler": null
+          },
+          {
+            "Sıra": "16",
+            "Açıklamalar": "Bir dişte",
+            "İşaret": "fi'",
+            "Değerler": null
+          },
+          {
+            "Sıra": "17",
+            "Açıklamalar": "Diş istikamet hatası",
+            "İşaret": "fß",
+            "Değerler": null
+          },
+          {
+            "Sıra": "18",
+            "Açıklamalar": "Diş yanak boşluğu",
+            "İşaret": "B",
+            "Değerler": null
+          }
+        ]
+      },
+      {
+        "table_type": "tolerance_table",
+        "table_title": null,
+        "column_headers": [
+          "Ölçü",
+          "Tolerans"
+        ],
+        "table_data": [
+          {
+            "Ölçü": "P9",
+            "Tolerans": "-0.0018"
+          },
+          {
+            "Ölçü": "16",
+            "Tolerans": "-0.006"
+          },
+          {
+            "Ölçü": "H7",
+            "Tolerans": "+0.030 / -0.000"
+          },
+          {
+            "Ölçü": "⌀55",
+            "Tolerans": "+0.030 / -0.000"
+          },
+          {
+            "Ölçü": "h9",
+            "Tolerans": "0.000 / -0.115"
+          },
+          {
+            "Ölçü": "⌀216.5",
+            "Tolerans": "0.000 / -0.115"
+          }
+        ]
+      },
+      {
+        "table_type": "revision_history",
+        "table_title": "DEĞİŞİKLİK (Change)",
+        "column_headers": [
+          "SIRA",
+          "RESİM No.",
+          "PARÇA ADI",
+          "ADET",
+          "MALZEME",
+          "AÇIKLAMA"
+        ],
+        "table_data": []
+      }
+    ],
+    "material_and_treatment": {
+      "base_material": "17CrNiMo6",
+      "heat_treatment": "Case hardening (Kabuk sertliği)",
+      "hardness_requirement": "Case: 56±2 HRC, Core: 25-35 HRC",
+      "coating": null,
+      "finish": null
+    },
+    "quality_requirements": {
+      "inspection_requirements": [
+        "Measurement over 5 teeth with cutting micrometer (W5 69.167)",
+        "Gear caliper height (K. diş qn, k. diş kalınlığı sn)",
+        "Gear pin measurements (kontrol çapı d, Pimler M, üstü çapı)",
+        "Total runout (h.Fi')",
+        "On one tooth (fi')",
+        "Tooth direction error (fß)",
+        "Tooth flank clearance (B)"
+      ],
+      "critical_dimensions": [
+        "⌀55 H7 bore",
+        "⌀216.5 h9 outer diameter",
+        "Overall length 55 (+0.15/-0)",
+        "Keyway width 16 (-0.006)",
+        "Perpendicularity ⌀0.033 A",
+        "Runout/Concentricity ⌀0.034 A"
+      ],
+      "functional_requirements": [
+        "Gear tooth count: 42",
+        "Normal module: 5",
+        "Normal pressure angle: 20°",
+        "Pitch helix angle: 0° (Spur gear)",
+        "Operating center distance: 130.005"
+      ]
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 2661,
+        "image_tokens": 516,
+        "total_input_tokens": 3177
+      },
+      "output_tokens": 5615,
+      "total_tokens": 8792,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 1042,
+        "height": 786,
+        "total_pixels": 819012,
+        "format": "JPEG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-20T10:59:32.762233"
+}

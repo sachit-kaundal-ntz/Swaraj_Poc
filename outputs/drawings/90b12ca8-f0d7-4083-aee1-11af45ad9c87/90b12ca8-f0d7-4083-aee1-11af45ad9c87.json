@@ -1,0 +1,49 @@
+{
+  "task_id": "90b12ca8-f0d7-4083-aee1-11af45ad9c87",
+  "filename": "90b12ca8-f0d7-4083-aee1-11af45ad9c87_gear_img2.jpg",
+  "file_size": 483937,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": null,
+      "part_name": null,
+      "drawing_number": null
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": null,
+        "unit": null
+      },
+      "width": {
+        "value": null,
+        "unit": null
+      },
+      "height": {
+        "value": null,
+        "unit": null
+      },
+      "diameter": {
+        "value": null,
+        "unit": null
+      }
+    },
+    "geometric_decomposition": {
+      "tolerance_applied": {
+        "value": 4,
+        "unit": "mm"
+      },
+      "base_shapes": [],
+      "subtracted_features": []
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 3193,
+        "image_tokens": 516,
+        "total_input_tokens": 3709
+      },
+      "output_tokens": 0,
+      "total_tokens": 3709
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-27T10:33:32.539183"
+}

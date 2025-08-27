@@ -1,6 +1,7 @@
 # add files/directories to ignore
 .env
 env/
+venv/ 
 __pycache__/
 output
 uploads

@@ -1,0 +1,639 @@
+{
+  "task_id": "0c874f63-f255-46af-8861-5dac52c08e72",
+  "filename": "0c874f63-f255-46af-8861-5dac52c08e72_UVW_0001_page_14_png.rf.a674e5e077f0bf6682c9f47dc4139ff1.jpg",
+  "file_size": 483821,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "mechanical part",
+      "component_type": "sprocket",
+      "part_name": "SPROCKET (DRIVE)",
+      "drawing_number": "810-101-104",
+      "revision": "O",
+      "scale": "1:2",
+      "date_created": "3/10/2003",
+      "date_revised": "3/10/2003",
+      "sheet_info": "1 OF 1",
+      "company": "S V ROBOTICS & AUTOMATION INDIA PVT LTD.",
+      "drawn_by": "KSJ",
+      "checked_by": "KSJ",
+      "approved_by": "unclear_text",
+      "material_specification": "Sprocket: P.P./DERLINE, Insert: M.S.",
+      "standards_referenced": [
+        "ALL DIMENSIONS AER IN MM",
+        "A4-THIS IS A CAD DRAWING"
+      ]
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": "50",
+        "unit": "mm",
+        "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": "137",
+        "unit": "mm",
+        "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+      },
+      "other_critical_dimensions": [
+        {
+          "feature": "Overall Diameter",
+          "value": "137",
+          "unit": "mm",
+          "tolerance": "±0.3",
+          "location": "Section View"
+        },
+        {
+          "feature": "Overall Length",
+          "value": "50",
+          "unit": "mm",
+          "tolerance": "±0.3",
+          "location": "Section View"
+        }
+      ]
+    },
+    "feature_dimensions": [
+      {
+        "feature_type": "bore",
+        "feature_description": "Main bore diameter",
+        "dimensions": {
+          "primary": {
+            "value": "35",
+            "unit": "mm",
+            "tolerance": "H7"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "part center"
+        },
+        "specification": "bore",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "keyway",
+        "feature_description": "Keyway width",
+        "dimensions": {
+          "primary": {
+            "value": "8",
+            "unit": "mm",
+            "tolerance": "Js9"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "bore"
+        },
+        "specification": "keyway",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "keyway",
+        "feature_description": "Keyway depth from center",
+        "dimensions": {
+          "primary": {
+            "value": "38.3",
+            "unit": "mm",
+            "tolerance": "+0.2"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "bore"
+        },
+        "specification": "keyway",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Inner diameter of sprocket body",
+        "dimensions": {
+          "primary": {
+            "value": "60",
+            "unit": "mm",
+            "tolerance": "±0.2 (based on general tolerance for 6-30mm)"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "Section View"
+        },
+        "specification": "concentric bore",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Intermediate diameter of sprocket body",
+        "dimensions": {
+          "primary": {
+            "value": "83",
+            "unit": "mm",
+            "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "Section View"
+        },
+        "specification": "concentric diameter",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Outer diameter of sprocket body",
+        "dimensions": {
+          "primary": {
+            "value": "108",
+            "unit": "mm",
+            "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "Section View"
+        },
+        "specification": "concentric diameter",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "width",
+        "feature_description": "Outer flange width",
+        "dimensions": {
+          "primary": {
+            "value": "7.5",
+            "unit": "mm",
+            "tolerance": "±0.1"
+          }
+        },
+        "location": {
+          "x": "left/right flanges",
+          "y": "center",
+          "reference": "Section View"
+        },
+        "specification": "TYP (typical, applies to both flanges)",
+        "quantity": "2"
+      },
+      {
+        "feature_type": "width",
+        "feature_description": "Central body width",
+        "dimensions": {
+          "primary": {
+            "value": "16",
+            "unit": "mm",
+            "tolerance": "+0.2"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "Section View"
+        },
+        "specification": "body width",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Number of teeth",
+        "dimensions": {
+          "primary": {
+            "value": "10",
+            "unit": "No's",
+            "tolerance": "N/A"
+          }
+        },
+        "location": "Sprocket Data",
+        "specification": "tooth count",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Pitch Circle Diameter (P.C.D.)",
+        "dimensions": {
+          "primary": {
+            "value": "123.3",
+            "unit": "mm",
+            "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+          }
+        },
+        "location": "Sprocket Data / Front View",
+        "specification": "P.C.D.",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Outer Diameter (O.D.)",
+        "dimensions": {
+          "primary": {
+            "value": "137",
+            "unit": "mm",
+            "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+          }
+        },
+        "location": "Sprocket Data / Front View",
+        "specification": "O.D.",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Outer radius of tooth profile",
+        "dimensions": {
+          "primary": {
+            "value": "141.62",
+            "unit": "mm",
+            "tolerance": "±0.3 (based on general tolerance for 120-400mm)"
+          }
+        },
+        "location": "Front View",
+        "specification": "radius",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Tooth width at tip",
+        "dimensions": {
+          "primary": {
+            "value": "8.21",
+            "unit": "mm",
+            "tolerance": "±0.2 (based on general tolerance for 6-30mm)"
+          }
+        },
+        "location": "Front View",
+        "specification": "width",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Tooth pitch/span",
+        "dimensions": {
+          "primary": {
+            "value": "38.1",
+            "unit": "mm",
+            "tolerance": "±0.3 (based on general tolerance for 30-120mm)"
+          }
+        },
+        "location": "Front View",
+        "specification": "pitch",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Tooth root diameter",
+        "dimensions": {
+          "primary": {
+            "value": "23",
+            "unit": "mm",
+            "tolerance": "±0.2 (based on general tolerance for 6-30mm)"
+          }
+        },
+        "location": "Front View",
+        "specification": "diameter",
+        "quantity": "1"
+      },
+      {
+        "feature_type": "sprocket tooth",
+        "feature_description": "Tooth root radius",
+        "dimensions": {
+          "primary": {
+            "value": "18.97",
+            "unit": "mm",
+            "tolerance": "±0.2 (based on general tolerance for 6-30mm)"
+          }
+        },
+        "location": "Front View",
+        "specification": "radius",
+        "quantity": "1"
+      }
+    ],
+    "tolerances": {
+      "general_tolerances": {
+        "linear": {
+          "0.5 TO 6": "±0.1 mm",
+          "6 TO 30": "±0.2 mm",
+          "30 TO 120": "±0.3 mm",
+          "120 TO 400": "±0.5 mm",
+          "400 TO 1000": "±0.8 mm",
+          "1000 TO 2000": "±1.2 mm",
+          "2000 TO 4000": "±2 mm"
+        },
+        "angular": "not specified",
+        "standard_reference": "ALL DIMENSIONS AER IN MM (implies ISO 2768-m or similar)"
+      },
+      "specific_tolerances": [
+        {
+          "feature": "Outer flange width",
+          "tolerance": "±0.1",
+          "type": "bilateral"
+        },
+        {
+          "feature": "Central body width",
+          "tolerance": "+0.2",
+          "type": "unilateral"
+        },
+        {
+          "feature": "Main bore diameter",
+          "tolerance": "H7",
+          "type": "fit"
+        },
+        {
+          "feature": "Keyway width",
+          "tolerance": "Js9",
+          "type": "fit"
+        },
+        {
+          "feature": "Keyway depth from center",
+          "tolerance": "+0.2",
+          "type": "unilateral"
+        },
+        {
+          "feature": "Distances (general note)",
+          "tolerance": "±0.2",
+          "type": "bilateral"
+        }
+      ]
+    },
+    "geometric_tolerances": [],
+    "surface_specifications": [
+      {
+        "feature": "General surfaces (Rough Cut)",
+        "roughness_value": "Δ",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Rough Cut",
+        "machining_requirement": "Rough Cut",
+        "coating": null
+      },
+      {
+        "feature": "General surfaces (Clean Mill/Turn)",
+        "roughness_value": "∇∇",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Clean Mill/Turn",
+        "machining_requirement": "Clean Mill/Turn",
+        "coating": null
+      },
+      {
+        "feature": "General surfaces (Grinding)",
+        "roughness_value": "∇∇∇",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Grinding",
+        "machining_requirement": "Grinding",
+        "coating": null
+      },
+      {
+        "feature": "General surfaces (Lapping)",
+        "roughness_value": "∇∇∇∇",
+        "roughness_unit": "symbol",
+        "surface_symbol": "Lapping",
+        "machining_requirement": "Lapping",
+        "coating": null
+      }
+    ],
+    "threaded_features": [],
+    "section_views": [
+      {
+        "section_identifier": "unlabeled section view",
+        "section_scale": "1:2 (main drawing scale)",
+        "section_type": "full section",
+        "cutting_plane_location": "through the center of the sprocket",
+        "dimensions_shown": [
+          {
+            "feature": "Overall Length",
+            "value": "50",
+            "unit": "mm",
+            "tolerance": "±0.3"
+          },
+          {
+            "feature": "Outer flange width",
+            "value": "7.5",
+            "unit": "mm",
+            "tolerance": "±0.1"
+          },
+          {
+            "feature": "Central body width",
+            "value": "16",
+            "unit": "mm",
+            "tolerance": "+0.2"
+          },
+          {
+            "feature": "Inner diameter",
+            "value": "60",
+            "unit": "mm",
+            "tolerance": "±0.2"
+          },
+          {
+            "feature": "Intermediate diameter",
+            "value": "83",
+            "unit": "mm",
+            "tolerance": "±0.3"
+          },
+          {
+            "feature": "Outer diameter",
+            "value": "108",
+            "unit": "mm",
+            "tolerance": "±0.3"
+          },
+          {
+            "feature": "Largest diameter",
+            "value": "137",
+            "unit": "mm",
+            "tolerance": "±0.3"
+          }
+        ]
+      }
+    ],
+    "manufacturing_notes": [
+      {
+        "note_text": "INSERT HAS TO BE PRESS FITTED IN TO SPROCKET",
+        "note_type": "assembly instruction",
+        "applies_to": "Insert and Sprocket",
+        "location_on_drawing": "bottom left"
+      },
+      {
+        "note_text": "ALL DRILLED & TAPED HOLES CENTER",
+        "note_type": "machining/quality requirement",
+        "applies_to": "all drilled and tapped holes (none explicitly shown as tapped)",
+        "location_on_drawing": "bottom left"
+      },
+      {
+        "note_text": "DISTANCES TO BE MAINTENED WITHIN ±0.2",
+        "note_type": "general tolerance",
+        "applies_to": "all unspecified distances",
+        "location_on_drawing": "bottom left"
+      },
+      {
+        "note_text": "UNSPECIFIED CHAMFER 0.5*45°",
+        "note_type": "design specification",
+        "applies_to": "all sharp edges not otherwise specified",
+        "location_on_drawing": "bottom left"
+      },
+      {
+        "note_text": "REMOVE ALL SHARP EDGES",
+        "note_type": "finishing requirement",
+        "applies_to": "all edges",
+        "location_on_drawing": "bottom left"
+      }
+    ],
+    "tables_and_data": [
+      {
+        "table_type": "part list",
+        "table_title": null,
+        "column_headers": [
+          "S.NO",
+          "DESCRIPTION",
+          "MATL."
+        ],
+        "table_data": [
+          {
+            "S.NO": "1",
+            "DESCRIPTION": "SPROCKET",
+            "MATL.": "P.P./DERLINE"
+          },
+          {
+            "S.NO": "2",
+            "DESCRIPTION": "INSERT",
+            "MATL.": "M.S."
+          }
+        ]
+      },
+      {
+        "table_type": "sprocket data",
+        "table_title": "SPROKET DATA",
+        "column_headers": [
+          "Parameter",
+          "Value"
+        ],
+        "table_data": [
+          {
+            "Parameter": "NO OF TEETH",
+            "Value": "10"
+          },
+          {
+            "Parameter": "P.C.D.",
+            "Value": "⌀123.3"
+          },
+          {
+            "Parameter": "O.D.",
+            "Value": "⌀137"
+          }
+        ]
+      },
+      {
+        "table_type": "permissible deviations for linear dimensions",
+        "table_title": "PERMISSIBLE DEVIATIONS FOR LINEAR DIMENSIONS",
+        "column_headers": [
+          "0.5 TO 6",
+          "6 TO 30",
+          "30 TO 120",
+          "120 TO 400",
+          "400 TO 1000",
+          "1000 TO 2000",
+          "2000 TO 4000"
+        ],
+        "table_data": [
+          {
+            "0.5 TO 6": "±0.1",
+            "6 TO 30": "±0.2",
+            "30 TO 120": "±0.3",
+            "120 TO 400": "±0.5",
+            "400 TO 1000": "±0.8",
+            "1000 TO 2000": "±1.2",
+            "2000 TO 4000": "±2"
+          }
+        ]
+      },
+      {
+        "table_type": "quantity information",
+        "table_title": null,
+        "column_headers": [
+          "Description",
+          "Quantity"
+        ],
+        "table_data": [
+          {
+            "Description": "Qty. For One Assembly",
+            "Quantity": "2 No's."
+          },
+          {
+            "Description": "Total No of Assemblys",
+            "Quantity": "2 No's"
+          },
+          {
+            "Description": "Total Qty.",
+            "Quantity": "4 No's"
+          }
+        ]
+      },
+      {
+        "table_type": "surface roughness symbols",
+        "table_title": null,
+        "column_headers": [
+          "Machining Type",
+          "Symbol"
+        ],
+        "table_data": [
+          {
+            "Machining Type": "ROUGH CUT",
+            "Symbol": "Δ"
+          },
+          {
+            "Machining Type": "CLEAN MILL/TURN",
+            "Symbol": "∇∇"
+          },
+          {
+            "Machining Type": "GRINDING",
+            "Symbol": "∇∇∇"
+          },
+          {
+            "Machining Type": "LAPPING",
+            "Symbol": "∇∇∇∇"
+          }
+        ]
+      }
+    ],
+    "material_and_treatment": {
+      "base_material": "Sprocket: P.P./DERLINE, Insert: M.S.",
+      "heat_treatment": "not specified",
+      "hardness_requirement": "not specified",
+      "coating": "not specified",
+      "finish": "REMOVE ALL SHARP EDGES, UNSPECIFIED CHAMFER 0.5*45°"
+    },
+    "quality_requirements": {
+      "inspection_requirements": [
+        "ALL DRILLED & TAPED HOLES CENTER"
+      ],
+      "critical_dimensions": [
+        "⌀35H7 (bore fit)",
+        "8Js9 (keyway fit)",
+        "16⁺⁰·² (central width)",
+        "38.3⁺⁰·² (keyway depth)",
+        "Distances to be maintained within ±0.2"
+      ],
+      "functional_requirements": [
+        "INSERT HAS TO BE PRESS FITTED IN TO SPROCKET"
+      ]
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 2661,
+        "image_tokens": 774,
+        "total_input_tokens": 3435
+      },
+      "output_tokens": 4499,
+      "total_tokens": 7934,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 1773,
+        "height": 2535,
+        "total_pixels": 4494555,
+        "format": "JPEG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-20T16:03:52.272631"
+}

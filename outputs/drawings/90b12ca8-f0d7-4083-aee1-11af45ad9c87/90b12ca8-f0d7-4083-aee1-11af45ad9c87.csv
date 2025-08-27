@@ -1,0 +1,4 @@
+Filename,Meta_drawing_number,Meta_drawing_type,Meta_part_name,Overall_diameter,Overall_height,Overall_length,Overall_width,Quality_base_shapes,Quality_subtracted_features,Quality_tolerance_applied,Record_Type
+90b12ca8-f0d7-4083-aee1-11af45ad9c87_gear_img2.jpg,,,,,,,,,,,Drawing_Metadata
+90b12ca8-f0d7-4083-aee1-11af45ad9c87_gear_img2.jpg,,,,"{'value': None, 'unit': None}","{'value': None, 'unit': None}","{'value': None, 'unit': None}","{'value': None, 'unit': None}",,,,Overall_Dimensions
+90b12ca8-f0d7-4083-aee1-11af45ad9c87_gear_img2.jpg,,,,,,,,[],[],"{'value': 4, 'unit': 'mm'}",geometric_decomposition

@@ -1,0 +1,20 @@
+{
+  "task_id": "9b5eb8c1-3b7b-4e5a-99a4-5d3d32afedbe",
+  "filename": "9b5eb8c1-3b7b-4e5a-99a4-5d3d32afedbe_image (5).png",
+  "file_size": 169251,
+  "extracted_data": {
+    "error": "Invalid JSON response: Invalid JSON structure: line 1 column 1 (char 0)",
+    "raw_response": "{\n    \"drawing_metadata\": {\n        \"drawing_type\": \"mechanical\",\n        \"component_type\": \"gear\",\n        \"part_name\": \"TRANSMISSION GEAR\",\n        \"drawing_number\": \"18\",\n        \"revision\": \"unclear_text\",\n        \"scale\": \"NTS\",\n        \"date_created\": \"unclear_text\",\n        \"date_revised\": \"unclear_text\",\n        \"sheet_info\": \"04 OF 05\",\n        \"company\": \"CENTENNIAL COLLEGE - C.A.D. LAB\",\n        \"drawn_by\": \"U.N. OWEN\",\n        \"checked_by\": \"S. HOLMES\",\n        \"approved_by\": \"J. WATSON\",\n        \"material_specification\": \"unclear_text\",\n        \"standards_referenced\": []\n    },\n    \"overall_dimensions\": {\n        \"length\": {\n            \"value\": 66.675,\n            \"unit\": \"mm\",\n            \"original_unit\": \"2.625 inches\",\n            \"tolerance\": \"unclear_text\"\n        },\n        \"width\": {\n            \"value\": 101.600,\n            \"unit\": \"mm\",\n            \"original_unit\": \"4.000 inches\",\n            \"tolerance\": \"unclear_text\"\n        },\n        \"height\": {\n            \"value\": 101.600,\n            \"unit\": \"mm\",\n            \"original_unit\": \"4.000 inches\",\n            \"tolerance\": \"unclear_text\"\n        },\n        \"diameter\": {\n            \"value\": 101.600,\n            \"unit\": \"mm\",\n            \"original_unit\": \"4.000 inches\",\n            \"tolerance\": \"unclear_text\"\n        },\n        \"other_critical_dimensions\": [\n            {\n                \"feature\": \"Hub Diameter (outer)\",\n                \"value\": 50.800,\n                \"unit\": \"mm\",\n                \"original_unit\": \"⌀2.000 inches\",\n                \"tolerance\": \"unclear_text\",\n                \"location\": \"section view\"\n            },\n            {\n                \"feature\": \"Central Web Diameter\",\n                \"value\": 88.900,\n                \"unit\": \"mm\",\n                \"original_unit\": \"⌀3.500 inches\",\n                \"tolerance\": \"unclear_text\",\n                \"location\": \"section view\"\n            },\n            {\n                \"feature\": \"Bore Diameter\",\n                \"value\": 38",
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 3617,
+        "image_tokens": 516,
+        "total_input_tokens": 4133
+      },
+      "output_tokens": 0,
+      "total_tokens": 4133
+    }
+  },
+  "status": "completed_with_errors",
+  "timestamp": "2025-08-26T15:50:30.793857"
+}

@@ -1,15 +1,16 @@
-
 import os
 import uuid
 import shutil
+import json
 from datetime import datetime
 from typing import Optional, List
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Query, Depends, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Query, Depends, status, Body
 from fastapi.responses import FileResponse
 from pathlib import Path
 from requests import Session
 from app.schemas.drawingSchema import DrawingProcessingResult, DrawingProcessingStatus, DrawingUploadResponse
 from app.service.techinalDrawingService2 import TechnicalDrawingExtractionService
+from app.service.volume_calculation_service import extract_dimensions_and_calculate_volumes, calculate_net_volume
 from app.log.logger import get_logger
 from app.database.db import get_db
 from typing import Optional, Tuple
@@ -372,7 +373,28 @@ async def list_processed_drawings(
             status_code=503,  # Service Unavailable
             detail="Could not retrieve file list"
         )
- 
+
+@router.get("/calculate-volume/{task_id}")
+async def calculate_volume_by_task_id(task_id: str):
+    """
+    Calculate volumes for a drawing by task_id (loads the corresponding JSON file).
+    """
+    try:
+        # Build the path to the JSON file
+        json_path = os.path.join(OUTPUT_DIR, task_id, f"{task_id}.json")
+        if not os.path.exists(json_path):
+            return {"error": f"Result file not found for task_id {task_id}"}
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        components = extract_dimensions_and_calculate_volumes(data)
+        volume_summary = calculate_net_volume(components)
+        return {
+            "components": components,
+            "volume_summary": volume_summary
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
 @router.delete("/delete/{task_id}")
 async def delete_processed_drawing(task_id: str):
     """

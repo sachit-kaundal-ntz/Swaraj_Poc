@@ -1,0 +1,473 @@
+{
+  "task_id": "3675c85e-fbec-478a-b6e4-6a49e22f0fed",
+  "filename": "3675c85e-fbec-478a-b6e4-6a49e22f0fed_image (5).png",
+  "file_size": 169251,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "mechanical",
+      "component_type": "gear",
+      "part_name": "MEGATHERIUM TRANSMISSION",
+      "drawing_number": "18",
+      "revision": "unclear_text",
+      "scale": "NTS",
+      "date_created": "unclear_text",
+      "date_revised": "unclear_text",
+      "sheet_info": "04 OF 05",
+      "company": "CENTENNIAL COLLEGE - C.A.D. LAB",
+      "drawn_by": "U.N. OWEN",
+      "checked_by": "S. HOLMES",
+      "approved_by": "J. WATSON",
+      "material_specification": "unspecified",
+      "standards_referenced": [],
+      "copyright_info": "© 1993, 2000, '04, '07, '08 - E.BEVILACQUA"
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": "2.625",
+        "unit": "INCHES",
+        "tolerance": "unspecified"
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": "4.000",
+        "unit": "INCHES",
+        "tolerance": "unspecified"
+      },
+      "other_critical_dimensions": [
+        {
+          "feature": "Overall axial length (reference)",
+          "value": "1.725",
+          "unit": "INCHES",
+          "tolerance": "unspecified",
+          "type": "reference",
+          "location": "Section View"
+        }
+      ]
+    },
+    "feature_dimensions": [
+      {
+        "feature_type": "diameter",
+        "feature_description": "Outer diameter (OD) of gear teeth",
+        "dimensions": {
+          "primary": {
+            "value": "4.000",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Pitch diameter (implied)",
+        "dimensions": {
+          "primary": {
+            "value": "3.500",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Inner hub diameter",
+        "dimensions": {
+          "primary": {
+            "value": "2.000",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "diameter",
+        "feature_description": "Bore diameter",
+        "dimensions": {
+          "primary": {
+            "value": "1.500",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "keyway",
+        "feature_description": "Keyway width",
+        "dimensions": {
+          "primary": {
+            "value": ".096",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View, Bore",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "keyway",
+        "feature_description": "Keyway depth from center of bore",
+        "dimensions": {
+          "primary": {
+            "value": ".192",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View, Bore",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "radius",
+        "feature_description": "Fillet radius (4 instances)",
+        "dimensions": {
+          "primary": {
+            "value": "R.125",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Section View, internal corners",
+        "specification": null,
+        "quantity": 4
+      },
+      {
+        "feature_type": "radius",
+        "feature_description": "Outer hub radius",
+        "dimensions": {
+          "primary": {
+            "value": "R.500",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "radius",
+        "feature_description": "Inner hub radius",
+        "dimensions": {
+          "primary": {
+            "value": "R.380",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "axial dimension",
+        "feature_description": "Hub face thickness (left)",
+        "dimensions": {
+          "primary": {
+            "value": ".450",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "axial dimension",
+        "feature_description": "Hub face thickness (right)",
+        "dimensions": {
+          "primary": {
+            "value": ".450",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "axial dimension",
+        "feature_description": "Inner web thickness",
+        "dimensions": {
+          "primary": {
+            "value": ".812",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "axial dimension",
+        "feature_description": "Outer web thickness (bottom)",
+        "dimensions": {
+          "primary": {
+            "value": ".475",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "axial dimension",
+        "feature_description": "Outer web thickness (top)",
+        "dimensions": {
+          "primary": {
+            "value": ".625",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Section View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "gear teeth count",
+        "feature_description": "Number of gear teeth",
+        "dimensions": {
+          "primary": {
+            "value": "32",
+            "unit": "teeth",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "radius",
+        "feature_description": "Gear tooth profile radius (outer)",
+        "dimensions": {
+          "primary": {
+            "value": "R2.375",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Detail View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "radius",
+        "feature_description": "Gear tooth profile radius (inner)",
+        "dimensions": {
+          "primary": {
+            "value": "R2.125",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Detail View",
+        "specification": null,
+        "quantity": 1
+      },
+      {
+        "feature_type": "linear dimension",
+        "feature_description": "Gear tooth profile dimension",
+        "dimensions": {
+          "primary": {
+            "value": "1.875'",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Detail View",
+        "specification": "Note: The apostrophe (') is unusual for linear dimensions in inches and typically denotes feet or minutes of arc. Interpreted as a linear dimension as shown.",
+        "quantity": 1
+      },
+      {
+        "feature_type": "linear dimension",
+        "feature_description": "Gear tooth profile dimension",
+        "dimensions": {
+          "primary": {
+            "value": "3.75'",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Detail View",
+        "specification": "Note: The apostrophe (') is unusual for linear dimensions in inches and typically denotes feet or minutes of arc. Interpreted as a linear dimension as shown.",
+        "quantity": 1
+      },
+      {
+        "feature_type": "linear dimension",
+        "feature_description": "Gear tooth profile dimension",
+        "dimensions": {
+          "primary": {
+            "value": "7.5'",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Detail View",
+        "specification": "Note: The apostrophe (') is unusual for linear dimensions in inches and typically denotes feet or minutes of arc. Interpreted as a linear dimension as shown.",
+        "quantity": 1
+      },
+      {
+        "feature_type": "linear dimension",
+        "feature_description": "Gear tooth profile dimension",
+        "dimensions": {
+          "primary": {
+            "value": "9.375'",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Detail View",
+        "specification": "Note: The apostrophe (') is unusual for linear dimensions in inches and typically denotes feet or minutes of arc. Interpreted as a linear dimension as shown.",
+        "quantity": 1
+      },
+      {
+        "feature_type": "radial dimension",
+        "feature_description": "Radial distance from center to gear tooth root",
+        "dimensions": {
+          "primary": {
+            "value": ".468",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": "Front View",
+        "specification": null,
+        "quantity": 1
+      }
+    ],
+    "tolerances": {
+      "general_tolerances": {
+        "linear": "unspecified",
+        "angular": "unspecified",
+        "standard_reference": "unspecified"
+      },
+      "specific_tolerances": []
+    },
+    "geometric_tolerances": [],
+    "surface_specifications": [],
+    "threaded_features": [],
+    "section_views": [
+      {
+        "section_identifier": "unlabeled",
+        "section_scale": "NTS",
+        "section_type": "full section",
+        "cutting_plane_location": "Implied through the center of the gear, perpendicular to the axis of rotation.",
+        "dimensions_shown": [
+          {
+            "feature": "Overall axial length",
+            "value": "2.625",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Axial length (reference)",
+            "value": "1.725",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Hub face thickness (left)",
+            "value": ".450",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Hub face thickness (right)",
+            "value": ".450",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Inner web thickness",
+            "value": ".812",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Outer web thickness (bottom)",
+            "value": ".475",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Outer web thickness (top)",
+            "value": ".625",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          },
+          {
+            "feature": "Fillet radius (4x)",
+            "value": "R.125",
+            "unit": "INCHES",
+            "tolerance": "unspecified"
+          }
+        ]
+      }
+    ],
+    "manufacturing_notes": [
+      {
+        "note_text": "NOTE: SOME HIDDEN LINES OMITTED FOR CLARITY",
+        "note_type": "general",
+        "applies_to": "Entire drawing views",
+        "location_on_drawing": "Top right of drawing area"
+      },
+      {
+        "note_text": "NOTE THE POSITION OF KEYWAY RELATIVE TO GEAR TEETH",
+        "note_type": "general",
+        "applies_to": "Keyway and gear teeth orientation",
+        "location_on_drawing": "Bottom center of drawing area"
+      }
+    ],
+    "tables_and_data": [],
+    "material_and_treatment": {
+      "base_material": "unspecified",
+      "heat_treatment": "unspecified",
+      "hardness_requirement": "unspecified",
+      "coating": "unspecified",
+      "finish": "unspecified"
+    },
+    "quality_requirements": {
+      "inspection_requirements": [],
+      "critical_dimensions": [],
+      "functional_requirements": []
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 2661,
+        "image_tokens": 516,
+        "total_input_tokens": 3177
+      },
+      "output_tokens": 3223,
+      "total_tokens": 6400,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 1430,
+        "height": 544,
+        "total_pixels": 777920,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-21T14:54:00.784881"
+}

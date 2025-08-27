@@ -1,0 +1,2 @@
+Filename,Record_Type,error,token_usage_input_tokens_image_tokens,token_usage_input_tokens_prompt_tokens,token_usage_input_tokens_total_input_tokens,token_usage_output_tokens,token_usage_token_counting_method,token_usage_total_tokens
+afab4f3b-af7e-4d92-af2e-0a1f66f3f2d3_UVW_0001_page_14_png.rf.a674e5e077f0bf6682c9f47dc4139ff1.jpg,General,Invalid JSON response from AI model: Unterminated string starting at: line 24 column 9 (char 899),774,3193,3967,302,gemini_api_with_estimation_fallback,4269

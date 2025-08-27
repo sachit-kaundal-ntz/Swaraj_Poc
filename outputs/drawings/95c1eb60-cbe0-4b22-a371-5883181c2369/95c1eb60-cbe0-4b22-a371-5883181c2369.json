@@ -1,0 +1,358 @@
+{
+  "task_id": "95c1eb60-cbe0-4b22-a371-5883181c2369",
+  "filename": "95c1eb60-cbe0-4b22-a371-5883181c2369_1.png",
+  "file_size": 52252,
+  "extracted_data": {
+    "drawing_metadata": {
+      "drawing_type": "mechanical",
+      "component_type": "spur gear",
+      "part_name": "Spur Gear",
+      "drawing_number": "KHJ 203-6202D",
+      "revision": "D (implied by drawing number)",
+      "scale": "Scale: 1.15, Scale: 1:1.5, Acale N. 1.5 (multiple conflicting scales visible)",
+      "date_created": "unclear_text",
+      "date_revised": "unclear_text",
+      "sheet_info": "unclear_text",
+      "company": "KHK The Gear Company",
+      "drawn_by": "1:1.5",
+      "checked_by": "unclear_text",
+      "approved_by": "IRS/BDO L22HD TP",
+      "material_specification": "J",
+      "standards_referenced": []
+    },
+    "overall_dimensions": {
+      "length": {
+        "value": "30",
+        "unit": "mm",
+        "tolerance": "unspecified"
+      },
+      "width": null,
+      "height": null,
+      "diameter": {
+        "value": "124",
+        "unit": "mm",
+        "tolerance": "unspecified"
+      },
+      "other_critical_dimensions": [
+        {
+          "feature": "Overall Length (from left face to rightmost face)",
+          "value": "30",
+          "unit": "mm",
+          "tolerance": "unspecified",
+          "location": "front view"
+        },
+        {
+          "feature": "Step Length 1",
+          "value": "10",
+          "unit": "mm",
+          "tolerance": "unspecified",
+          "location": "front view"
+        },
+        {
+          "feature": "Step Length 2",
+          "value": "10",
+          "unit": "mm",
+          "tolerance": "unspecified",
+          "location": "front view"
+        },
+        {
+          "feature": "Step Length 3",
+          "value": "5",
+          "unit": "mm",
+          "tolerance": "unspecified",
+          "location": "front view"
+        }
+      ]
+    },
+    "feature_dimensions": [
+      {
+        "feature_type": "bore",
+        "feature_description": "Central bore diameter",
+        "dimensions": {
+          "primary": {
+            "value": "17",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "part center"
+        },
+        "specification": "Through hole",
+        "quantity": 1
+      },
+      {
+        "feature_type": "bore",
+        "feature_description": "Hub bore diameter",
+        "dimensions": {
+          "primary": {
+            "value": "20",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "part center"
+        },
+        "specification": "Through hole",
+        "quantity": 1
+      },
+      {
+        "feature_type": "keyway",
+        "feature_description": "Keyway in central bore",
+        "dimensions": {
+          "primary": {
+            "value": "3",
+            "unit": "mm",
+            "tolerance": "unspecified",
+            "description": "width"
+          },
+          "secondary": {
+            "value": "2",
+            "unit": "mm",
+            "tolerance": "unspecified",
+            "description": "depth from ⌀12"
+          }
+        },
+        "location": {
+          "x": "center",
+          "y": "center",
+          "reference": "bore center"
+        },
+        "specification": "Keyway on ⌀12 bore",
+        "quantity": 1
+      },
+      {
+        "feature_type": "hole",
+        "feature_description": "Hole with M5 thread callout (side view)",
+        "dimensions": {
+          "primary": {
+            "value": "8",
+            "unit": "mm",
+            "tolerance": "unspecified",
+            "description": "diameter"
+          },
+          "secondary": {
+            "value": "20",
+            "unit": "mm",
+            "tolerance": "unspecified",
+            "description": "depth"
+          }
+        },
+        "location": {
+          "x": "unspecified",
+          "y": "unspecified",
+          "reference": "unspecified"
+        },
+        "specification": "6 @ 8 220 (unclear, likely 6 holes, ⌀8, depth 20, with '220' being extraneous or a typo)",
+        "quantity": 6
+      },
+      {
+        "feature_type": "hole",
+        "feature_description": "Hole with M5 thread callout (front view)",
+        "dimensions": {
+          "primary": {
+            "value": "unspecified",
+            "unit": "mm",
+            "tolerance": "unspecified"
+          }
+        },
+        "location": {
+          "x": "unspecified",
+          "y": "unspecified",
+          "reference": "unspecified"
+        },
+        "specification": "M5",
+        "quantity": "unspecified"
+      }
+    ],
+    "tolerances": {
+      "general_tolerances": {
+        "linear": "See 'Tolerance' table for ranges and values",
+        "angular": "unspecified",
+        "standard_reference": "unspecified"
+      },
+      "specific_tolerances": []
+    },
+    "geometric_tolerances": [],
+    "surface_specifications": [
+      {
+        "feature": "secondary-operated parts",
+        "roughness_value": "unspecified",
+        "roughness_unit": "unspecified",
+        "surface_symbol": "unspecified",
+        "machining_requirement": "unspecified",
+        "coating": "black oxide is optionally applied"
+      }
+    ],
+    "threaded_features": [
+      {
+        "thread_specification": "M5",
+        "thread_class": "unspecified",
+        "thread_length": "20 (implied for the 6 holes)",
+        "location": "side face",
+        "quantity": "6 (implied by '6 @ 8 220')"
+      },
+      {
+        "thread_specification": "M5",
+        "thread_class": "unspecified",
+        "thread_length": "unspecified",
+        "location": "front face",
+        "quantity": "unspecified"
+      }
+    ],
+    "section_views": [],
+    "manufacturing_notes": [
+      {
+        "note_text": "For J Series products, without black oxide is optionally applied on secondary-operated parts:",
+        "note_type": "general/coating",
+        "applies_to": "J Series products, secondary-operated parts",
+        "location_on_drawing": "top left"
+      },
+      {
+        "note_text": "The precision rade of gears after secondary operation is equivalent to the clalassific at for the 1b process.",
+        "note_type": "quality/process",
+        "applies_to": "gears after secondary operation",
+        "location_on_drawing": "bottom left"
+      }
+    ],
+    "tables_and_data": [
+      {
+        "table_type": "tolerance table",
+        "table_title": "Tolerance",
+        "column_headers": [
+          "Dimensions (l/3 6mm)",
+          "Imm (mn)"
+        ],
+        "table_data": [
+          {
+            "Dimensions (l/3 6mm)": "6-3",
+            "Imm (mn)": "2.005"
+          },
+          {
+            "Dimensions (l/3 6mm)": "0-28",
+            "Imm (mn)": "5.005"
+          },
+          {
+            "Dimensions (l/3 6mm)": "65-23",
+            "Imm (mn)": "5.602"
+          },
+          {
+            "Dimensions (l/3 6mm)": "118-19",
+            "Imm (mn)": "7.00L"
+          },
+          {
+            "Dimensions (l/3 6mm)": "6.5-10",
+            "Imm (mn)": "7.005"
+          },
+          {
+            "Dimensions (l/3 6mm)": "6.4-19",
+            "Imm (mn)": "1.006"
+          }
+        ]
+      },
+      {
+        "table_type": "gear data table",
+        "table_title": "Stael/Spur Gear Data",
+        "column_headers": [
+          "Parameter",
+          "Value"
+        ],
+        "table_data": [
+          {
+            "Parameter": "Module",
+            "Value": "M.5"
+          },
+          {
+            "Parameter": "Number of team",
+            "Value": "unclear_text"
+          },
+          {
+            "Parameter": "Phial ctrodects",
+            "Value": "Inomlnutictung/be"
+          },
+          {
+            "Parameter": "Bimertur",
+            "Value": "Z."
+          },
+          {
+            "Parameter": "Protectots Bassoyll",
+            "Value": "28"
+          },
+          {
+            "Parameter": "Goudar Otimefor",
+            "Value": "28"
+          },
+          {
+            "Parameter": "Rodlsienor Medertoll",
+            "Value": "28"
+          },
+          {
+            "Parameter": "Hent 7Hs Ourated",
+            "Value": "28"
+          },
+          {
+            "Parameter": "Material",
+            "Value": "J"
+          },
+          {
+            "Parameter": "Boror New",
+            "Value": "J"
+          },
+          {
+            "Parameter": "Beleboloking",
+            "Value": "1:3H"
+          },
+          {
+            "Parameter": "Aplp",
+            "Value": "unclear_text"
+          },
+          {
+            "Parameter": "Boor txt",
+            "Value": "unclear_text"
+          },
+          {
+            "Parameter": "IGG diston",
+            "Value": "unclear_text"
+          }
+        ]
+      }
+    ],
+    "material_and_treatment": {
+      "base_material": "J",
+      "heat_treatment": "Hent 7Hs Ourated (value 28)",
+      "hardness_requirement": "unspecified",
+      "coating": "black oxide (optional)",
+      "finish": "unspecified"
+    },
+    "quality_requirements": {
+      "inspection_requirements": [],
+      "critical_dimensions": [],
+      "functional_requirements": [
+        "Precision grade of gears after secondary operation equivalent to clalassific at for the 1b process."
+      ]
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 2661,
+        "image_tokens": 516,
+        "total_input_tokens": 3177
+      },
+      "output_tokens": 2355,
+      "total_tokens": 5532,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 800,
+        "height": 533,
+        "total_pixels": 426400,
+        "format": "JPEG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-08-21T13:09:38.910303"
+}
