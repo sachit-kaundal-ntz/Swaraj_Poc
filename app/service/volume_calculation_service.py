@@ -2,6 +2,24 @@ import math
 import json
 import re
 
+# Material density mapping in g/mm³
+MATERIAL_DENSITIES = {
+    "20MnCr5 (IS:1570)": 0.00785,
+    "20Ni55Cr50Mo20 (IS:1570)": 0.00785,
+    "20MnCr5 (IS:9175)": 0.00785,
+    "SAE 8620": 0.00785,
+    "EN43D (BS970)": 0.00785,
+    "EN353 (BS970)": 0.00785,
+    "SAE 8622H": 0.00785,
+    # Simplified material names for easier lookup
+    "20MnCr5": 0.00785,
+    "20Ni55Cr50Mo20": 0.00785,
+    "SAE8620": 0.00785,
+    "EN43D": 0.00785,
+    "EN353": 0.00785,
+    "SAE8622H": 0.00785
+}
+
 def extract_dimensions_and_calculate_volumes(json_data, tolerance_mm=4.0):
     """
     Extract dimensions from LLM response and calculate volumes programmatically
@@ -385,4 +403,204 @@ def calculate_net_volume(components):
             'subtracted_volume_change_mm3': round(subtracted_volume_tol - subtracted_volume, 2),
             'net_volume_change_mm3': round(tolerance_net - nominal_net, 2)
         }
+    }
+
+def get_material_density(material_name):
+    """
+    Get material density based on material name with flexible matching
+    
+    Args:
+        material_name: Name of the material
+        
+    Returns:
+        Density in g/mm³ or None if not found
+    """
+    if not material_name:
+        return None
+    
+    # Direct lookup
+    if material_name in MATERIAL_DENSITIES:
+        return MATERIAL_DENSITIES[material_name]
+    
+    # Flexible matching - remove spaces, hyphens, and case variations
+    normalized_input = material_name.replace(' ', '').replace('-', '').upper()
+    
+    for material, density in MATERIAL_DENSITIES.items():
+        normalized_material = material.replace(' ', '').replace('-', '').upper()
+        if normalized_input in normalized_material or normalized_material in normalized_input:
+            return density
+    
+    # If no match found, return default steel density
+    return 0.00785
+
+def calculate_mass_from_volume(volume_mm3, material_name="20MnCr5"):
+    """
+    Calculate mass based on volume and material density
+    
+    Args:
+        volume_mm3: Volume in cubic millimeters
+        material_name: Name of the material (default: "20MnCr5")
+        
+    Returns:
+        Dictionary with mass calculations in different units
+    """
+    if volume_mm3 <= 0:
+        return {
+            'mass_grams': 0.0,
+            'mass_kg': 0.0,
+            'material_used': material_name,
+            'density_g_per_mm3': 0.0,
+            'volume_mm3': volume_mm3
+        }
+    
+    density = get_material_density(material_name)
+    mass_grams = volume_mm3 * density
+    
+    return {
+        'mass_grams': round(mass_grams, 3),
+        'mass_kg': round(mass_grams / 1000, 6),
+        'material_used': material_name,
+        'density_g_per_mm3': density,
+        'volume_mm3': round(volume_mm3, 2)
+    }
+
+def calculate_mass_with_tolerance(components, material_name="20MnCr5"):
+    """
+    Calculate mass for all components including tolerance variations
+    
+    Args:
+        components: List of component dictionaries from volume calculation
+        material_name: Name of the material
+        
+    Returns:
+        Dictionary with detailed mass calculations
+    """
+    result = {
+        'material_used': material_name,
+        'density_g_per_mm3': get_material_density(material_name),
+        'components': [],
+        'summary': {}
+    }
+    
+    # Calculate mass for each component
+    for component in components:
+        comp_mass = {
+            'name': component['name'],
+            'is_subtracted': component['is_subtracted'],
+            'nominal_mass': calculate_mass_from_volume(
+                component['calculated_volume_mm3'], 
+                material_name
+            ),
+            'tolerance_mass': calculate_mass_from_volume(
+                component.get('volume_with_tolerance_mm3', component['calculated_volume_mm3']), 
+                material_name
+            )
+        }
+        
+        # Calculate mass change due to tolerance
+        comp_mass['mass_change'] = {
+            'mass_change_grams': round(
+                comp_mass['tolerance_mass']['mass_grams'] - comp_mass['nominal_mass']['mass_grams'], 
+                3
+            ),
+            'mass_change_kg': round(
+                comp_mass['tolerance_mass']['mass_kg'] - comp_mass['nominal_mass']['mass_kg'], 
+                6
+            )
+        }
+        
+        result['components'].append(comp_mass)
+    
+    # Calculate summary masses
+    base_components = [c for c in result['components'] if not c['is_subtracted']]
+    subtracted_components = [c for c in result['components'] if c['is_subtracted']]
+    
+    # Nominal masses
+    base_mass_nominal = sum(c['nominal_mass']['mass_grams'] for c in base_components)
+    subtracted_mass_nominal = sum(c['nominal_mass']['mass_grams'] for c in subtracted_components)
+    net_mass_nominal = base_mass_nominal - subtracted_mass_nominal
+    
+    # Tolerance masses
+    base_mass_tolerance = sum(c['tolerance_mass']['mass_grams'] for c in base_components)
+    subtracted_mass_tolerance = sum(c['tolerance_mass']['mass_grams'] for c in subtracted_components)
+    net_mass_tolerance = base_mass_tolerance - subtracted_mass_tolerance
+    
+    result['summary'] = {
+        'nominal_masses': {
+            'base_mass_grams': round(base_mass_nominal, 3),
+            'base_mass_kg': round(base_mass_nominal / 1000, 6),
+            'subtracted_mass_grams': round(subtracted_mass_nominal, 3),
+            'subtracted_mass_kg': round(subtracted_mass_nominal / 1000, 6),
+            'net_mass_grams': round(net_mass_nominal, 3),
+            'net_mass_kg': round(net_mass_nominal / 1000, 6)
+        },
+        'tolerance_masses': {
+            'base_mass_grams': round(base_mass_tolerance, 3),
+            'base_mass_kg': round(base_mass_tolerance / 1000, 6),
+            'subtracted_mass_grams': round(subtracted_mass_tolerance, 3),
+            'subtracted_mass_kg': round(subtracted_mass_tolerance / 1000, 6),
+            'net_mass_grams': round(net_mass_tolerance, 3),
+            'net_mass_kg': round(net_mass_tolerance / 1000, 6)
+        },
+        'mass_changes': {
+            'base_mass_change_grams': round(base_mass_tolerance - base_mass_nominal, 3),
+            'base_mass_change_kg': round((base_mass_tolerance - base_mass_nominal) / 1000, 6),
+            'subtracted_mass_change_grams': round(subtracted_mass_tolerance - subtracted_mass_nominal, 3),
+            'subtracted_mass_change_kg': round((subtracted_mass_tolerance - subtracted_mass_nominal) / 1000, 6),
+            'net_mass_change_grams': round(net_mass_tolerance - net_mass_nominal, 3),
+            'net_mass_change_kg': round((net_mass_tolerance - net_mass_nominal) / 1000, 6)
+        }
+    }
+    
+    return result
+
+def calculate_simple_mass(components, material_name="20MnCr5"):
+    """
+    Calculate simple mass with tolerance - returns just the final mass value
+    
+    Args:
+        components: List of component dictionaries from volume calculation
+        material_name: Name of the material
+        
+    Returns:
+        Simple dictionary with just the total mass
+    """
+    density = get_material_density(material_name)
+    
+    # Calculate net volume with tolerance
+    base_volume_tolerance = sum(
+        comp.get('volume_with_tolerance_mm3', comp['calculated_volume_mm3']) 
+        for comp in components if not comp['is_subtracted']
+    )
+    subtracted_volume_tolerance = sum(
+        comp.get('volume_with_tolerance_mm3', comp['calculated_volume_mm3']) 
+        for comp in components if comp['is_subtracted']
+    )
+    
+    net_volume_tolerance = base_volume_tolerance - subtracted_volume_tolerance
+    # Ensure mass and volume are always positive
+    total_mass_grams = abs(net_volume_tolerance * density)
+    net_volume_tolerance = abs(net_volume_tolerance)
+    return {
+        "message": f"The total mass of material is {round(total_mass_grams, 3)} grams",
+        "total_mass_grams": round(total_mass_grams, 3),
+        "total_mass_kg": round(total_mass_grams / 1000, 6),
+        "material": material_name,
+        "net_volume_with_tolerance_mm3": round(net_volume_tolerance, 2)
+    }
+
+def get_available_materials():
+    """
+    Get list of available materials and their densities
+    
+    Returns:
+        Dictionary of available materials and their properties
+    """
+    return {
+        material: {
+            'density_g_per_mm3': density,
+            'density_g_per_cm3': density * 1000,
+            'density_kg_per_m3': density * 1000000
+        }
+        for material, density in MATERIAL_DENSITIES.items()
     }

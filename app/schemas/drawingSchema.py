@@ -33,3 +33,20 @@ class ErrorResponse(BaseModel):
     error: str
     error_type: str
     task_id: Optional[str] = None
+
+class MassCalculationRequest(BaseModel):
+    material_name: Optional[str] = "20MnCr5"
+    tolerance_mm: Optional[float] = 4.0
+
+class MaterialInfo(BaseModel):
+    name: str
+    density_g_per_mm3: float
+    density_g_per_cm3: float
+    density_kg_per_m3: float
+
+class SimpleMassResponse(BaseModel):
+    message: str
+    total_mass_grams: float
+    total_mass_kg: float
+    material: str
+    net_volume_with_tolerance_mm3: float
