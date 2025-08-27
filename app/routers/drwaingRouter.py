@@ -53,10 +53,10 @@ def validate_image_file(file: UploadFile) -> Tuple[bool, Optional[str]]:
     
     return True, None
  
-async def process_drawing_background(task_id: str, file_path: str, output_dir: str, db):
-    """Background task to process technical drawing"""
+async def process_drawing_background(task_id: str, file_path: str, output_dir: str):
+    """Background task to process technical drawing (db removed)"""
     try:
-        result = await drawing_service.process_image_file(task_id, file_path, output_dir, db)
+        result = await drawing_service.process_image_file(task_id, file_path, output_dir)
         logger.info(f"Background processing completed for task: {task_id}")
         return result
     except ValueError as e:

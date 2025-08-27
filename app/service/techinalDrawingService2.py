@@ -12,7 +12,6 @@ from typing import Dict, List, Optional, Any
 from PIL import Image, ImageEnhance
 import base64
 import io
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.log.logger import get_logger
  
 logger = get_logger(__name__)
@@ -967,27 +966,24 @@ class TechnicalDrawingExtractionService:
         self,
         task_id: str,
         file_path: str,
-        output_dir: str,
-        db: 'AsyncSession' = None
+        output_dir: str
     ) -> dict:
-        """Process image file using Gemini extraction"""
-        from app.models.drawingModel import DrawingProcessingResult as DrawingProcessingResultModel
-        from sqlalchemy.exc import SQLAlchemyError
+        """Process image file using Gemini extraction (DB code removed)"""
         try:
             logger.info(f"Starting image processing for task: {task_id}")
- 
+
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"Image file not found: {file_path}")
- 
+
             file_size = os.path.getsize(file_path)
             logger.info(f"File size: {file_size} bytes")
- 
+
             if file_size == 0:
                 raise ValueError("Image file is empty")
- 
+
             os.makedirs(output_dir, exist_ok=True)
             base_filename = os.path.join(output_dir, task_id)
- 
+
             file_info = {
                 "task_id": task_id,
                 "original_filename": os.path.basename(file_path),
@@ -998,14 +994,14 @@ class TechnicalDrawingExtractionService:
                 "file_size": file_size,
                 "created_at": datetime.now().isoformat()
             }
- 
+
             self.processed_files[task_id] = file_info
- 
+
             extracted_data = await self.extract_technical_drawing_data(file_path)
- 
+
             status = "completed" if "error" not in extracted_data else "completed_with_errors"
             self.processed_files[task_id]["status"] = status
- 
+
             json_output = {
                 "task_id": task_id,
                 "filename": os.path.basename(file_path),
@@ -1014,15 +1010,15 @@ class TechnicalDrawingExtractionService:
                 "status": status,
                 "timestamp": datetime.now().isoformat()
             }
- 
+
             json_file_path = f"{base_filename}.json"
             with open(json_file_path, "w", encoding='utf-8') as f:
                 json.dump(json_output, f, indent=2, ensure_ascii=False)
             logger.info(f"JSON output saved to: {json_file_path}")
- 
+
             csv_file_path = f"{base_filename}.csv"
             processed_data = await self.process_all_data(extracted_data, os.path.basename(file_path))
- 
+
             if processed_data and len(processed_data) > 0:
                 with open(csv_file_path, "w", newline="", encoding='utf-8') as csvfile:
                     fieldnames = set()
@@ -1032,26 +1028,7 @@ class TechnicalDrawingExtractionService:
                     writer.writeheader()
                     writer.writerows(processed_data)
                 logger.info(f"CSV output saved to: {csv_file_path}")
- 
-            # Save to DB if session provided
-            if db is not None:
-                try:
-                    db_obj = DrawingProcessingResultModel(
-                        task_id=task_id,
-                        filename=os.path.basename(file_path),
-                        status=status,
-                        file_size=file_size,
-                        has_errors=("error" in extracted_data),
-                        json_path=json_file_path,
-                        csv_path=csv_file_path,
-                        extracted_data=extracted_data,
-                    )
-                    db.add(db_obj)
-                    await db.commit()
-                except SQLAlchemyError as db_exc:
-                    logger.error(f"DB error: {db_exc}")
-                    await db.rollback()
- 
+
             return {
                 "status": status,
                 "output_path": base_filename,
