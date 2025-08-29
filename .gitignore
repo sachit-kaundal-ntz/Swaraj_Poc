@@ -1,0 +1,15 @@
+# add files/directories to ignore
+.env
+env/
+venv/ 
+__pycache__/
+outputs/
+drawings/
+tests/
+uploads
+logs
+venv3.12.7/
+gemini_key.json
+*.png
+*.pdf
+*.xlsx
