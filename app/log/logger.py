@@ -4,6 +4,7 @@ from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
 # Central logger configuration
+# In your logger.py
 def setup_logging():
     """Centralized logging configuration for the entire application"""
     log_dir = Path("logs")
@@ -29,7 +30,7 @@ def setup_logging():
     file_handler.setFormatter(file_formatter)
     
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(logging.ERROR)  # CHANGE: Only show errors in console
     console_handler.setFormatter(console_formatter)
     
     root_logger = logging.getLogger()
