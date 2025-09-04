@@ -1,506 +1,591 @@
 
-import requests
-import base64
-import json
-import os
-from typing import Dict, List, Optional, Union
-from dataclasses import dataclass
-from pathlib import Path
-import argparse
-import time
 
+import json
+import math
+import re
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
 
 @dataclass
-class TechnicalSpecification:
-    """Data structure to hold extracted technical information"""
-    part_name: str = ""
-    drawing_number: str = ""
+class GearSpecifications:
+    """Extracted gear specifications from JSON"""
+    finished_volume_mm3: float = 0
+    finished_mass_kg: float = 0
     material: str = ""
-    dimensions: Dict[str, str] = None
-    tolerances: Dict[str, str] = None
-    surface_treatments: List[str] = None
-    manufacturing_notes: List[str] = None
-    quantity_info: Dict[str, str] = None
-    additional_specs: Dict[str, str] = None
+    material_density: float = 7.85  # g/cm³ for steel
+    outer_diameter: float = 0
+    length: float = 0
+    complexity: str = "complex"
+    has_internal_spline: bool = False
+    has_external_teeth: bool = False
+    heat_treatment: str = ""
+    hardness_requirement: str = ""
 
-    def __post_init__(self):
-        if self.dimensions is None:
-            self.dimensions = {}
-        if self.tolerances is None:
-            self.tolerances = {}
-        if self.surface_treatments is None:
-            self.surface_treatments = []
-        if self.manufacturing_notes is None:
-            self.manufacturing_notes = []
-        if self.quantity_info is None:
-            self.quantity_info = {}
-        if self.additional_specs is None:
-            self.additional_specs = {}
-
-
-class HuggingFaceTechnicalDrawingExtractor:
-    """Technical drawing extractor using Hugging Face API"""
+class AutomatedGearAnalyzer:
+    """
+    Fully automated gear analysis from JSON
+    """
     
-    def __init__(self, api_key: str, model_name: str = "OpenGVLab/InternVL3-78B"):
-        """
-        Initialize the extractor for Hugging Face API
-        
-        Args:
-            api_key: Hugging Face API key (starts with hf_)
-            model_name: Model name on Hugging Face
-        """
-        self.api_key = api_key
-        self.model_name = model_name
-        self.base_url = f"https://api-inference.huggingface.co/models/{model_name}"
-        self.headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+    # Material densities (g/cm³)
+    MATERIAL_DENSITIES = {
+        '20MnCr5': 7.85,
+        'EN353': 7.85,
+        'IS:9175': 7.85,
+        'SAE8620': 7.85,
+        'SAE8622H': 7.85,
+        '4140': 7.85,
+        '4340': 7.85,
+        'default': 7.85
+    }
+    
+    # Manufacturing operations detection rules
+    OPERATION_RULES = {
+        'Forging': {
+            'materials': ['20MnCr5', 'EN353', '4140', '4340', '8620'],
+            'geometry': ['stepped', 'hub', 'complex'],
+            'keywords': ['forged', 'forging']
+        },
+        'Hardening and Tempering': {
+            'keywords': ['normaliz', 'anneal', 'harden', 'temper'],
+            'heat_treatment': True
+        },
+        'Rough Turning': {
+            'geometry': ['cylinder', 'diameter', 'bore'],
+            'always': True  # Always needed for cylindrical parts
+        },
+        'Finish Turning': {
+            'tolerances': ['H7', 'H8', 'H9', '±0.1', '±0.05'],
+            'follows': 'Rough Turning'
+        },
+        'Broaching': {
+            'features': ['internal_spline', 'keyway', 'internal_gear'],
+            'keywords': ['spline', 'DIN 5480']
+        },
+        'Hobbing': {
+            'features': ['external_gear_teeth', 'helical', 'spur'],
+            'keywords': ['teeth', 'module', 'helix']
+        },
+        'Gear Tooth Chamfering': {
+            'features': ['tooth_chamfer', 'gear_tip_chamfer'],
+            'keywords': ['tooth edge chamfer', 'gear tip chamfer']
+        },
+        'Carburising': {
+            'keywords': ['carburiz', 'case harden', 'case depth'],
+            'heat_treatment': ['case', 'HRC']
+        },
+        'Grinding': {
+            'post_heat_treat': True,
+            'tolerances': ['tight', 'H7', 'H6'],
+            'keywords': ['grind', 'ground']
         }
-
-    def encode_image_to_base64(self, image_path: str) -> str:
+    }
+    
+    def __init__(self):
+        self.specs = GearSpecifications()
+        self.operations = []
+        self.gross_weight_data = {}
+        
+    def analyze_json_file(self, json_file_path: str) -> Dict:
         """
-        Encode image to base64 string
+        Main entry point - analyzes JSON file and returns complete results
         
         Args:
-            image_path: Path to the image file
+            json_file_path: Path to the JSON file
             
         Returns:
-            Base64 encoded image string
+            Dictionary with operations and weight calculations
         """
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-
-    def create_extraction_prompt(self) -> str:
-        """
-        Create a detailed prompt for technical drawing analysis
+        # Load JSON
+        with open(json_file_path, 'r') as f:
+            json_data = json.load(f)
         
-        Returns:
-            Formatted prompt string
-        """
-        prompt = """
-        Please analyze this technical engineering drawing image and extract the following information:
-
-        **PART IDENTIFICATION:**
-        - Part name or description
-        - Drawing number
-        - Sheet number
-        - Date and revision information
-
-        **MATERIAL & SPECIFICATIONS:**
-        - Material type and grade
-        - Heat treatment requirements
-        - Surface finish specifications
-
-        **DIMENSIONS & MEASUREMENTS:**
-        - Overall dimensions with units
-        - Critical dimensions (diameters, lengths, heights)
-        - Hole sizes and positions
-        - Thread specifications
-        - Angular measurements
-
-        **TOLERANCES & PRECISION:**
-        - General tolerance information
-        - Specific dimensional tolerances
-        - Geometric dimensioning and tolerancing (GD&T)
-
-        **MANUFACTURING DETAILS:**
-        - Manufacturing processes mentioned
-        - Assembly instructions
-        - Special manufacturing notes
-        - Quality requirements
-
-        **QUANTITY & ASSEMBLY:**
-        - Quantity required
-        - Assembly information
-        - Related part numbers
-
-        Please provide a detailed analysis focusing on accuracy. Extract all visible text, numbers, and technical specifications. If any information is unclear or not visible, please indicate this clearly.
-
-        Format your response as clear, structured text with sections for each category above.
-        """
-        return prompt
-
-    def wait_for_model(self, max_wait_time: int = 300) -> bool:
-        """
-        Wait for the model to be ready (in case it's loading)
+        # Extract specifications
+        self.extract_specifications(json_data)
         
-        Args:
-            max_wait_time: Maximum time to wait in seconds
-            
-        Returns:
-            True if model is ready, False if timeout
-        """
-        print("Checking if model is ready...")
+        # Detect manufacturing operations
+        self.operations = self.detect_operations(json_data)
         
-        # Simple payload to check model status
-        test_payload = {
-            "inputs": "Test message",
-            "parameters": {
-                "max_new_tokens": 10,
-                "temperature": 0.1
-            }
-        }
+        # Calculate gross weight
+        self.gross_weight_data = self.calculate_gross_weight()
         
-        start_time = time.time()
-        while time.time() - start_time < max_wait_time:
-            try:
-                response = requests.post(
-                    self.base_url,
-                    headers=self.headers,
-                    json=test_payload,
-                    timeout=30
-                )
-                
-                if response.status_code == 200:
-                    print("✅ Model is ready!")
-                    return True
-                elif response.status_code == 503:
-                    result = response.json()
-                    if "estimated_time" in result:
-                        wait_time = result["estimated_time"]
-                        print(f"⏳ Model is loading, estimated wait time: {wait_time} seconds")
-                        time.sleep(min(wait_time + 5, 60))  # Wait but cap at 60 seconds
-                    else:
-                        print("⏳ Model is loading, waiting 30 seconds...")
-                        time.sleep(30)
-                else:
-                    print(f"❌ Unexpected status code: {response.status_code}")
-                    return False
-                    
-            except requests.exceptions.RequestException as e:
-                print(f"⏳ Connection issue, retrying in 10 seconds... ({e})")
-                time.sleep(10)
-        
-        print("❌ Timeout waiting for model to be ready")
-        return False
-
-    def extract_information(self, image_path: str, custom_prompt: Optional[str] = None) -> Dict:
-        """
-        Extract technical information from a drawing image using Hugging Face API
-        
-        Args:
-            image_path: Path to the image file
-            custom_prompt: Custom prompt to override default
-            
-        Returns:
-            Dictionary containing extracted information
-        """
-        if not os.path.exists(image_path):
-            raise FileNotFoundError(f"Image file not found: {image_path}")
-
-        # Check if model is ready
-        if not self.wait_for_model():
-            return {
-                "success": False,
-                "error": "Model is not ready or unavailable",
-                "image_path": image_path
-            }
-
-        # Encode image
-        try:
-            base64_image = self.encode_image_to_base64(image_path)
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Failed to encode image: {str(e)}",
-                "image_path": image_path
-            }
-        
-        # Use custom prompt or default
-        prompt = custom_prompt if custom_prompt else self.create_extraction_prompt()
-
-        # Prepare the request payload for Hugging Face Inference API
-        # Note: Different models may have different input formats
-        payload = {
-            "inputs": {
-                "question": prompt,
-                "image": base64_image
+        # Compile results
+        results = {
+            'file': Path(json_file_path).name,
+            'part_info': self.get_part_info(json_data),
+            'specifications': {
+                'material': self.specs.material,
+                'density_g_cm3': self.specs.material_density,
+                'finished_mass_kg': self.specs.finished_mass_kg,
+                'outer_diameter_mm': self.specs.outer_diameter,
+                'length_mm': self.specs.length,
+                'complexity': self.specs.complexity
             },
-            "parameters": {
-                "max_new_tokens": 2000,
-                "temperature": 0.1,
-                "do_sample": False
+            'manufacturing_operations': self.operations,
+            'weight_analysis': self.gross_weight_data,
+            'summary': {
+                'finished_weight_kg': self.specs.finished_mass_kg,
+                'gross_weight_kg': self.gross_weight_data.get('gross_weight_kg', 0),
+                'material_utilization_percent': self.gross_weight_data.get('material_utilization_percent', 0),
+                'total_operations': len(self.operations)
             }
         }
-
-        try:
-            print(f"🔍 Analyzing image: {Path(image_path).name}")
-            response = requests.post(
-                self.base_url,
-                headers=self.headers,
-                json=payload,
-                timeout=120
+        
+        return results
+    
+    def extract_specifications(self, json_data: Dict):
+        """
+        Extract all specifications from JSON data
+        """
+        extracted_data = json_data.get('extracted_data', {})
+        
+        # Get material
+        material_data = extracted_data.get('material_and_treatment', {})
+        self.specs.material = material_data.get('base_material', '20MnCr5')
+        self.specs.heat_treatment = material_data.get('heat_treatment', '')
+        self.specs.hardness_requirement = material_data.get('hardness_requirement', '')
+        
+        # Get material density
+        self.specs.material_density = self.get_material_density(self.specs.material)
+        
+        # Get dimensions
+        overall_dims = extracted_data.get('overall_dimensions', {})
+        
+        # Extract diameter
+        diameter_data = overall_dims.get('diameter', {})
+        if isinstance(diameter_data, dict):
+            self.specs.outer_diameter = self.extract_number(diameter_data.get('value', 0))
+        
+        # Extract length
+        length_data = overall_dims.get('length', {})
+        if isinstance(length_data, dict):
+            self.specs.length = self.extract_number(length_data.get('value', 0))
+        
+        # Calculate volume and mass from geometric decomposition
+        self.calculate_volume_and_mass(extracted_data)
+        
+        # Determine complexity
+        self.specs.complexity = self.determine_complexity(extracted_data)
+        
+        # Check for features
+        geom = extracted_data.get('geometric_decomposition', {})
+        for feature in geom.get('subtracted_features', []):
+            if 'spline' in str(feature).lower():
+                self.specs.has_internal_spline = True
+        
+        for feature in geom.get('additive_features', []):
+            if 'gear' in str(feature).lower() or 'teeth' in str(feature).lower():
+                self.specs.has_external_teeth = True
+    
+    def calculate_volume_and_mass(self, extracted_data: Dict):
+        """
+        Calculate finished volume and mass from geometric decomposition
+        """
+        geom = extracted_data.get('geometric_decomposition', {})
+        
+        total_volume = 0
+        
+        # Add base shapes
+        for shape in geom.get('base_shapes', []):
+            volume = self.calculate_shape_volume(shape)
+            total_volume += volume
+        
+        # Subtract removed features
+        for feature in geom.get('subtracted_features', []):
+            volume = self.calculate_feature_volume(feature)
+            total_volume -= volume
+        
+        # Store results
+        self.specs.finished_volume_mm3 = max(total_volume, 0)
+        
+        # Calculate mass (volume in mm³ * density in g/cm³ / 1000)
+        self.specs.finished_mass_kg = (self.specs.finished_volume_mm3 * self.specs.material_density) / 1000000
+    
+    def calculate_shape_volume(self, shape: Dict) -> float:
+        """Calculate volume of a base shape"""
+        shape_type = shape.get('shape_type', '').lower()
+        dims = shape.get('dimensions', {})
+        
+        if shape_type == 'cylinder':
+            d = self.extract_number(dims.get('outer_diameter', dims.get('diameter', 0)))
+            h = self.extract_number(dims.get('height', dims.get('length', 0)))
+            if d and h:
+                return math.pi * (d/2)**2 * h
+                
+        elif shape_type == 'stepped_cylinder':
+            # Main cylinder
+            main_d = self.extract_number(
+                dims.get('main_outer_diameter', {}).get('value', 0) if isinstance(dims.get('main_outer_diameter'), dict)
+                else dims.get('main_outer_diameter', 0)
+            )
+            main_h = self.extract_number(
+                dims.get('main_height', {}).get('value', 0) if isinstance(dims.get('main_height'), dict)
+                else dims.get('main_height', 0)
             )
             
-            print(f"📊 API Response Status: {response.status_code}")
+            # Hub cylinder
+            hub_d = self.extract_number(
+                dims.get('hub_outer_diameter', {}).get('value', 0) if isinstance(dims.get('hub_outer_diameter'), dict)
+                else dims.get('hub_outer_diameter', 0)
+            )
+            hub_h = self.extract_number(
+                dims.get('hub_height', {}).get('value', 0) if isinstance(dims.get('hub_height'), dict)
+                else dims.get('hub_height', 0)
+            )
             
-            if response.status_code == 200:
-                result = response.json()
-                
-                # Handle different response formats
-                if isinstance(result, list) and len(result) > 0:
-                    content = result[0].get('generated_text', str(result))
-                elif isinstance(result, dict):
-                    content = result.get('generated_text', str(result))
-                else:
-                    content = str(result)
-                
-                return {
-                    "success": True,
-                    "extracted_text": content,
-                    "raw_response": result,
-                    "image_path": image_path
-                }
+            volume = 0
+            if main_d and main_h:
+                volume += math.pi * (main_d/2)**2 * main_h
+            if hub_d and hub_h:
+                volume += math.pi * (hub_d/2)**2 * hub_h
             
-            elif response.status_code == 503:
-                error_detail = response.json() if response.content else {}
-                estimated_time = error_detail.get('estimated_time', 'unknown')
-                return {
-                    "success": False,
-                    "error": f"Model is loading. Estimated time: {estimated_time} seconds",
-                    "image_path": image_path,
-                    "retry_after": estimated_time
-                }
+            return volume
+        
+        return 0
+    
+    def calculate_feature_volume(self, feature: Dict) -> float:
+        """Calculate volume of a subtracted feature"""
+        feature_type = feature.get('feature_type', '').lower()
+        dims = feature.get('dimensions', {})
+        
+        if 'bore' in feature_type:
+            d = self.extract_number(dims.get('diameter', dims.get('main_diameter', 0)))
+            depth = self.extract_number(dims.get('depth', dims.get('height', self.specs.length)))
+            if d and depth:
+                return math.pi * (d/2)**2 * depth
+        
+        elif 'spline' in feature_type:
+            # Approximate spline as bore
+            d = self.extract_number(dims.get('major_diameter', 45))  # Default from your example
+            depth = self.extract_number(dims.get('depth', self.specs.length))
+            if d and depth:
+                return math.pi * (d/2)**2 * depth * 0.8  # 80% of cylinder volume for spline
+        
+        return 0
+    
+    def detect_operations(self, json_data: Dict) -> List[Dict]:
+        """
+        Detect manufacturing operations from JSON data
+        """
+        operations = []
+        extracted_data = json_data.get('extracted_data', {})
+        
+        # 1. Forging (always first for these materials)
+        if self.check_operation_indicators(extracted_data, 'Forging'):
+            operations.append({
+                'sequence': 1,
+                'operation': 'Forging',
+                'evidence': f"Material: {self.specs.material}, Complex geometry"
+            })
+        
+        # 2. Hardening and Tempering (normalization)
+        if 'normaliz' in self.specs.heat_treatment.lower() or self.check_operation_indicators(extracted_data, 'Hardening and Tempering'):
+            operations.append({
+                'sequence': 2,
+                'operation': 'Hardening and Tempering',
+                'evidence': "Initial heat treatment for machinability"
+            })
+        
+        # 3-4. Turning operations
+        if self.specs.outer_diameter > 0:
+            operations.append({
+                'sequence': 3,
+                'operation': 'Rough Turning',
+                'evidence': f"Cylindrical part OD: {self.specs.outer_diameter}mm"
+            })
+            operations.append({
+                'sequence': 4,
+                'operation': 'Finish Turning',
+                'evidence': "Achieve final dimensions and tolerances"
+            })
+        
+        # 5. Broaching (internal features)
+        if self.specs.has_internal_spline or self.check_operation_indicators(extracted_data, 'Broaching'):
+            operations.append({
+                'sequence': 5,
+                'operation': 'Broaching',
+                'evidence': "Internal spline/keyway machining"
+            })
+        
+        # 6. Hobbing (external teeth)
+        if self.specs.has_external_teeth or self.check_operation_indicators(extracted_data, 'Hobbing'):
+            operations.append({
+                'sequence': 6,
+                'operation': 'Hobbing',
+                'evidence': "External gear teeth cutting"
+            })
+        
+        # 7. Gear Tooth Chamfering
+        if self.check_for_tooth_chamfer(extracted_data):
+            operations.append({
+                'sequence': 7,
+                'operation': 'Gear Tooth Chamfering',
+                'evidence': "Tooth edge chamfering specified"
+            })
+        
+        # 8. Carburising
+        if 'carburiz' in self.specs.heat_treatment.lower() or 'case' in self.specs.heat_treatment.lower():
+            operations.append({
+                'sequence': 8,
+                'operation': 'Carburising',
+                'evidence': self.specs.heat_treatment
+            })
+        
+        # 9-10. Grinding
+        if 'HRC' in self.specs.hardness_requirement:
+            operations.append({
+                'sequence': 9,
+                'operation': 'Grinding',
+                'evidence': "Post heat-treatment grinding for accuracy"
+            })
             
-            else:
-                error_detail = response.text
-                return {
-                    "success": False,
-                    "error": f"API Error {response.status_code}: {error_detail}",
-                    "image_path": image_path
-                }
-            
-        except requests.exceptions.Timeout:
-            return {
-                "success": False,
-                "error": "Request timeout - image analysis took too long",
-                "image_path": image_path
+            # Check if bore grinding is needed
+            if self.check_for_bore_grinding(extracted_data):
+                operations.append({
+                    'sequence': 10,
+                    'operation': 'Grinding',
+                    'evidence': "Bore grinding for tight tolerance"
+                })
+        
+        return operations
+    
+    def check_operation_indicators(self, data: Dict, operation: str) -> bool:
+        """Check if operation indicators are present in data"""
+        rules = self.OPERATION_RULES.get(operation, {})
+        
+        # Check material indicators
+        if 'materials' in rules:
+            for mat in rules['materials']:
+                if mat.lower() in self.specs.material.lower():
+                    return True
+        
+        # Check keywords in all text
+        if 'keywords' in rules:
+            data_str = str(data).lower()
+            for keyword in rules['keywords']:
+                if keyword.lower() in data_str:
+                    return True
+        
+        return False
+    
+    def check_for_tooth_chamfer(self, data: Dict) -> bool:
+        """Check for gear tooth chamfer specifications"""
+        features = data.get('feature_dimensions', [])
+        for feature in features:
+            if 'chamfer' in str(feature).lower() and 'tooth' in str(feature).lower():
+                return True
+        
+        # Check geometric decomposition
+        geom = data.get('geometric_decomposition', {})
+        for mod in geom.get('feature_modifications', []):
+            if 'chamfer' in str(mod).lower() and 'tooth' in str(mod).lower():
+                return True
+        
+        return False
+    
+    def check_for_bore_grinding(self, data: Dict) -> bool:
+        """Check if bore grinding is needed"""
+        tolerances = data.get('tolerances', {})
+        for tol in tolerances.get('specific_tolerances', []):
+            if 'bore' in str(tol).lower() and any(x in str(tol) for x in ['H7', 'H8', 'H6']):
+                return True
+        return False
+    
+    def calculate_gross_weight(self) -> Dict:
+        """
+        Calculate gross weight from finished weight using industry factors
+        """
+        finished_weight = self.specs.finished_mass_kg
+        
+        # If no finished weight calculated, use default
+        if finished_weight <= 0:
+            finished_weight = 1.47  # Default for POC
+        
+        # Material losses based on industry standards
+        losses = {
+            'machining': 0.35,  # 35% typical for gears
+            'flash': self.get_flash_factor(finished_weight),
+            'scale': 0.03,  # 3% for gas furnace
+            'tong_hold': 0.02,
+            'die_wear': 0.04,
+            'saw_cut': 0.03,
+            'bar_end': 0.05
+        }
+        
+        # Progressive weight calculation
+        forged_weight = finished_weight / (1 - losses['machining'])
+        weight_with_flash = forged_weight * (1 + losses['flash'])
+        weight_after_scale = weight_with_flash / (1 - losses['scale'])
+        weight_with_handling = weight_after_scale / (1 - losses['tong_hold'] - losses['die_wear'])
+        gross_weight = weight_with_handling / (1 - losses['saw_cut'] - losses['bar_end'])
+        
+        # Material utilization
+        material_utilization = (finished_weight / gross_weight) * 100
+        
+        return {
+            'finished_weight_kg': round(finished_weight, 3),
+            'forged_weight_kg': round(forged_weight, 3),
+            'gross_weight_kg': round(gross_weight, 3),
+            'material_utilization_percent': round(material_utilization, 1),
+            'weight_progression': {
+                '1_finished': round(finished_weight, 3),
+                '2_after_machining': round(forged_weight, 3),
+                '3_with_flash': round(weight_with_flash, 3),
+                '4_after_heating': round(weight_after_scale, 3),
+                '5_gross_billet': round(gross_weight, 3)
+            },
+            'losses_kg': {
+                'machining': round(forged_weight - finished_weight, 3),
+                'flash': round(weight_with_flash - forged_weight, 3),
+                'scale': round(weight_after_scale - weight_with_flash, 3),
+                'handling': round(weight_with_handling - weight_after_scale, 3),
+                'cutting': round(gross_weight - weight_with_handling, 3),
+                'total': round(gross_weight - finished_weight, 3)
             }
-        except requests.exceptions.RequestException as e:
-            return {
-                "success": False,
-                "error": f"Request failed: {str(e)}",
-                "image_path": image_path
-            }
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Unexpected error: {str(e)}",
-                "image_path": image_path
-            }
-
-    def parse_extracted_data(self, extracted_text: str) -> TechnicalSpecification:
-        """
-        Parse the extracted text into a structured format
+        }
+    
+    def get_flash_factor(self, weight_kg: float) -> float:
+        """Get flash loss factor based on weight"""
+        if weight_kg < 2:
+            return 0.18
+        elif weight_kg < 5:
+            return 0.15
+        elif weight_kg < 10:
+            return 0.12
+        else:
+            return 0.10
+    
+    def get_material_density(self, material: str) -> float:
+        """Get material density"""
+        for key in self.MATERIAL_DENSITIES:
+            if key in material:
+                return self.MATERIAL_DENSITIES[key]
+        return self.MATERIAL_DENSITIES['default']
+    
+    def determine_complexity(self, data: Dict) -> str:
+        """Determine part complexity"""
+        complexity_score = 0
         
-        Args:
-            extracted_text: Raw extracted text from the model
-            
-        Returns:
-            TechnicalSpecification object
-        """
-        spec = TechnicalSpecification()
+        geom = data.get('geometric_decomposition', {})
         
-        # Clean the text
-        text = extracted_text.strip()
-        lines = text.split('\n')
+        # Check for complex features
+        if any('stepped' in str(s).lower() for s in geom.get('base_shapes', [])):
+            complexity_score += 1
         
-        current_section = ""
+        if len(geom.get('subtracted_features', [])) > 2:
+            complexity_score += 1
         
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-            
-            # Identify sections based on keywords
-            line_upper = line.upper()
-            
-            if any(keyword in line_upper for keyword in ["PART IDENTIFICATION", "PART NAME", "DRAWING"]):
-                current_section = "part"
-            elif any(keyword in line_upper for keyword in ["MATERIAL", "SPECIFICATION"]):
-                current_section = "material"
-            elif any(keyword in line_upper for keyword in ["DIMENSION", "MEASUREMENT"]):
-                current_section = "dimensions"
-            elif any(keyword in line_upper for keyword in ["TOLERANCE", "PRECISION"]):
-                current_section = "tolerances"
-            elif any(keyword in line_upper for keyword in ["MANUFACTURING", "PROCESS"]):
-                current_section = "manufacturing"
-            elif any(keyword in line_upper for keyword in ["QUANTITY", "ASSEMBLY"]):
-                current_section = "quantity"
-            
-            # Extract information based on current section
-            if current_section == "part":
-                if ":" in line:
-                    key, value = line.split(":", 1)
-                    key_lower = key.lower()
-                    if any(word in key_lower for word in ["name", "description"]):
-                        spec.part_name = value.strip()
-                    elif any(word in key_lower for word in ["number", "drawing"]):
-                        spec.drawing_number = value.strip()
-                        
-            elif current_section == "material":
-                if ":" in line:
-                    spec.material = line.split(":", 1)[1].strip()
-                else:
-                    if spec.material:
-                        spec.material += " " + line
-                    else:
-                        spec.material = line
-                        
-            elif current_section == "dimensions":
-                if ":" in line:
-                    key, value = line.split(":", 1)
-                    spec.dimensions[key.strip()] = value.strip()
-                elif any(char.isdigit() for char in line):
-                    # Try to extract dimensions from lines with numbers
-                    spec.dimensions[f"dimension_{len(spec.dimensions)}"] = line
-                    
-            elif current_section == "manufacturing":
-                spec.manufacturing_notes.append(line)
+        if self.specs.has_internal_spline:
+            complexity_score += 1
         
-        return spec
-
-    def process_multiple_images(self, image_directory: str, output_file: Optional[str] = None) -> List[Dict]:
-        """
-        Process multiple images in a directory
+        if self.specs.has_external_teeth:
+            complexity_score += 1
         
-        Args:
-            image_directory: Directory containing images
-            output_file: Optional file to save results
-            
-        Returns:
-            List of extraction results
-        """
-        image_extensions = {'.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp'}
-        image_dir = Path(image_directory)
+        return "complex" if complexity_score >= 2 else "simple"
+    
+    def extract_number(self, value) -> float:
+        """Extract numeric value from various formats"""
+        if isinstance(value, (int, float)):
+            return float(value)
         
-        if not image_dir.exists():
-            raise FileNotFoundError(f"Directory not found: {image_directory}")
+        if isinstance(value, str):
+            # Remove units and special characters
+            cleaned = re.sub(r'[^\d.-]', '', value)
+            try:
+                return float(cleaned)
+            except:
+                return 0
         
-        results = []
-        image_files = [f for f in image_dir.iterdir() if f.suffix.lower() in image_extensions]
-        
-        print(f"📁 Found {len(image_files)} images to process")
-        
-        for i, image_file in enumerate(image_files, 1):
-            print(f"\n🔄 Processing {i}/{len(image_files)}: {image_file.name}")
-            
-            result = self.extract_information(str(image_file))
-            
-            if result["success"]:
-                print("✅ Extraction successful")
-                spec = self.parse_extracted_data(result["extracted_text"])
-                result["parsed_data"] = spec.__dict__
-            else:
-                print(f"❌ Extraction failed: {result['error']}")
-                # If model is loading, wait and retry once
-                if "retry_after" in result:
-                    wait_time = min(int(result.get("retry_after", 60)), 300)  # Cap at 5 minutes
-                    print(f"⏳ Waiting {wait_time} seconds before retry...")
-                    time.sleep(wait_time)
-                    result = self.extract_information(str(image_file))
-                    if result["success"]:
-                        print("✅ Retry successful")
-                        spec = self.parse_extracted_data(result["extracted_text"])
-                        result["parsed_data"] = spec.__dict__
-            
-            results.append(result)
-        
-        # Save results if output file specified
-        if output_file:
-            with open(output_file, 'w') as f:
-                json.dump(results, f, indent=2, default=str)
-            print(f"💾 Results saved to: {output_file}")
-                
-        return results
+        return 0
+    
+    def get_part_info(self, json_data: Dict) -> Dict:
+        """Extract part identification info"""
+        metadata = json_data.get('extracted_data', {}).get('drawing_metadata', {})
+        return {
+            'part_name': metadata.get('part_name', 'Unknown'),
+            'drawing_number': metadata.get('drawing_number', 'Unknown'),
+            'revision': metadata.get('revision', 'Unknown'),
+            'company': metadata.get('company', 'Unknown')
+        }
 
 
 def main():
-    """Main function for command-line usage"""
-    parser = argparse.ArgumentParser(description="Extract technical information from engineering drawings using Hugging Face API")
-    parser.add_argument("--api-key", required=True, help="Hugging Face API key (starts with hf_)")
-    parser.add_argument("--model", default="OpenGVLab/InternVL3-78B", help="Hugging Face model name")
-    parser.add_argument("--image", help="Single image file to process")
-    parser.add_argument("--directory", help="Directory containing images to process")
-    parser.add_argument("--output", help="Output JSON file for results")
-    parser.add_argument("--custom-prompt", help="Custom prompt file")
+    """
+    Main function to run the analysis
+    Usage: python automated_gear_analyzer.py path/to/json_file.json
+    """
+    import sys
     
-    args = parser.parse_args()
+    if len(sys.argv) < 2:
+        print("Usage: python automated_gear_analyzer.py <json_file_path>")
+        print("\nExample: python automated_gear_analyzer.py 39304e84-99fd-48b6-88b5-f20be86db3d3.json")
+        sys.exit(1)
     
-    # Validate API key format
-    if not args.api_key.startswith('hf_'):
-        print("⚠️  Warning: API key should start with 'hf_' for Hugging Face")
+    json_file_path = sys.argv[1]
     
-    # Initialize extractor
-    print(f"🚀 Initializing extractor with model: {args.model}")
-    extractor = HuggingFaceTechnicalDrawingExtractor(args.api_key, args.model)
+    # Check if file exists
+    if not Path(json_file_path).exists():
+        print(f"Error: File not found: {json_file_path}")
+        sys.exit(1)
     
-    # Load custom prompt if provided
-    custom_prompt = None
-    if args.custom_prompt:
-        with open(args.custom_prompt, 'r') as f:
-            custom_prompt = f.read().strip()
+    # Run analysis
+    analyzer = AutomatedGearAnalyzer()
+    results = analyzer.analyze_json_file(json_file_path)
     
-    if args.image:
-        # Process single image
-        print(f"\n📷 Processing single image: {args.image}")
-        result = extractor.extract_information(args.image, custom_prompt)
-        
-        if result["success"]:
-            print("\n✅ Extraction successful!")
-            print("\n📋 Extracted Information:")
-            print("-" * 50)
-            print(result["extracted_text"])
-            
-            # Parse and display structured data
-            spec = extractor.parse_extracted_data(result["extracted_text"])
-            print(f"\n📊 Parsed Data Summary:")
-            print(f"Part Name: {spec.part_name or 'Not found'}")
-            print(f"Drawing Number: {spec.drawing_number or 'Not found'}")
-            print(f"Material: {spec.material or 'Not found'}")
-            print(f"Dimensions found: {len(spec.dimensions)}")
-            print(f"Manufacturing notes: {len(spec.manufacturing_notes)}")
-            
-        else:
-            print(f"\n❌ Extraction failed: {result['error']}")
-            
-    elif args.directory:
-        # Process multiple images
-        print(f"\n📁 Processing directory: {args.directory}")
-        results = extractor.process_multiple_images(args.directory, args.output)
-        
-        successful = sum(1 for r in results if r["success"])
-        print(f"\n📊 Processing Summary:")
-        print(f"Total images: {len(results)}")
-        print(f"Successful extractions: {successful}")
-        print(f"Failed extractions: {len(results) - successful}")
-        
-        if args.output:
-            print(f"💾 Results saved to: {args.output}")
+    # Print results
+    print("=" * 80)
+    print("GEAR MANUFACTURING ANALYSIS REPORT")
+    print("=" * 80)
     
-    else:
-        print("❌ Please specify either --image or --directory")
-        parser.print_help()
+    print(f"\nFile: {results['file']}")
+    print(f"Part: {results['part_info']['part_name']}")
+    print(f"Drawing: {results['part_info']['drawing_number']}")
+    
+    print("\n" + "-" * 40)
+    print("SPECIFICATIONS")
+    print("-" * 40)
+    for key, value in results['specifications'].items():
+        print(f"  {key}: {value}")
+    
+    print("\n" + "-" * 40)
+    print("MANUFACTURING OPERATIONS")
+    print("-" * 40)
+    for op in results['manufacturing_operations']:
+        print(f"  {op['sequence']}. {op['operation']}")
+        print(f"     Evidence: {op['evidence']}")
+    
+    print("\n" + "-" * 40)
+    print("WEIGHT ANALYSIS")
+    print("-" * 40)
+    weight_data = results['weight_analysis']
+    print(f"  Finished Weight: {weight_data['finished_weight_kg']} kg")
+    print(f"  Gross Weight: {weight_data['gross_weight_kg']} kg")
+    print(f"  Material Utilization: {weight_data['material_utilization_percent']}%")
+    
+    print("\n  Weight Progression:")
+    for stage, weight in weight_data['weight_progression'].items():
+        print(f"    {stage}: {weight} kg")
+    
+    print("\n  Material Losses:")
+    for loss_type, loss_kg in weight_data['losses_kg'].items():
+        print(f"    {loss_type}: {loss_kg} kg")
+    
+    print("\n" + "-" * 40)
+    print("SUMMARY")
+    print("-" * 40)
+    summary = results['summary']
+    print(f"  Total Operations: {summary['total_operations']}")
+    print(f"  Finished → Gross: {summary['finished_weight_kg']} → {summary['gross_weight_kg']} kg")
+    print(f"  Material Efficiency: {summary['material_utilization_percent']}%")
+    
+    # Save results to JSON
+    output_file = Path(json_file_path).stem + "_analysis.json"
+    with open(output_file, 'w') as f:
+        json.dump(results, f, indent=2)
+    print(f"\n✓ Full results saved to: {output_file}")
 
 
 if __name__ == "__main__":
     main()
 
-
-
-
-# Example usage:
-"""
-# For single image:
-python test.py --api-key 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 --image images/UVW_0001_page_14_png.rf.a674e5e077f0bf6682c9f47dc4139ff1.jpg
-
-# For multiple images:
-python technical_drawing_extractor.py --api-key YOUR_API_KEY --directory ./drawings --output results.json --report summary_report.md
-
-# Using in code:
-extractor = TechnicalDrawingExtractor("your_api_key")
-result = extractor.extract_information("path/to/drawing.jpg")
-if result["success"]:
-    spec = extractor.parse_extracted_data(result["extracted_text"])
-    print(f"Part: {spec.part_name}")
-"""
+    # python test.py 39304e84-99fd-48b6-88b5-f20be86db3d3 1.json

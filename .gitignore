@@ -8,3 +8,7 @@ logs
 venv/
 outputs
 newoutput 
+demo.py
+test.py
+test.json
+test_analysis.json

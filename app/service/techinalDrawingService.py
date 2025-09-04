@@ -16,16 +16,14 @@ from app.log.logger import get_logger
 from app.models.drawingModel import DrawingProcessingResult as DrawingProcessingResultModel
 from sqlalchemy.exc import SQLAlchemyError
 
-
-
 logger = get_logger(__name__)
 load_dotenv()
 genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 class TechnicalDrawingExtractionService:
-    MAX_ALLOWED_INPUT_TOKENS = 10000
-    MAX_ALLOWED_OUTPUT_TOKENS = 8000
+    MAX_ALLOWED_INPUT_TOKENS = 15000
+    MAX_ALLOWED_OUTPUT_TOKENS = 15000
 
     def __init__(self):
         self.processed_files = {}
@@ -175,37 +173,223 @@ class TechnicalDrawingExtractionService:
             return text
 
     async def extract_technical_drawing_data(self, image_path: str) -> Dict:
-        """Extract technical drawing data from image using Gemini."""
+        """Extract comprehensive technical drawing data from image using Gemini."""
         try:
-            logger.info(f"Starting technical drawing extraction for: {image_path}")
+            logger.info(f"Starting comprehensive technical drawing extraction for: {image_path}")
 
             PROMPT = """
-            You are an expert engineering drawing analysis system. Analyze this technical drawing and extract visible specifications.
+                You are an expert technical drawing analysis system. Extract ALL visible information from this technical drawing with maximum accuracy and completeness.
 
-            CRITICAL OUTPUT REQUIREMENTS:
-            - Respond with COMPLETE, VALID JSON only - no partial or truncated output
-            - Ensure all braces and brackets are closed
-            - If no data can be extracted or the image is unclear, return: {}
-            - Do not include Markdown, comments, or additional text
-            - Prioritize drawing_metadata and overall_dimensions if token limits are approached
+                CRITICAL OUTPUT REQUIREMENTS:
+                - Respond with COMPLETE, VALID JSON only - no explanations or partial output
+                - Extract information EXACTLY as it appears in the drawing
+                - Use null for missing/unclear values, not empty strings
+                - Ensure proper JSON syntax with all braces and brackets closed
+                - If nothing can be extracted, return: {"status": "no_data_extracted"}
 
-            EXTRACT:
-            1. DRAWING METADATA:
-               - drawing_type: "mechanical/electrical/etc"
-               - component_type: "gear/shaft/etc"
-               - part_name: exact title
-               - drawing_number: drawing ID
-               - revision: revision level
-               - scale: drawing scale
-               - date_created: creation date
-               - material_specification: material callout
-               - standards_referenced: [] (JSON array)
+                EXTRACTION SPECIFICATIONS:
 
-            2. OVERALL DIMENSIONS: 
-               - length, width, height, diameter: {"value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown"}
-               - other_critical_dimensions: [{"feature": "description", "value": "exact_value", "unit": "mm/inch", "tolerance": "if_shown", "location": "where_dimensioned"}]
+                1. DRAWING_METADATA:
+                - drawing_title: "exact title from title block"
+                - drawing_number: "complete drawing number with prefixes/suffixes"
+                - part_number: "part number if different from drawing number"
+                - revision: "revision letter/number exactly as shown"
+                - scale: "scale notation exactly as shown (e.g., '1:1', '2:1')"
+                - date: "date in original format"
+                - company_name: "complete company name and divisions"
+                - material: "complete material specification with grade"
+                - heat_treatment: "complete heat treatment specification"
+                - surface_treatment: "complete surface treatment specification"
+                - standards: ["list", "of", "all", "standards", "referenced"]
+                - notes: ["all", "general", "notes", "exactly", "as", "written"]
 
-            Respond ONLY with valid JSON.
+                2. DIMENSIONS_BY_SHAPE:
+                
+                circular_features: [
+                    {
+                    "feature_description": "exact label/description from drawing",
+                    "diameter": "diameter value with Ø symbol if shown",
+                    "radius": "radius value with R if shown",
+                    "tolerance": "complete tolerance notation (+0.1/-0.2 format)",
+                    "location": "descriptive location on drawing"
+                    }
+                ]
+                
+                linear_features: [
+                    {
+                    "feature_description": "exact label/description from drawing",
+                    "dimension_value": "exact dimension with units",
+                    "tolerance": "complete tolerance notation",
+                    "location": "descriptive location on drawing",
+                    "dimension_type": "length/width/height/depth/thickness"
+                    }
+                ]
+                
+                angular_features: [
+                    {
+                    "feature_description": "exact label/description from drawing", 
+                    "angle": "angle value with ° symbol",
+                    "tolerance": "angular tolerance if shown",
+                    "location": "descriptive location on drawing"
+                    }
+                ]
+                
+                threaded_features: [
+                    {
+                    "feature_description": "exact description from drawing",
+                    "thread_specification": "complete thread callout (M10x1.5, etc.)",
+                    "nominal_diameter": "thread diameter",
+                    "pitch": "thread pitch if shown separately",
+                    "length": "thread length/engagement",
+                    "tolerance_class": "thread tolerance class if shown"
+                    }
+                ]
+                
+                gear_features: [
+                    {
+                    "feature_description": "gear identification from drawing",
+                    "number_of_teeth": "exact tooth count",
+                    "module": "module value",
+                    "pitch_diameter": "PCD value",
+                    "addendum": "addendum value if shown",
+                    "dedendum": "dedendum value if shown", 
+                    "pressure_angle": "pressure angle with ° symbol",
+                    "helix_angle": "helix angle if shown",
+                    "face_width": "gear face width if dimensioned"
+                    }
+                ]
+
+                3. DATA_TABLES:
+                Extract all tabulated data exactly as shown:
+                
+                gear_data_table: {
+                    "table_title": "exact table heading",
+                    "parameters": {
+                    "parameter_name": "exact_value_as_shown"
+                    }
+                }
+                
+                spline_data_table: {
+                    "table_title": "exact table heading", 
+                    "parameters": {
+                    "parameter_name": "exact_value_as_shown"
+                    }
+                }
+
+                4. OVERALL_DIMENSIONS:
+                - overall_length: "maximum length dimension if shown"
+                - overall_width: "maximum width dimension if shown" 
+                - overall_height: "maximum height dimension if shown"
+                - overall_diameter: "maximum diameter if shown"
+                - envelope_dimensions: "bounding box dimensions if specified"
+                - center_distances: "center-to-center spacing dimensions"
+
+                5. TOLERANCES_AND_FITS:
+                
+                geometric_tolerances: [
+                    {
+                    "symbol": "GD&T symbol description",
+                    "tolerance_value": "exact tolerance value",
+                    "datum_reference": "datum letters if applicable", 
+                    "feature_description": "what feature this applies to",
+                    "modifier": "any modifiers like (Q) or MMC"
+                    }
+                ]
+                
+                dimensional_tolerances: [
+                    {
+                    "dimension": "base dimension",
+                    "plus_tolerance": "positive tolerance",
+                    "minus_tolerance": "negative tolerance",
+                    "bilateral_notation": "±X.X format if applicable"
+                    }
+                ]
+                
+                surface_finish: [
+                    {
+                    "symbol": "surface finish symbol description",
+                    "value": "surface finish value",
+                    "location": "where specified on drawing"
+                    }
+                ]
+                
+                fit_specifications: [
+                    "exact fit callouts as shown"
+                ]
+
+                6. MASS_AND_WEIGHT_INFORMATION:
+                - mass: "mass value with units if shown"
+                - weight: "weight value with units if shown"
+                - material_density: "density if specified"
+                - calculated_volume: "volume if specified"
+                - center_of_gravity: "CG location if specified"
+
+                7. MANUFACTURING_INFORMATION:
+                - machining_notes: ["exact machining instructions"]
+                - assembly_notes: ["exact assembly requirements"]
+                - inspection_notes: ["exact inspection requirements"]
+                - special_processes: ["heat treatment, coating, etc."]
+                - quality_requirements: ["quality standards and acceptance criteria"]
+                - tooling_notes: ["any tooling or fixturing notes"]
+
+                8. MATERIAL_PROPERTIES:
+                - material_grade: "complete material designation"
+                - hardness_requirements: "hardness specification with scale"
+                - mechanical_properties: "strength, yield, etc. if shown"
+                - chemical_composition: "composition requirements if shown"
+                - grain_structure: "grain size or structure requirements"
+
+                9. TITLE_BLOCK_INFORMATION:
+                Extract every field from title block:
+                - drawing_number: "complete drawing number"
+                - revision: "revision level"
+                - sheet: "sheet number and total sheets"
+                - size: "drawing size (A0, A1, etc.)"
+                - scale: "drawing scale"
+                - date: "drawing date"
+                - drawn_by: "draftsperson name and date"
+                - checked_by: "checker name and date" 
+                - approved_by: "approver name and date"
+                - company_information: "complete company details"
+                - part_name: "part name/description"
+                - material: "material specification"
+                - weight: "part weight if shown"
+                - finish: "surface finish if shown in title block"
+                - do_not_scale: "do not scale notation if present"
+
+                10. SECTIONAL_VIEWS:
+                    Extract dimensions and details from all sectional views:
+                    - section_identifier: "section letter/number"
+                    - view_type: "section A-A, detail B, etc."
+                    - specific_dimensions: ["dimensions unique to this view"]
+                    - callouts: ["specific callouts in this view"]
+
+                11. DETAIL_VIEWS:
+                    - detail_identifier: "detail letter/designation"
+                    - scale: "detail scale if different from main drawing"
+                    - specific_features: ["features highlighted in detail"]
+                    - dimensions: ["dimensions shown in detail view"]
+
+                EXTRACTION GUIDELINES:
+                - Scan the entire drawing systematically (top-left to bottom-right)
+                - Extract dimensions from main views, sections, and details
+                - Include all dimension lines, extension lines, and leader callouts
+                - Capture both driven and driving dimensions
+                - Record reference dimensions in parentheses as shown
+                - Extract all text annotations, even if they seem redundant
+                - Include all geometric tolerance callouts with proper symbols
+                - Capture table data exactly as formatted
+                - Note any revision clouds or change indicators
+                - Include all drawing notes, even fine print
+
+                QUALITY CHECKS:
+                - Verify all JSON brackets are properly closed
+                - Ensure no truncated or incomplete entries
+                - Check that all visible dimensions are captured
+                - Confirm table data is complete and accurate
+                - Validate that title block information is fully extracted
+
+                Return ONLY the complete JSON object with all extracted information.
             """
             
             # Preprocess image
@@ -239,28 +423,22 @@ class TechnicalDrawingExtractionService:
             uploaded_file = await self.upload_image_to_gemini(image_path)
             
             # Retry with adjusted safety settings
-            max_retries = 4
+            max_retries = 2
             response_text = None
             for attempt in range(max_retries):
                 try:
-                    safety_settings=[
-                        types.SafetySettingDict(
-                            category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE,  # least restrictive
-                        ),
-                        types.SafetySettingDict(
-                            category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE,
-                        ),
-                        types.SafetySettingDict(
-                            category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE,
-                        ),
-                        types.SafetySettingDict(
-                            category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE,
-                        ),
+                    # Replace your current safety_settings with this more comprehensive version
+                    safety_settings = [
+                        types.SafetySettingDict(category=cat, threshold=types.HarmBlockThreshold.BLOCK_NONE)
+                        for cat in [
+                            types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                            types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                            types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT
+                        ]
                     ]
+                    
+                    
                     response = model.generate_content(
                         [PROMPT, uploaded_file],
                         generation_config={
@@ -432,40 +610,134 @@ class TechnicalDrawingExtractionService:
             return {"error": "Could not read image dimensions"}
 
     async def process_all_data(self, data: Dict, filename: str) -> List[Dict]:
-        """Process data into a flat structure for CSV output."""
+        """Process data into a comprehensive flat structure for CSV output."""
         try:
-            logger.info(f"Processing data for CSV output: {filename}")
+            logger.info(f"Processing comprehensive data for CSV output: {filename}")
             records = []
             
-            def create_universal_records(data, filename):
-                universal_records = []
-                if "drawing_metadata" in data:
-                    metadata_record = {
-                        "Filename": filename,
-                        "Record_Type": "Drawing_Metadata",
-                        **{f"Meta_{k}": self.sanitize_for_json(v) for k, v in data["drawing_metadata"].items()}
-                    }
-                    universal_records.append(metadata_record)
-                if "overall_dimensions" in data:
-                    overall_record = {
-                        "Filename": filename,
-                        "Record_Type": "Overall_Dimensions",
-                        **{f"Overall_{k}": self.sanitize_for_json(v) for k, v in data["overall_dimensions"].items()}
-                    }
-                    universal_records.append(overall_record)
-                if "feature_dimensions" in data and isinstance(data["feature_dimensions"], list):
-                    for i, feature in enumerate(data["feature_dimensions"]):
-                        feature_record = {
+            # Process drawing metadata
+            if "drawing_metadata" in data:
+                metadata_record = {
+                    "Filename": filename,
+                    "Record_Type": "Drawing_Metadata",
+                    **{f"Meta_{k}": self.sanitize_for_json(v) for k, v in data["drawing_metadata"].items()}
+                }
+                records.append(metadata_record)
+            
+            # Process dimensions by shape
+            if "dimensions_by_shape" in data:
+                shapes = data["dimensions_by_shape"]
+                
+                # Circular features
+                if "circular_features" in shapes and isinstance(shapes["circular_features"], list):
+                    for i, feature in enumerate(shapes["circular_features"]):
+                        record = {
                             "Filename": filename,
-                            "Record_Type": "Feature_Dimension",
+                            "Record_Type": "Circular_Dimension",
                             "Feature_Index": i + 1,
-                            **{f"Feature_{k}": self.sanitize_for_json(v) for k, v in feature.items()}
+                            **{f"Circular_{k}": self.sanitize_for_json(v) for k, v in feature.items()}
                         }
-                        universal_records.append(feature_record)
-                return universal_records
+                        records.append(record)
+                
+                # Linear features
+                if "linear_features" in shapes and isinstance(shapes["linear_features"], list):
+                    for i, feature in enumerate(shapes["linear_features"]):
+                        record = {
+                            "Filename": filename,
+                            "Record_Type": "Linear_Dimension",
+                            "Feature_Index": i + 1,
+                            **{f"Linear_{k}": self.sanitize_for_json(v) for k, v in feature.items()}
+                        }
+                        records.append(record)
+                
+                # Angular features
+                if "angular_features" in shapes and isinstance(shapes["angular_features"], list):
+                    for i, feature in enumerate(shapes["angular_features"]):
+                        record = {
+                            "Filename": filename,
+                            "Record_Type": "Angular_Dimension",
+                            "Feature_Index": i + 1,
+                            **{f"Angular_{k}": self.sanitize_for_json(v) for k, v in feature.items()}
+                        }
+                        records.append(record)
+                
+                # Threaded features
+                if "threaded_features" in shapes and isinstance(shapes["threaded_features"], list):
+                    for i, feature in enumerate(shapes["threaded_features"]):
+                        record = {
+                            "Filename": filename,
+                            "Record_Type": "Threaded_Dimension",
+                            "Feature_Index": i + 1,
+                            **{f"Thread_{k}": self.sanitize_for_json(v) for k, v in feature.items()}
+                        }
+                        records.append(record)
+                
+                # Gear features
+                if "gear_features" in shapes and isinstance(shapes["gear_features"], list):
+                    for i, feature in enumerate(shapes["gear_features"]):
+                        record = {
+                            "Filename": filename,
+                            "Record_Type": "Gear_Dimension",
+                            "Feature_Index": i + 1,
+                            **{f"Gear_{k}": self.sanitize_for_json(v) for k, v in feature.items()}
+                        }
+                        records.append(record)
             
-            records = create_universal_records(data, filename)
+            # Process overall dimensions
+            if "overall_dimensions" in data:
+                overall_record = {
+                    "Filename": filename,
+                    "Record_Type": "Overall_Dimensions",
+                    **{f"Overall_{k}": self.sanitize_for_json(v) for k, v in data["overall_dimensions"].items()}
+                }
+                records.append(overall_record)
             
+            # Process mass and weight information
+            if "mass_and_weight_information" in data:
+                mass_record = {
+                    "Filename": filename,
+                    "Record_Type": "Mass_Weight_Information",
+                    **{f"Mass_{k}": self.sanitize_for_json(v) for k, v in data["mass_and_weight_information"].items()}
+                }
+                records.append(mass_record)
+            
+            # Process tolerances and fits
+            if "tolerances_and_fits" in data:
+                tolerance_record = {
+                    "Filename": filename,
+                    "Record_Type": "Tolerances_Fits",
+                    **{f"Tolerance_{k}": self.sanitize_for_json(v) for k, v in data["tolerances_and_fits"].items()}
+                }
+                records.append(tolerance_record)
+            
+            # Process manufacturing information
+            if "manufacturing_information" in data:
+                mfg_record = {
+                    "Filename": filename,
+                    "Record_Type": "Manufacturing_Information",
+                    **{f"Mfg_{k}": self.sanitize_for_json(v) for k, v in data["manufacturing_information"].items()}
+                }
+                records.append(mfg_record)
+            
+            # Process material properties
+            if "material_properties" in data:
+                material_record = {
+                    "Filename": filename,
+                    "Record_Type": "Material_Properties",
+                    **{f"Material_{k}": self.sanitize_for_json(v) for k, v in data["material_properties"].items()}
+                }
+                records.append(material_record)
+            
+            # Process title block information
+            if "title_block_information" in data:
+                title_record = {
+                    "Filename": filename,
+                    "Record_Type": "Title_Block_Information",
+                    **{f"Title_{k}": self.sanitize_for_json(v) for k, v in data["title_block_information"].items()}
+                }
+                records.append(title_record)
+            
+            # If no specific records found, create a general flattened record
             if not records:
                 def flatten_dict(d, parent_key='', record=None):
                     if record is None:
@@ -500,10 +772,10 @@ class TechnicalDrawingExtractionService:
             }]
 
     async def process_image_file(self, task_id: str, file_path: str, output_dir: str, db: 'AsyncSession' = None) -> dict:
-        """Process image file using Gemini extraction."""
+        """Process image file using comprehensive Gemini extraction."""
         
         try:
-            logger.info(f"Starting image processing for task: {task_id}")
+            logger.info(f"Starting comprehensive image processing for task: {task_id}")
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"Image file not found: {file_path}")
             file_size = os.path.getsize(file_path)
@@ -637,41 +909,80 @@ class TechnicalDrawingExtractionService:
             return "unknown"
 
     def get_critical_dimensions(self, extracted_data: Dict) -> List[Dict]:
-        """Extract critical dimensions."""
+        """Extract critical dimensions from all shape categories."""
         critical_dims = []
         try:
+            # Overall dimensions
             if "overall_dimensions" in extracted_data:
-                for dim_name, dim_data in extracted_data["overall_dimensions"].items():
-                    if isinstance(dim_data, dict) and "value" in dim_data:
+                for dim_name, dim_value in extracted_data["overall_dimensions"].items():
+                    critical_dims.append({
+                        "type": "overall",
+                        "feature": dim_name,
+                        "value": dim_value,
+                        "category": "overall_dimension"
+                    })
+            
+            # Dimensions by shape
+            if "dimensions_by_shape" in extracted_data:
+                shapes = extracted_data["dimensions_by_shape"]
+                
+                # Circular features
+                if "circular_features" in shapes:
+                    for i, feature in enumerate(shapes["circular_features"]):
                         critical_dims.append({
-                            "type": "overall",
-                            "feature": dim_name,
-                            "value": dim_data["value"],
-                            "unit": dim_data.get("unit", ""),
-                            "tolerance": dim_data.get("tolerance", "")
+                            "type": "circular",
+                            "feature_index": i + 1,
+                            "feature_data": feature,
+                            "category": "circular_dimension"
                         })
-            if "feature_dimensions" in extracted_data:
-                for feature in extracted_data["feature_dimensions"]:
-                    if isinstance(feature, dict) and "dimensions" in feature:
-                        feature_type = feature.get("feature_type", "unknown")
-                        dims = feature["dimensions"]
-                        if isinstance(dims, dict):
-                            for dim_key, dim_data in dims.items():
-                                if isinstance(dim_data, dict) and "value" in dim_data:
-                                    critical_dims.append({
-                                        "type": "feature",
-                                        "feature": f"{feature_type}_{dim_key}",
-                                        "value": dim_data["value"],
-                                        "unit": dim_data.get("unit", ""),
-                                        "tolerance": dim_data.get("tolerance", "")
-                                    })
+                
+                # Linear features
+                if "linear_features" in shapes:
+                    for i, feature in enumerate(shapes["linear_features"]):
+                        critical_dims.append({
+                            "type": "linear",
+                            "feature_index": i + 1,
+                            "feature_data": feature,
+                            "category": "linear_dimension"
+                        })
+                
+                # Angular features
+                if "angular_features" in shapes:
+                    for i, feature in enumerate(shapes["angular_features"]):
+                        critical_dims.append({
+                            "type": "angular",
+                            "feature_index": i + 1,
+                            "feature_data": feature,
+                            "category": "angular_dimension"
+                        })
+                
+                # Threaded features
+                if "threaded_features" in shapes:
+                    for i, feature in enumerate(shapes["threaded_features"]):
+                        critical_dims.append({
+                            "type": "threaded",
+                            "feature_index": i + 1,
+                            "feature_data": feature,
+                            "category": "threaded_dimension"
+                        })
+                
+                # Gear features
+                if "gear_features" in shapes:
+                    for i, feature in enumerate(shapes["gear_features"]):
+                        critical_dims.append({
+                            "type": "gear",
+                            "feature_index": i + 1,
+                            "feature_data": feature,
+                            "category": "gear_dimension"
+                        })
+            
             return critical_dims
         except Exception as e:
             logger.warning(f"Error extracting critical dimensions: {str(e)}")
             return []
 
     def generate_summary_report(self, extracted_data: Dict, filename: str) -> Dict:
-        """Generate a summary report."""
+        """Generate a comprehensive summary report."""
         try:
             summary = {
                 "filename": filename,
@@ -680,18 +991,34 @@ class TechnicalDrawingExtractionService:
                 "has_errors": "error" in extracted_data,
                 "data_completeness": {}
             }
+            
+            # Count elements by category
             element_counts = {}
-            if "feature_dimensions" in extracted_data:
-                element_counts["feature_dimensions"] = len(extracted_data["feature_dimensions"]) if isinstance(extracted_data["feature_dimensions"], list) else 0
-            if "geometric_tolerances" in extracted_data:
-                element_counts["geometric_tolerances"] = len(extracted_data["geometric_tolerances"]) if isinstance(extracted_data["geometric_tolerances"], list) else 0
-            if "manufacturing_notes" in extracted_data:
-                element_counts["manufacturing_notes"] = len(extracted_data["manufacturing_notes"]) if isinstance(extracted_data["manufacturing_notes"], list) else 0
-            if "threaded_features" in extracted_data:
-                element_counts["threaded_features"] = len(extracted_data["threaded_features"]) if isinstance(extracted_data["threaded_features"], list) else 0
+            
+            if "dimensions_by_shape" in extracted_data:
+                shapes = extracted_data["dimensions_by_shape"]
+                element_counts["circular_features"] = len(shapes.get("circular_features", []))
+                element_counts["linear_features"] = len(shapes.get("linear_features", []))
+                element_counts["angular_features"] = len(shapes.get("angular_features", []))
+                element_counts["threaded_features"] = len(shapes.get("threaded_features", []))
+                element_counts["gear_features"] = len(shapes.get("gear_features", []))
+            
+            if "tolerances_and_fits" in extracted_data:
+                tol_data = extracted_data["tolerances_and_fits"]
+                element_counts["geometric_tolerances"] = len(tol_data.get("geometric_tolerances", []))
+                element_counts["dimensional_tolerances"] = len(tol_data.get("dimensional_tolerances", []))
+                element_counts["surface_finish"] = len(tol_data.get("surface_finish", []))
+            
+            if "manufacturing_information" in extracted_data:
+                mfg_data = extracted_data["manufacturing_information"]
+                element_counts["machining_notes"] = len(mfg_data.get("machining_notes", []))
+                element_counts["assembly_notes"] = len(mfg_data.get("assembly_notes", []))
+            
             summary["element_counts"] = element_counts
             summary["critical_dimensions"] = self.get_critical_dimensions(extracted_data)
+            summary["mass_weight_info"] = extracted_data.get("mass_and_weight_information", {})
             summary["token_usage"] = extracted_data.get("token_usage", {})
+            
             return summary
         except Exception as e:
             logger.error(f"Error generating summary report: {str(e)}")
@@ -702,64 +1029,218 @@ class TechnicalDrawingExtractionService:
             }
 
     def export_to_specific_format(self, extracted_data: Dict, format_type: str) -> str:
-        """Export data to specific formats."""
+        """Export data to specific formats with comprehensive information."""
         try:
             if format_type.lower() == "inspection_sheet":
-                return self._create_inspection_sheet_format(extracted_data)
+                return self._create_comprehensive_inspection_sheet(extracted_data)
             elif format_type.lower() == "cad_import":
-                return self._create_cad_import_format(extracted_data)
+                return self._create_comprehensive_cad_import_format(extracted_data)
             elif format_type.lower() == "manufacturing_sheet":
-                return self._create_manufacturing_sheet_format(extracted_data)
+                return self._create_comprehensive_manufacturing_sheet(extracted_data)
+            elif format_type.lower() == "dimension_summary":
+                return self._create_dimension_summary_sheet(extracted_data)
             else:
                 return "Unsupported format type"
         except Exception as e:
             logger.error(f"Export format error: {str(e)}")
             return f"Export failed: {str(e)}"
 
-    def _create_inspection_sheet_format(self, data: Dict) -> str:
-        """Create inspection sheet format."""
-        lines = ["=== INSPECTION SHEET ===\n"]
+    def _create_comprehensive_inspection_sheet(self, data: Dict) -> str:
+        """Create comprehensive inspection sheet format."""
+        lines = ["=== COMPREHENSIVE INSPECTION SHEET ===\n"]
+        
+        # Drawing metadata
         if "drawing_metadata" in data:
             meta = data["drawing_metadata"]
-            lines.append(f"Part Name: {meta.get('part_name', 'N/A')}")
-            lines.append(f"Drawing Number: {meta.get('drawing_number', 'N/A')}")
-            lines.append(f"Revision: {meta.get('revision', 'N/A')}")
-            lines.append(f"Material: {meta.get('material_specification', 'N/A')}\n")
+            lines.append("=== DRAWING INFORMATION ===")
+            for key, value in meta.items():
+                lines.append(f"{key.replace('_', ' ').title()}: {value}")
+            lines.append("")
+        
+        # Mass and weight information
+        if "mass_and_weight_information" in data:
+            mass_info = data["mass_and_weight_information"]
+            lines.append("=== MASS & WEIGHT INFORMATION ===")
+            for key, value in mass_info.items():
+                lines.append(f"{key.replace('_', ' ').title()}: {value}")
+            lines.append("")
+        
+        # Overall dimensions
+        if "overall_dimensions" in data:
+            lines.append("=== OVERALL DIMENSIONS ===")
+            for dim_name, dim_value in data["overall_dimensions"].items():
+                lines.append(f"• {dim_name.replace('_', ' ').title()}: {dim_value}")
+            lines.append("")
+        
+        # Dimensions by shape
+        if "dimensions_by_shape" in data:
+            shapes = data["dimensions_by_shape"]
+            
+            if shapes.get("circular_features"):
+                lines.append("=== CIRCULAR FEATURES ===")
+                for i, feature in enumerate(shapes["circular_features"], 1):
+                    lines.append(f"Feature {i}:")
+                    for key, value in feature.items():
+                        lines.append(f"  {key.replace('_', ' ').title()}: {value}")
+                lines.append("")
+            
+            if shapes.get("linear_features"):
+                lines.append("=== LINEAR FEATURES ===")
+                for i, feature in enumerate(shapes["linear_features"], 1):
+                    lines.append(f"Feature {i}:")
+                    for key, value in feature.items():
+                        lines.append(f"  {key.replace('_', ' ').title()}: {value}")
+                lines.append("")
+            
+            if shapes.get("angular_features"):
+                lines.append("=== ANGULAR FEATURES ===")
+                for i, feature in enumerate(shapes["angular_features"], 1):
+                    lines.append(f"Feature {i}:")
+                    for key, value in feature.items():
+                        lines.append(f"  {key.replace('_', ' ').title()}: {value}")
+                lines.append("")
+            
+            if shapes.get("threaded_features"):
+                lines.append("=== THREADED FEATURES ===")
+                for i, feature in enumerate(shapes["threaded_features"], 1):
+                    lines.append(f"Feature {i}:")
+                    for key, value in feature.items():
+                        lines.append(f"  {key.replace('_', ' ').title()}: {value}")
+                lines.append("")
+            
+            if shapes.get("gear_features"):
+                lines.append("=== GEAR FEATURES ===")
+                for i, feature in enumerate(shapes["gear_features"], 1):
+                    lines.append(f"Feature {i}:")
+                    for key, value in feature.items():
+                        lines.append(f"  {key.replace('_', ' ').title()}: {value}")
+                lines.append("")
+        
+        # Tolerances and fits
+        if "tolerances_and_fits" in data:
+            tol_data = data["tolerances_and_fits"]
+            lines.append("=== TOLERANCES & FITS ===")
+            for key, value in tol_data.items():
+                if isinstance(value, list) and value:
+                    lines.append(f"{key.replace('_', ' ').title()}:")
+                    for item in value:
+                        lines.append(f"  • {item}")
+                elif value:
+                    lines.append(f"{key.replace('_', ' ').title()}: {value}")
+            lines.append("")
+        
+        return "\n".join(lines)
+
+    def _create_comprehensive_cad_import_format(self, data: Dict) -> str:
+        """Create comprehensive CAD import format."""
+        lines = ["# Comprehensive CAD Import Data"]
+        
+        # Overall dimensions
+        if "overall_dimensions" in data:
+            lines.append("\n## Overall Dimensions")
+            for dim_name, dim_value in data["overall_dimensions"].items():
+                lines.append(f"{dim_name.upper()},{dim_value}")
+        
+        # Circular features
+        if "dimensions_by_shape" in data and "circular_features" in data["dimensions_by_shape"]:
+            lines.append("\n## Circular Features")
+            for i, feature in enumerate(data["dimensions_by_shape"]["circular_features"], 1):
+                lines.append(f"CIRCULAR_FEATURE_{i}")
+                for key, value in feature.items():
+                    lines.append(f"{key.upper()},{value}")
+        
+        # Linear features
+        if "dimensions_by_shape" in data and "linear_features" in data["dimensions_by_shape"]:
+            lines.append("\n## Linear Features")
+            for i, feature in enumerate(data["dimensions_by_shape"]["linear_features"], 1):
+                lines.append(f"LINEAR_FEATURE_{i}")
+                for key, value in feature.items():
+                    lines.append(f"{key.upper()},{value}")
+        
+        # Mass and weight
+        if "mass_and_weight_information" in data:
+            lines.append("\n## Mass and Weight")
+            for key, value in data["mass_and_weight_information"].items():
+                lines.append(f"{key.upper()},{value}")
+        
+        return "\n".join(lines)
+
+    def _create_comprehensive_manufacturing_sheet(self, data: Dict) -> str:
+        """Create comprehensive manufacturing instruction sheet."""
+        lines = ["=== COMPREHENSIVE MANUFACTURING INSTRUCTIONS ===\n"]
+        
+        # Material properties
+        if "material_properties" in data:
+            mat = data["material_properties"]
+            lines.append("=== MATERIAL REQUIREMENTS ===")
+            for key, value in mat.items():
+                lines.append(f"{key.replace('_', ' ').title()}: {value}")
+            lines.append("")
+        
+        # Manufacturing information
+        if "manufacturing_information" in data:
+            mfg_data = data["manufacturing_information"]
+            for key, value in mfg_data.items():
+                if isinstance(value, list) and value:
+                    lines.append(f"=== {key.replace('_', ' ').upper()} ===")
+                    for item in value:
+                        lines.append(f"• {item}")
+                    lines.append("")
+                elif value:
+                    lines.append(f"=== {key.replace('_', ' ').upper()} ===")
+                    lines.append(f"{value}")
+                    lines.append("")
+        
+        # Critical dimensions for manufacturing
         critical_dims = self.get_critical_dimensions(data)
         if critical_dims:
-            lines.append("=== CRITICAL DIMENSIONS FOR INSPECTION ===")
+            lines.append("=== CRITICAL DIMENSIONS FOR MANUFACTURING ===")
             for dim in critical_dims:
-                lines.append(f"• {dim['feature']}: {dim['value']} {dim['unit']} {dim.get('tolerance', '')}")
-            lines.append("")
-        if "geometric_tolerances" in data and data["geometric_tolerances"]:
-            lines.append("=== GEOMETRIC TOLERANCES ===")
-            for tol in data["geometric_tolerances"]:
-                lines.append(f"• {tol.get('tolerance_type', 'Unknown')}: {tol.get('tolerance_value', 'N/A')} - {tol.get('feature', 'Unknown feature')}")
-            lines.append("")
+                lines.append(f"• {dim['type'].title()} - {dim.get('feature', 'Feature')} {dim.get('feature_index', '')}")
+                if 'feature_data' in dim:
+                    for key, value in dim['feature_data'].items():
+                        lines.append(f"  {key}: {value}")
+                lines.append("")
+        
         return "\n".join(lines)
 
-    def _create_cad_import_format(self, data: Dict) -> str:
-        """Create CAD import format."""
-        lines = ["# CAD Import Data"]
+    def _create_dimension_summary_sheet(self, data: Dict) -> str:
+        """Create dimension summary sheet organized by shape."""
+        lines = ["=== DIMENSION SUMMARY BY SHAPE ===\n"]
+        
+        # Overall dimensions
         if "overall_dimensions" in data:
-            lines.append("## Overall Dimensions")
-            for dim_name, dim_data in data["overall_dimensions"].items():
-                if isinstance(dim_data, dict) and "value" in dim_data:
-                    lines.append(f"{dim_name.upper()},{dim_data['value']},{dim_data.get('unit', 'mm')}")
-        return "\n".join(lines)
-
-    def _create_manufacturing_sheet_format(self, data: Dict) -> str:
-        """Create manufacturing instruction sheet."""
-        lines = ["=== MANUFACTURING INSTRUCTIONS ===\n"]
-        if "material_and_treatment" in data:
-            mat = data["material_and_treatment"]
-            lines.append("=== MATERIAL REQUIREMENTS ===")
-            lines.append(f"Base Material: {mat.get('base_material', 'N/A')}")
-            lines.append(f"Heat Treatment: {mat.get('heat_treatment', 'N/A')}")
-            lines.append(f"Hardness: {mat.get('hardness_requirement', 'N/A')}\n")
-        if "manufacturing_notes" in data and data["manufacturing_notes"]:
-            lines.append("=== MANUFACTURING NOTES ===")
-            for note in data["manufacturing_notes"]:
-                lines.append(f"• {note.get('note_text', 'N/A')} ({note.get('note_type', 'General')})")
+            lines.append("=== OVERALL DIMENSIONS ===")
+            for dim_name, dim_value in data["overall_dimensions"].items():
+                lines.append(f"{dim_name}: {dim_value}")
             lines.append("")
+        
+        # Shape-wise dimensions
+        if "dimensions_by_shape" in data:
+            shapes = data["dimensions_by_shape"]
+            
+            shape_types = [
+                ("circular_features", "CIRCULAR DIMENSIONS"),
+                ("linear_features", "LINEAR DIMENSIONS"),
+                ("angular_features", "ANGULAR DIMENSIONS"),
+                ("threaded_features", "THREADED DIMENSIONS"),
+                ("gear_features", "GEAR DIMENSIONS")
+            ]
+            
+            for shape_key, shape_title in shape_types:
+                if shape_key in shapes and shapes[shape_key]:
+                    lines.append(f"=== {shape_title} ===")
+                    for i, feature in enumerate(shapes[shape_key], 1):
+                        lines.append(f"Feature {i}:")
+                        for key, value in feature.items():
+                            lines.append(f"  {key}: {value}")
+                        lines.append("")
+        
+        # Mass and weight summary
+        if "mass_and_weight_information" in data:
+            lines.append("=== MASS & WEIGHT SUMMARY ===")
+            for key, value in data["mass_and_weight_information"].items():
+                lines.append(f"{key}: {value}")
+            lines.append("")
+        
         return "\n".join(lines)
