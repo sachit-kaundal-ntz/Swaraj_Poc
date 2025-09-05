@@ -1,0 +1,655 @@
+{
+  "task_id": "a30fcfa2-77eb-4231-8df2-36921d51e502",
+  "filename": "a30fcfa2-77eb-4231-8df2-36921d51e502_image (6).png",
+  "file_size": 3068637,
+  "extracted_data": {
+    "units": "mm",
+    "views": [
+      {
+        "id": "view_section_bb",
+        "name": "SECTION B-B"
+      },
+      {
+        "id": "view_iso",
+        "name": "ISOMETRIC VIEW"
+      },
+      {
+        "id": "view_lead_crowning",
+        "name": "LEAD CROWNING DETAIL"
+      },
+      {
+        "id": "view_gear_tooth_chamfer",
+        "name": "GEAR TOOTH EDGE CHAMFER"
+      },
+      {
+        "id": "view_gear_tip_chamfer",
+        "name": "GEAR TIP CHAMFER"
+      }
+    ],
+    "tables": [
+      {
+        "id": "tbl_gear_data",
+        "view_id": "view_section_bb",
+        "cells": [
+          {
+            "label": "MODULE",
+            "value": "3.5",
+            "unit": "mm"
+          },
+          {
+            "label": "NO. OF TEETH",
+            "value": "33",
+            "unit": null
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": "20",
+            "unit": "°"
+          },
+          {
+            "label": "HELIX ANGLE",
+            "value": "22.5",
+            "unit": "°"
+          },
+          {
+            "label": "DIRECTION OF HELIX",
+            "value": "LEFT",
+            "unit": null
+          },
+          {
+            "label": "COEFFICIENT OF CORRECTION",
+            "value": "0.5930",
+            "unit": null
+          },
+          {
+            "label": "SPAN MEASURMENT OVER TEETH",
+            "value": "5",
+            "unit": null
+          },
+          {
+            "label": "SPAN MEASURMENT",
+            "value": "49.942⁻⁰·⁰⁷⁴ / ⁻⁰·¹¹⁸",
+            "unit": "mm"
+          },
+          {
+            "label": "QUALITY OF TOLERANCE ZONE (DIN 3962-63)",
+            "value": "DIN X 7",
+            "unit": null
+          },
+          {
+            "label": "MESHES WITH GEAR (Z-21)",
+            "value": "P50001751D",
+            "unit": null
+          },
+          {
+            "label": "CENTER DISTANCE",
+            "value": "103.0±0.05",
+            "unit": "mm"
+          },
+          {
+            "label": "PITCH CIRCLE DIAMETER",
+            "value": "125.016",
+            "unit": "mm"
+          },
+          {
+            "label": "BASE DIAMETER",
+            "value": "116.315",
+            "unit": "mm"
+          },
+          {
+            "label": "MEASUREMENT OVER PINS (ALTERNATE)",
+            "value": "138.339⁻⁰·¹⁶⁹ / ⁻⁰·²⁰⁹",
+            "unit": "mm"
+          },
+          {
+            "label": "SAP",
+            "value": "122.842",
+            "unit": "mm"
+          },
+          {
+            "label": "EAP",
+            "value": "135.2",
+            "unit": "mm"
+          },
+          {
+            "label": "MAX. TRUE INVOLUTE FORM DIA.(TIF)",
+            "value": "122.381",
+            "unit": "mm"
+          },
+          {
+            "label": "OPERATING PCD",
+            "value": "125.889",
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_permissible_deviations",
+        "view_id": "view_section_bb",
+        "cells": [
+          {
+            "label": "REFERENCE:- SPLINE PITCH CYLINDER",
+            "value": "0.070",
+            "unit": "mm"
+          },
+          {
+            "label": "RUNOUT OF FACE A & B",
+            "value": "0.070",
+            "unit": "mm"
+          },
+          {
+            "label": "RUNOUT OF GEAR PITCH CROWN",
+            "value": "0.032 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "PERMISSIBLE DOUBLE FLANK TOTAL ERROR RANGE (Fi\")",
+            "value": "0.036 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "PERMISSIBLE DOUBLE FLANK TOOTH TO TOOTH ERROR RANGE (fi\")",
+            "value": "0.016 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "TOOTH TRACE FORM DEVIATION (fβr)",
+            "value": "0.007 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "PERMISSIBLE TOOTH ALIGNMENT ERROR OVER FACE WIDTH (fHB)",
+            "value": "0.011 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "TOOTH TRACE TOTAL DEVIATION (Fβ)",
+            "value": "0.013 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "PROFILE FORM DEVIATION (fα)",
+            "value": "0.011 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "PROFILE ANGLE DEVIATION (fHα)",
+            "value": "0.009 (a)",
+            "unit": "mm"
+          },
+          {
+            "label": "TOTAL PROFILE DEVIATION (Fα)",
+            "value": "0.014 (a)",
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_spline_data",
+        "view_id": "view_section_bb",
+        "cells": [
+          {
+            "label": "STANDARD",
+            "value": "DIN 5480",
+            "unit": null
+          },
+          {
+            "label": "FIT",
+            "value": "SIDE FIT",
+            "unit": null
+          },
+          {
+            "label": "NO. OF TEETH",
+            "value": "21",
+            "unit": null
+          },
+          {
+            "label": "MODULE",
+            "value": "2.0",
+            "unit": null
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": "30",
+            "unit": "°"
+          },
+          {
+            "label": "MEASUREMENT BETWEEN PINS",
+            "value": "37.603⁺⁰·²¹⁷ / ⁺⁰·¹¹⁷",
+            "unit": "mm"
+          },
+          {
+            "label": "PIN DIAMETER",
+            "value": "3.5",
+            "unit": "mm"
+          },
+          {
+            "label": "MAJOR DIAMETER",
+            "value": "45.0⁺⁰·⁶² / ⁺⁰·²⁵",
+            "unit": "mm"
+          },
+          {
+            "label": "MINOR DIAMETER",
+            "value": "41.0⁺⁰·¹⁶ / ⁰·⁰",
+            "unit": "mm"
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "dim_gear_outer_dia",
+        "view_id": "view_section_bb",
+        "raw_text": "⌀136.2-0.1",
+        "value": 136.2,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "-0.1"
+      },
+      {
+        "id": "dim_gear_pcd",
+        "view_id": "view_section_bb",
+        "raw_text": "PCD 125.016",
+        "value": 125.016,
+        "unit": "mm",
+        "symbol": "PCD",
+        "tolerance": null
+      },
+      {
+        "id": "dim_gear_root_dia",
+        "view_id": "view_section_bb",
+        "raw_text": "⌀120.417-0.3",
+        "value": 120.417,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "-0.3"
+      },
+      {
+        "id": "dim_gear_base_dia",
+        "view_id": "view_section_bb",
+        "raw_text": "⌀90",
+        "value": 90.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null
+      },
+      {
+        "id": "dim_hub_outer_dia",
+        "view_id": "view_section_bb",
+        "raw_text": "⌀58 (BOTH SIDE)",
+        "value": 58.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "note": "(BOTH SIDE)"
+      },
+      {
+        "id": "dim_bore_entry_dia",
+        "view_id": "view_section_bb",
+        "raw_text": "⌀46 (ENTRY DIA) (BOTH SIDE)",
+        "value": 46.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "note": "(ENTRY DIA) (BOTH SIDE)"
+      },
+      {
+        "id": "dim_spline_pcd",
+        "view_id": "view_section_bb",
+        "raw_text": "PCD 42",
+        "value": 42.0,
+        "unit": "mm",
+        "symbol": "PCD",
+        "tolerance": null
+      },
+      {
+        "id": "dim_face_width",
+        "view_id": "view_section_bb",
+        "raw_text": "15.2±0.1",
+        "value": 15.2,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.1"
+      },
+      {
+        "id": "dim_hub_height",
+        "view_id": "view_section_bb",
+        "raw_text": "24.7-0.1",
+        "value": 24.7,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "-0.1"
+      },
+      {
+        "id": "dim_chamfer_gear_outer_edge",
+        "view_id": "view_section_bb",
+        "raw_text": "1 x 45°",
+        "value": 1.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "angle": 45.0,
+        "note": "(BOTH SIDE)"
+      },
+      {
+        "id": "dim_radius_hub_to_gear_transition",
+        "view_id": "view_section_bb",
+        "raw_text": "R5 (BOTH SIDE)",
+        "value": 5.0,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "note": "(BOTH SIDE)"
+      },
+      {
+        "id": "dim_groove_identification",
+        "view_id": "view_section_bb",
+        "raw_text": "⌀8.0X0.3 DEEP, GROOVE (Q) FOR IDENTIFICATION ONLY",
+        "value": 8.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "note": "0.3 DEEP, GROOVE (Q) FOR IDENTIFICATION ONLY"
+      },
+      {
+        "id": "dim_lead_crowning_depth",
+        "view_id": "view_lead_crowning",
+        "raw_text": "0.005-0.015",
+        "value": null,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "note": "Range 0.005 to 0.015"
+      },
+      {
+        "id": "dim_gear_tooth_edge_chamfer",
+        "view_id": "view_gear_tooth_chamfer",
+        "raw_text": "0.3-1.0 TYP. BOTH SIDES",
+        "value": null,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "note": "Range 0.3 to 1.0, TYP. BOTH SIDES"
+      },
+      {
+        "id": "dim_gear_tip_chamfer_axial",
+        "view_id": "view_gear_tip_chamfer",
+        "raw_text": "0.35±0.1",
+        "value": 0.35,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.1"
+      },
+      {
+        "id": "dim_gear_tip_chamfer_radial",
+        "view_id": "view_gear_tip_chamfer",
+        "raw_text": "0.35±0.1",
+        "value": 0.35,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.1"
+      }
+    ],
+    "features": [
+      {
+        "id": "feat_gear_rim",
+        "type": "cylindrical_rim",
+        "role": "gear_tip",
+        "outer_diameter_dim_ids": [
+          "dim_gear_outer_dia"
+        ],
+        "face_width_dim_ids": [
+          "dim_face_width"
+        ],
+        "table_links": [
+          "tbl_gear_data",
+          "tbl_permissible_deviations"
+        ]
+      },
+      {
+        "id": "feat_hub_outer",
+        "type": "cylindrical_step",
+        "role": "hub_outer",
+        "diameter_dim_ids": [
+          "dim_hub_outer_dia"
+        ],
+        "length_dim_ids": [
+          "dim_hub_height"
+        ]
+      },
+      {
+        "id": "feat_bore_entry",
+        "type": "cylindrical_bore",
+        "role": "entry_bore",
+        "diameter_dim_ids": [
+          "dim_bore_entry_dia"
+        ]
+      },
+      {
+        "id": "feat_spline_bore",
+        "type": "internal_spline",
+        "role": "spline_bore",
+        "table_links": [
+          "tbl_spline_data"
+        ],
+        "pcd_dim_ids": [
+          "dim_spline_pcd"
+        ]
+      },
+      {
+        "id": "feat_gear_pcd_circle",
+        "type": "pitch_circle",
+        "role": "gear_pitch_circle",
+        "diameter_dim_ids": [
+          "dim_gear_pcd"
+        ]
+      },
+      {
+        "id": "feat_gear_root_circle",
+        "type": "cylindrical_feature",
+        "role": "gear_root_circle",
+        "diameter_dim_ids": [
+          "dim_gear_root_dia"
+        ]
+      },
+      {
+        "id": "feat_gear_base_circle",
+        "type": "cylindrical_feature",
+        "role": "gear_base_circle",
+        "diameter_dim_ids": [
+          "dim_gear_base_dia"
+        ]
+      },
+      {
+        "id": "feat_chamfer_gear_outer",
+        "type": "chamfer",
+        "role": "gear_outer_edge_chamfer",
+        "chamfer_dim_ids": [
+          "dim_chamfer_gear_outer_edge"
+        ]
+      },
+      {
+        "id": "feat_radius_hub_transition",
+        "type": "fillet",
+        "role": "hub_to_gear_transition_radius",
+        "radius_dim_ids": [
+          "dim_radius_hub_to_gear_transition"
+        ]
+      },
+      {
+        "id": "feat_identification_groove",
+        "type": "groove",
+        "role": "identification_groove",
+        "diameter_dim_ids": [
+          "dim_groove_identification"
+        ]
+      },
+      {
+        "id": "feat_lead_crowning",
+        "type": "gear_tooth_modification",
+        "role": "lead_crowning",
+        "depth_dim_ids": [
+          "dim_lead_crowning_depth"
+        ]
+      },
+      {
+        "id": "feat_gear_tooth_edge_chamfer_detail",
+        "type": "chamfer",
+        "role": "gear_tooth_edge_chamfer",
+        "chamfer_dim_ids": [
+          "dim_gear_tooth_edge_chamfer"
+        ]
+      },
+      {
+        "id": "feat_gear_tip_chamfer_detail",
+        "type": "chamfer",
+        "role": "gear_tip_chamfer",
+        "chamfer_dim_ids": [
+          "dim_gear_tip_chamfer_axial",
+          "dim_gear_tip_chamfer_radial"
+        ]
+      }
+    ],
+    "assembly_order": [
+      {
+        "op": "revolve",
+        "feature_id": "feat_gear_rim"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub_outer"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_bore_entry"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_spline_bore"
+      },
+      {
+        "op": "chamfer",
+        "feature_id": "feat_chamfer_gear_outer"
+      },
+      {
+        "op": "fillet",
+        "feature_id": "feat_radius_hub_transition"
+      },
+      {
+        "op": "groove",
+        "feature_id": "feat_identification_groove"
+      },
+      {
+        "op": "add_feature",
+        "feature_id": "feat_lead_crowning"
+      },
+      {
+        "op": "add_feature",
+        "feature_id": "feat_gear_tooth_edge_chamfer_detail"
+      },
+      {
+        "op": "add_feature",
+        "feature_id": "feat_gear_tip_chamfer_detail"
+      },
+      {
+        "op": "add_feature",
+        "feature_id": "feat_gear_pcd_circle"
+      },
+      {
+        "op": "add_feature",
+        "feature_id": "feat_gear_root_circle"
+      },
+      {
+        "op": "add_feature",
+        "feature_id": "feat_gear_base_circle"
+      }
+    ],
+    "metadata": {
+      "title_block": {
+        "drawing_no": "P50011489B X (a)",
+        "material": "20MnCr5; IS:9175",
+        "scale": "1:1",
+        "part_name": "GEAR Z-33 (4TH DRIVER)",
+        "revision": "001",
+        "date": "2025-04-07",
+        "weight_kg": "1.47"
+      }
+    },
+    "notes": [
+      {
+        "type": "general",
+        "text": "(A) ALL DIMENSIONS ARE IN MM UNLESS STATED OTHERWISE."
+      },
+      {
+        "type": "general",
+        "text": "(B) CODE PRACTICE ABBREVIATIONS ETC TO IS:696."
+      },
+      {
+        "type": "general",
+        "text": "(C) WORK TO MEDIUM TOLERANCES OF IS:2102 TABLE-1 PAGE 3 FOR DIMENSIONS OF MACHINED SURFACES WHICH LIMITS HAVE NOT BEEN SPECIFIED."
+      },
+      {
+        "type": "forging_details",
+        "text": "1. NORMALISE TO 155-185 BHN."
+      },
+      {
+        "type": "forging_details",
+        "text": "2. GRAIN SIZE 5 TO 8 ASTM."
+      },
+      {
+        "type": "forging_details",
+        "text": "3. MICROSTRUCTURE ON REPRESENTATIVE SAMPLE MUST SHOW UNIFORM GRAINED LAMELLAR PEARLITE & FERRITE FREE FROM WIDMANSTATTEN INTERMEDIATE & BANDED STRUCTURE."
+      },
+      {
+        "type": "forging_details",
+        "text": "4. FORGING TO HAVE BAINITE UP TO 5%."
+      },
+      {
+        "type": "heat_treatment",
+        "text": "CASE CARBURIZED TO A DEPTH OF 0.9-1.2 & HARDEN TO 58-62 HRC."
+      },
+      {
+        "type": "heat_treatment",
+        "text": "CORE HARDNESS 32-42 HRC."
+      },
+      {
+        "type": "surface_treatment",
+        "text": "SHOT BLAST TO DESCALE SHOT SIZE ≤ 1MM."
+      },
+      {
+        "type": "general_sharp_corners",
+        "text": "ALL SHARP CORNERS INCLUDING GEAR TEETH & SPLINE EDGES TO BE FREE FROM BURRS."
+      },
+      {
+        "type": "specific_note",
+        "text": "1. NEGATIVE CROWNING IS NOT ALLOWED ON GEAR TEETH PROFILE."
+      },
+      {
+        "type": "specific_note",
+        "text": "2. QUALITY REQUIREMENT AND ACCEPTABILITY NORMS TO CONFIRM SWARAJ ENGINEERING STANDARD SES-1007."
+      },
+      {
+        "type": "specific_note",
+        "text": "3. EAP MAY BE CONSIDERED AS 135 FOR INSPECTION PURPOSE ONLY."
+      }
+    ],
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 2006,
+        "image_tokens": 774,
+        "total_input_tokens": 2780
+      },
+      "output_tokens": 5553,
+      "total_tokens": 8333,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 9355,
+        "height": 6615,
+        "total_pixels": 61883325,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-05T15:16:31.708034"
+}

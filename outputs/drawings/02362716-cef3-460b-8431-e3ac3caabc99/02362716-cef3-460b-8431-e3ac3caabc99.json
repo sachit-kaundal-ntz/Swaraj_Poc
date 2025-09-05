@@ -1,0 +1,494 @@
+{
+  "task_id": "02362716-cef3-460b-8431-e3ac3caabc99",
+  "filename": "02362716-cef3-460b-8431-e3ac3caabc99_P10019486AS001 (Induction Hardening)_p0.png",
+  "file_size": 3216120,
+  "extracted_data": {
+    "units": "mm",
+    "views": [
+      {
+        "id": "view_main",
+        "name": "SECTION A-A",
+        "bbox": null
+      }
+    ],
+    "tables": [
+      {
+        "id": "tbl_gear_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "MODULE",
+            "value": 5.5,
+            "unit": null
+          },
+          {
+            "label": "NO OF TEETH",
+            "value": 58,
+            "unit": null
+          },
+          {
+            "label": "ADDENDUM",
+            "value": null,
+            "unit": "mm",
+            "source": "missing_on_drawing"
+          },
+          {
+            "label": "HELIX ANGLE",
+            "value": null,
+            "unit": null,
+            "source": "missing_on_drawing"
+          },
+          {
+            "label": "DIRECTION OF HELIX",
+            "value": null,
+            "unit": null,
+            "source": "missing_on_drawing"
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": 20,
+            "unit": "°"
+          },
+          {
+            "label": "AMOUNT OF CORRECTION",
+            "value": 0.22,
+            "unit": null
+          },
+          {
+            "label": "SPAN MEASUREMENT OVER 7 TEETH",
+            "value": 110.834,
+            "unit": "mm",
+            "tolerance": "-0.075 -0.175"
+          },
+          {
+            "label": "QUALITY OF TOLERANCE ZONE",
+            "value": "DIN 9 (DIN 3962-63)",
+            "unit": null
+          },
+          {
+            "label": "MESHES WITH GEAR (Z-12) DWG NO.",
+            "value": 759018,
+            "unit": null
+          },
+          {
+            "label": "CENTRE DISTANCE",
+            "value": 195.75,
+            "unit": "mm",
+            "tolerance": "±0.112"
+          }
+        ]
+      },
+      {
+        "id": "tbl_spline_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "MAJOR DIAMETER",
+            "value": 60,
+            "unit": "mm"
+          },
+          {
+            "label": "MINOR DIAMETER",
+            "value": 55,
+            "unit": "mm"
+          },
+          {
+            "label": "TYPE",
+            "value": "INVOLUTE",
+            "unit": null
+          },
+          {
+            "label": "NO. OFF TEETH",
+            "value": 22,
+            "unit": null
+          },
+          {
+            "label": "MODULE",
+            "value": 2.5,
+            "unit": null
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": 30,
+            "unit": "°"
+          },
+          {
+            "label": "MEASUREMENT BETWEEN PINS",
+            "value": 50.552,
+            "unit": "mm",
+            "tolerance": "+0.158 +0.093"
+          },
+          {
+            "label": "PIN DIAMETER",
+            "value": 4.5,
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_permissible_deviations",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "RADIAL RUNOUT OF SPLINE PITCH CYLINDER",
+            "value": 0.1,
+            "unit": "mm"
+          },
+          {
+            "label": "RADIAL RUNOUT OF GEAR PITCH CYLINDER",
+            "value": 0.1,
+            "unit": "mm"
+          },
+          {
+            "label": "RADIAL RUNOUT OF FACES A & B",
+            "value": 0.1,
+            "unit": "mm"
+          },
+          {
+            "label": "RADIAL RUNOUT OF FACES C & D",
+            "value": 0.5,
+            "unit": "mm",
+            "tolerance": "MAX."
+          },
+          {
+            "label": "PERMISSIBLE DOUBLE FLANK TOTAL ERROR RANGE F_i\"",
+            "value": 0.09,
+            "unit": null
+          },
+          {
+            "label": "PERMISSIBLE DOUBLE FLANK TOOTH TO TOOTH ERROR RANGE f_i\"",
+            "value": 0.04,
+            "unit": null
+          },
+          {
+            "label": "PERMISSIBLE TOOTH ALIGNMENT ERROR OVER FACE WIDTH f_HB",
+            "value": 0.028,
+            "unit": null
+          },
+          {
+            "label": "PERMISSIBLE PROFILE FORM DEVIATION f_f",
+            "value": 0.028,
+            "unit": null
+          }
+        ]
+      },
+      {
+        "id": "tbl_heat_treatment",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "1. TEETH TO BE INDUCTION HARDENED & TEMPERED TO",
+            "value": "53-58 HRC",
+            "unit": null
+          },
+          {
+            "label": "2. INDUCTION HARDENING PATTERN TO BE CENTRALISED W.R.T. TOOTH.",
+            "value": null,
+            "unit": null
+          }
+        ]
+      },
+      {
+        "id": "tbl_forging_parameters",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "UNIFORMLY NORMALISE TO",
+            "value": "170-210 BHN",
+            "unit": null
+          },
+          {
+            "label": "GRAIN SIZE",
+            "value": "5-8 ASTM",
+            "unit": null
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "dim_outer_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀282",
+        "value": 282,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀82",
+        "value": 82,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_face_width",
+        "view_id": "view_main",
+        "raw_text": "54 ±0.2",
+        "value": 54,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.2",
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_height",
+        "view_id": "view_main",
+        "raw_text": "45 +0 -1",
+        "value": 45,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+0 -1",
+        "leaders": []
+      },
+      {
+        "id": "dim_bore",
+        "view_id": "view_main",
+        "raw_text": "⌀55 -0",
+        "value": 55,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "-0",
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_inner_step_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀78",
+        "value": 78,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_spline_major_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀60 +0.3 -0",
+        "value": 60,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "+0.3 -0",
+        "leaders": []
+      },
+      {
+        "id": "dim_pitch_circle_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀319 P.C.D",
+        "value": 319,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_root_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀307.67",
+        "value": 307.67,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_overall_max_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀332 ±0.1",
+        "value": 332,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "±0.1",
+        "leaders": []
+      },
+      {
+        "id": "dim_axial_ref_2",
+        "view_id": "view_main",
+        "raw_text": "2 (REF)",
+        "value": 2,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "REF",
+        "leaders": []
+      },
+      {
+        "id": "dim_axial_ref_0_5",
+        "view_id": "view_main",
+        "raw_text": "0.5",
+        "value": 0.5,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_chamfer_1x45_min",
+        "view_id": "view_main",
+        "raw_text": "1 X 45° MIN",
+        "value": 1,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "MIN",
+        "leaders": []
+      },
+      {
+        "id": "dim_chamfer_2x45_both_sides",
+        "view_id": "view_main",
+        "raw_text": "2 X 45° BOTH SIDES",
+        "value": 2,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_crowning_length",
+        "view_id": "view_main",
+        "raw_text": "45",
+        "value": 45,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_crowning_height",
+        "view_id": "view_main",
+        "raw_text": "0.02 +0.02 +0.005",
+        "value": 0.02,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+0.02 +0.005",
+        "leaders": []
+      },
+      {
+        "id": "dim_spline_chamfer_0_4x45_both_flanks",
+        "view_id": "view_main",
+        "raw_text": "0.4 X 45° BOTH FLANKS",
+        "value": 0.4,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hole_dia_30_4_equispaced",
+        "view_id": "view_main",
+        "raw_text": "⌀30-4 HOLES EQUISPACED ON 180 PCD",
+        "value": 30,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hole_dia_5_2_holes",
+        "view_id": "view_main",
+        "raw_text": "⌀5.2-HOLES TO BE IN BETWEEN 2-SPLINES ON 66 P.C.D. WITHIN 0.1R OF TRUE POSITION",
+        "value": 5.2,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      }
+    ],
+    "features": [
+      {
+        "id": "feat_rim",
+        "type": "cylindrical_rim",
+        "role": "gear_tip",
+        "outer_diameter_dim_ids": [
+          "dim_outer_dia"
+        ],
+        "face_width_dim_ids": [
+          "dim_face_width"
+        ],
+        "table_links": [
+          "tbl_gear_data"
+        ]
+      },
+      {
+        "id": "feat_hub",
+        "type": "cylindrical_step",
+        "role": "hub_outer",
+        "diameter_dim_ids": [
+          "dim_hub_dia"
+        ],
+        "length_dim_ids": [
+          "dim_hub_height"
+        ]
+      },
+      {
+        "id": "feat_bore_main",
+        "type": "cylindrical_bore",
+        "role": "through_bore",
+        "diameter_dim_ids": [
+          "dim_bore"
+        ],
+        "length_dim_ids": [],
+        "fit_class": null
+      },
+      {
+        "id": "feat_spline",
+        "type": "internal_spline",
+        "role": "spline_bore",
+        "table_links": [
+          "tbl_spline_data"
+        ],
+        "diameter_dim_ids": [
+          "dim_spline_major_dia",
+          "dim_bore"
+        ]
+      }
+    ],
+    "assembly_order": [
+      {
+        "op": "revolve",
+        "feature_id": "feat_rim"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_bore_main"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_spline"
+      }
+    ],
+    "metadata": {
+      "title_block": {
+        "drawing_no": "P10019486A",
+        "material": "EN43D; BS970",
+        "scale": "1:2",
+        "part_name": "BULL GEAR"
+      }
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 1953,
+        "image_tokens": 774,
+        "total_input_tokens": 2727
+      },
+      "output_tokens": 3477,
+      "total_tokens": 6204,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 9355,
+        "height": 6615,
+        "total_pixels": 61883325,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-05T18:08:46.161268"
+}

@@ -1,0 +1,556 @@
+{
+  "task_id": "b1ceba7c-3999-4643-b08d-564280a90389",
+  "filename": "b1ceba7c-3999-4643-b08d-564280a90389_P10019486AS001 (Induction Hardening)_p0.png",
+  "file_size": 3216120,
+  "extracted_data": {
+    "units": "mm",
+    "views": [
+      {
+        "id": "view_main",
+        "name": "SEC A-A",
+        "bbox": null
+      }
+    ],
+    "tables": [
+      {
+        "id": "tbl_gear_data",
+        "view_id": "view_main",
+        "cells": [
+          {
+            "label": "MODULE",
+            "value": "5.5",
+            "unit": "mm"
+          },
+          {
+            "label": "NO OF TEETH",
+            "value": "58",
+            "unit": null
+          },
+          {
+            "label": "ADDENDUM",
+            "value": null,
+            "unit": "mm"
+          },
+          {
+            "label": "HELIX ANGLE",
+            "value": "-",
+            "unit": null
+          },
+          {
+            "label": "DIRECTION OF HELIX",
+            "value": "-",
+            "unit": null
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": "20",
+            "unit": "°"
+          },
+          {
+            "label": "DISPLACEMENT OF CORRECTION",
+            "value": "+0.22",
+            "unit": null
+          },
+          {
+            "label": "SPAN MEASUREMENT OVER 7 TEETH",
+            "value": "110.834 -0.075 -0.175",
+            "unit": "mm"
+          },
+          {
+            "label": "QUALITY OF TOLERANCE ZONE",
+            "value": "DIN 9 (DIN 3962-63)",
+            "unit": null
+          },
+          {
+            "label": "MESHES WITH GEAR (Z-12) DWG NO.",
+            "value": "759018",
+            "unit": null
+          },
+          {
+            "label": "CENTRE DISTANCE",
+            "value": "195.75 ±0.112",
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_spline_data",
+        "view_id": "view_main",
+        "cells": [
+          {
+            "label": "MAJOR DIAMETER",
+            "value": null,
+            "unit": "mm"
+          },
+          {
+            "label": "MINOR DIAMETER",
+            "value": null,
+            "unit": "mm"
+          },
+          {
+            "label": "TYPE",
+            "value": "INVOLUTE",
+            "unit": null
+          },
+          {
+            "label": "NO. OFF TEETH",
+            "value": "22",
+            "unit": null
+          },
+          {
+            "label": "MODULE",
+            "value": "2.5",
+            "unit": "mm"
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": "30",
+            "unit": "°"
+          },
+          {
+            "label": "MEASUREMENT BETWEEN PINS",
+            "value": "50.552 +0.158 +0.093",
+            "unit": "mm"
+          },
+          {
+            "label": "PIN DIAMETER",
+            "value": "4.5",
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_hardness_case_depth",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "S.NO",
+            "value": "1",
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "B-B",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "45-55 RC",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "X = 1.4 - 7.0 (ABOVE ROOT DIA)",
+            "unit": "mm"
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-2",
+            "unit": null
+          },
+          {
+            "label": "S.NO",
+            "value": "2",
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "A-A & C-C",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "45-55 RC",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "Y1 = 1.5 - 5.6 (BELOW ROOT DIA)",
+            "unit": "mm"
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-3",
+            "unit": null
+          },
+          {
+            "label": "S.NO",
+            "value": "3",
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "B-B",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH SPACE",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "50-60 RC/OHV",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "Y = 0.8 - 6.6 (BELOW ROOT DIA)",
+            "unit": "mm"
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-2",
+            "unit": null
+          },
+          {
+            "label": "S.NO",
+            "value": "4",
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "A-A & C-C",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH SPACE",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "50-60 RC/OHV",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "Y = 1.3 - 7.1 (BELOW ROOT DIA)",
+            "unit": "mm"
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-3",
+            "unit": null
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "dim_outer_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀332 ±0.1",
+        "value": 332.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "±0.1",
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_outer_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀82",
+        "value": 82.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_face_width",
+        "view_id": "view_main",
+        "raw_text": "54 ±0.2",
+        "value": 54.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.2",
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_extension_length",
+        "view_id": "view_main",
+        "raw_text": "45 +0 -1",
+        "value": 45.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+0 -1",
+        "leaders": []
+      },
+      {
+        "id": "dim_bore",
+        "view_id": "view_main",
+        "raw_text": "⌀55 -0 +0.19",
+        "value": 55.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "-0 +0.19",
+        "leaders": []
+      },
+      {
+        "id": "dim_pitch_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀307.67",
+        "value": 307.67,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_pitch_circle_dia",
+        "view_id": "view_main",
+        "raw_text": "319 P.C.D",
+        "value": 319.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_root_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀282",
+        "value": 282.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_inner_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀78",
+        "value": 78.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_spline_major_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀60 +0.3 -0",
+        "value": 60.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "+0.3 -0",
+        "leaders": []
+      },
+      {
+        "id": "dim_inner_hub_length",
+        "view_id": "view_main",
+        "raw_text": "14 +2 -1",
+        "value": 14.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+2 -1",
+        "leaders": []
+      },
+      {
+        "id": "dim_chamfer_2x45_both_sides",
+        "view_id": "view_main",
+        "raw_text": "2 x 45° BOTH SIDES",
+        "value": 2.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_chamfer_1x45_min",
+        "view_id": "view_main",
+        "raw_text": "1 x 45° MIN",
+        "value": 1.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_radius_r20",
+        "view_id": "view_main",
+        "raw_text": "R20",
+        "value": 20.0,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_angle_30deg",
+        "view_id": "view_main",
+        "raw_text": "30°",
+        "value": 30.0,
+        "unit": "°",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_detail_r_length",
+        "view_id": "view_main",
+        "raw_text": "8 +1 -0",
+        "value": 8.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+1 -0",
+        "leaders": []
+      },
+      {
+        "id": "dim_detail_s_length",
+        "view_id": "view_main",
+        "raw_text": "0.5",
+        "value": 0.5,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_crowning_height",
+        "view_id": null,
+        "raw_text": "0.02 +0.02 +0.005",
+        "value": 0.02,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+0.02 +0.005",
+        "leaders": []
+      },
+      {
+        "id": "dim_crowning_length",
+        "view_id": null,
+        "raw_text": "45",
+        "value": 45.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_flank_chamfer",
+        "view_id": null,
+        "raw_text": "0.4 X 45° BOTH FLANKS",
+        "value": 0.4,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      }
+    ],
+    "features": [
+      {
+        "id": "feat_rim",
+        "type": "cylindrical_rim",
+        "role": "gear_tip",
+        "outer_diameter_dim_ids": [
+          "dim_outer_dia"
+        ],
+        "face_width_dim_ids": [
+          "dim_face_width"
+        ],
+        "table_links": [
+          "tbl_gear_data"
+        ]
+      },
+      {
+        "id": "feat_hub_outer",
+        "type": "cylindrical_step",
+        "role": "hub_outer",
+        "diameter_dim_ids": [
+          "dim_hub_outer_dia"
+        ],
+        "length_dim_ids": [
+          "dim_hub_extension_length"
+        ]
+      },
+      {
+        "id": "feat_hub_inner",
+        "type": "cylindrical_step",
+        "role": "hub_inner",
+        "diameter_dim_ids": [
+          "dim_hub_inner_dia"
+        ],
+        "length_dim_ids": [
+          "dim_inner_hub_length"
+        ]
+      },
+      {
+        "id": "feat_bore_main",
+        "type": "cylindrical_bore",
+        "role": "through_bore",
+        "diameter_dim_ids": [
+          "dim_bore"
+        ],
+        "length_dim_ids": [],
+        "fit_class": null
+      },
+      {
+        "id": "feat_spline",
+        "type": "internal_spline",
+        "role": "spline_bore",
+        "table_links": [
+          "tbl_spline_data"
+        ]
+      }
+    ],
+    "assembly_order": [
+      {
+        "op": "revolve",
+        "feature_id": "feat_rim"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub_outer"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub_inner"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_bore_main"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_spline"
+      }
+    ],
+    "metadata": {
+      "title_block": {
+        "drawing_no": "P10019486A",
+        "material": "EN43D; BS970",
+        "scale": "1:2",
+        "part_name": "BULL GEAR"
+      }
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 1944,
+        "image_tokens": 774,
+        "total_input_tokens": 2718
+      },
+      "output_tokens": 4128,
+      "total_tokens": 6846,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 9355,
+        "height": 6615,
+        "total_pixels": 61883325,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-05T18:17:20.417926"
+}
