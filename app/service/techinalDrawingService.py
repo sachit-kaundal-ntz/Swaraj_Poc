@@ -177,220 +177,253 @@ class TechnicalDrawingExtractionService:
         try:
             logger.info(f"Starting comprehensive technical drawing extraction for: {image_path}")
 
+
             PROMPT = """
-                You are an expert technical drawing analysis system. Extract ALL visible information from this technical drawing with maximum accuracy and completeness.
+You are an expert technical drawing analysis system. Extract ALL visible dimensions with exact shape-wise calculations. Be completely dynamic - never hardcode tolerance values or make assumptions.
 
-                CRITICAL OUTPUT REQUIREMENTS:
-                - Respond with COMPLETE, VALID JSON only - no explanations or partial output
-                - Extract information EXACTLY as it appears in the drawing
-                - Use null for missing/unclear values, not empty strings
-                - Ensure proper JSON syntax with all braces and brackets closed
-                - If nothing can be extracted, return: {"status": "no_data_extracted"}
+🎯 CORE PRINCIPLES:
+1. Extract ONLY what is explicitly visible on the drawing
+2. Calculate exact min/max for each dimension with visible tolerances
+3. Group dimensions by geometric shapes/features
+4. Never assume tolerance values - mark as "tolerance_not_specified"
+5. Be completely generic for any drawing type
 
-                EXTRACTION SPECIFICATIONS:
+---
 
-                1. DRAWING_METADATA:
-                - drawing_title: "exact title from title block"
-                - drawing_number: "complete drawing number with prefixes/suffixes"
-                - part_number: "part number if different from drawing number"
-                - revision: "revision letter/number exactly as shown"
-                - scale: "scale notation exactly as shown (e.g., '1:1', '2:1')"
-                - date: "date in original format"
-                - company_name: "complete company name and divisions"
-                - material: "complete material specification with grade"
-                - heat_treatment: "complete heat treatment specification"
-                - surface_treatment: "complete surface treatment specification"
-                - standards: ["list", "of", "all", "standards", "referenced"]
-                - notes: ["all", "general", "notes", "exactly", "as", "written"]
+### DYNAMIC EXTRACTION METHODOLOGY
 
-                2. DIMENSIONS_BY_SHAPE:
-                
-                circular_features: [
-                    {
-                    "feature_description": "exact label/description from drawing",
-                    "diameter": "diameter value with Ø symbol if shown",
-                    "radius": "radius value with R if shown",
-                    "tolerance": "complete tolerance notation (+0.1/-0.2 format)",
-                    "location": "descriptive location on drawing"
-                    }
-                ]
-                
-                linear_features: [
-                    {
-                    "feature_description": "exact label/description from drawing",
-                    "dimension_value": "exact dimension with units",
-                    "tolerance": "complete tolerance notation",
-                    "location": "descriptive location on drawing",
-                    "dimension_type": "length/width/height/depth/thickness"
-                    }
-                ]
-                
-                angular_features: [
-                    {
-                    "feature_description": "exact label/description from drawing", 
-                    "angle": "angle value with ° symbol",
-                    "tolerance": "angular tolerance if shown",
-                    "location": "descriptive location on drawing"
-                    }
-                ]
-                
-                threaded_features: [
-                    {
-                    "feature_description": "exact description from drawing",
-                    "thread_specification": "complete thread callout (M10x1.5, etc.)",
-                    "nominal_diameter": "thread diameter",
-                    "pitch": "thread pitch if shown separately",
-                    "length": "thread length/engagement",
-                    "tolerance_class": "thread tolerance class if shown"
-                    }
-                ]
-                
-                gear_features: [
-                    {
-                    "feature_description": "gear identification from drawing",
-                    "number_of_teeth": "exact tooth count",
-                    "module": "module value",
-                    "pitch_diameter": "PCD value",
-                    "addendum": "addendum value if shown",
-                    "dedendum": "dedendum value if shown", 
-                    "pressure_angle": "pressure angle with ° symbol",
-                    "helix_angle": "helix angle if shown",
-                    "face_width": "gear face width if dimensioned"
-                    }
-                ]
+#### STEP 1: IDENTIFY ALL GEOMETRIC FEATURES
+Scan the drawing and identify every distinct shape:
+- Basic shapes: circles, rectangles, cylinders, cones
+- Complex features: gears, splines, threads, keyways
+- Detail features: chamfers, fillets, grooves, holes
+- Composite assemblies: multi-part features
 
-                3. DATA_TABLES:
-                Extract all tabulated data exactly as shown:
-                
-                gear_data_table: {
-                    "table_title": "exact table heading",
-                    "parameters": {
-                    "parameter_name": "exact_value_as_shown"
-                    }
-                }
-                
-                spline_data_table: {
-                    "table_title": "exact table heading", 
-                    "parameters": {
-                    "parameter_name": "exact_value_as_shown"
-                    }
-                }
+#### STEP 2: EXTRACT VISIBLE DIMENSIONS ONLY
+For each feature, extract ONLY explicitly shown:
+- Dimension values (exact as written: 50.0, 50.00, 50)
+- Tolerance notations (±0.1, +0.05/-0.02, H7/g6, etc.)
+- Units (mm, inches, μm, etc.)
+- Reference/datum callouts
 
-                4. OVERALL_DIMENSIONS:
-                - overall_length: "maximum length dimension if shown"
-                - overall_width: "maximum width dimension if shown" 
-                - overall_height: "maximum height dimension if shown"
-                - overall_diameter: "maximum diameter if shown"
-                - envelope_dimensions: "bounding box dimensions if specified"
-                - center_distances: "center-to-center spacing dimensions"
+#### STEP 3: CALCULATE EXACT RANGES (ONLY FOR SPECIFIED TOLERANCES)
+When tolerance IS specified:
+- Max = Nominal + Upper_Tolerance
+- Min = Nominal - Lower_Tolerance
+- Show calculation formula
 
-                5. TOLERANCES_AND_FITS:
-                
-                geometric_tolerances: [
-                    {
-                    "symbol": "GD&T symbol description",
-                    "tolerance_value": "exact tolerance value",
-                    "datum_reference": "datum letters if applicable", 
-                    "feature_description": "what feature this applies to",
-                    "modifier": "any modifiers like (Q) or MMC"
-                    }
-                ]
-                
-                dimensional_tolerances: [
-                    {
-                    "dimension": "base dimension",
-                    "plus_tolerance": "positive tolerance",
-                    "minus_tolerance": "negative tolerance",
-                    "bilateral_notation": "±X.X format if applicable"
-                    }
-                ]
-                
-                surface_finish: [
-                    {
-                    "symbol": "surface finish symbol description",
-                    "value": "surface finish value",
-                    "location": "where specified on drawing"
-                    }
-                ]
-                
-                fit_specifications: [
-                    "exact fit callouts as shown"
-                ]
+When tolerance NOT specified:
+- Mark as "tolerance_not_specified"
+- Do NOT assume general tolerance values
+- Do NOT calculate min/max ranges
 
-                6. MASS_AND_WEIGHT_INFORMATION:
-                - mass: "mass value with units if shown"
-                - weight: "weight value with units if shown"
-                - material_density: "density if specified"
-                - calculated_volume: "volume if specified"
-                - center_of_gravity: "CG location if specified"
+---
 
-                7. MANUFACTURING_INFORMATION:
-                - machining_notes: ["exact machining instructions"]
-                - assembly_notes: ["exact assembly requirements"]
-                - inspection_notes: ["exact inspection requirements"]
-                - special_processes: ["heat treatment, coating, etc."]
-                - quality_requirements: ["quality standards and acceptance criteria"]
-                - tooling_notes: ["any tooling or fixturing notes"]
+### DYNAMIC OUTPUT SCHEMA
 
-                8. MATERIAL_PROPERTIES:
-                - material_grade: "complete material designation"
-                - hardness_requirements: "hardness specification with scale"
-                - mechanical_properties: "strength, yield, etc. if shown"
-                - chemical_composition: "composition requirements if shown"
-                - grain_structure: "grain size or structure requirements"
+```json
+{
+  "drawing_identification": {
+    "title": "exact_title_as_written",
+    "drawing_number": "exact_number",
+    "revision": "if_visible",
+    "scale": "exact_scale",
+    "material": "material_spec_if_shown",
+    "general_tolerance_statement": "exact_statement_if_present"
+  },
 
-                9. TITLE_BLOCK_INFORMATION:
-                Extract every field from title block:
-                - drawing_number: "complete drawing number"
-                - revision: "revision level"
-                - sheet: "sheet number and total sheets"
-                - size: "drawing size (A0, A1, etc.)"
-                - scale: "drawing scale"
-                - date: "drawing date"
-                - drawn_by: "draftsperson name and date"
-                - checked_by: "checker name and date" 
-                - approved_by: "approver name and date"
-                - company_information: "complete company details"
-                - part_name: "part name/description"
-                - material: "material specification"
-                - weight: "part weight if shown"
-                - finish: "surface finish if shown in title block"
-                - do_not_scale: "do not scale notation if present"
+  "geometric_features": [
+    {
+      "feature_id": "AUTO_GENERATED_ID",
+      "feature_type": "DETECTED_TYPE", // cylinder, rectangle, circle, gear, spline, etc.
+      "feature_description": "descriptive_name",
+      "location_reference": "view_name_or_section",
+      
+      "dimensions": {
+        "dimension_name": {
+          "nominal_value": "EXACT_AS_WRITTEN",
+          "tolerance_notation": "EXACT_AS_SHOWN_OR_not_specified",
+          "unit": "EXACT_UNIT",
+          "tolerance_type": "bilateral|unilateral|fit_designation|limit|not_specified",
+          
+          // ONLY calculate if tolerance is specified
+          "calculated_range": {
+            "max_value": "CALCULATION_OR_not_calculated",
+            "min_value": "CALCULATION_OR_not_calculated", 
+            "calculation_formula": "SHOW_MATH_OR_not_applicable",
+            "final_range": "[min, max] unit OR not_calculated"
+          }
+        }
+      }
+    }
+  ],
 
-                10. SECTIONAL_VIEWS:
-                    Extract dimensions and details from all sectional views:
-                    - section_identifier: "section letter/number"
-                    - view_type: "section A-A, detail B, etc."
-                    - specific_dimensions: ["dimensions unique to this view"]
-                    - callouts: ["specific callouts in this view"]
+  "tolerance_specifications": {
+    "general_tolerances": {
+      "statement": "EXACT_STATEMENT_IF_PRESENT",
+      "standard_reference": "ISO_2768_etc_IF_SHOWN",
+      "applied": false // true only if explicitly stated
+    },
+    
+    "geometric_tolerances": [
+      {
+        "feature": "EXACT_FEATURE_NAME",
+        "tolerance_value": "EXACT_VALUE",
+        "tolerance_symbol": "EXACT_SYMBOL", 
+        "datum_references": "EXACT_DATUMS",
+        "type": "runout|position|profile|etc"
+      }
+    ],
 
-                11. DETAIL_VIEWS:
-                    - detail_identifier: "detail letter/designation"
-                    - scale: "detail scale if different from main drawing"
-                    - specific_features: ["features highlighted in detail"]
-                    - dimensions: ["dimensions shown in detail view"]
+    "fit_designations": [
+      {
+        "feature": "FEATURE_NAME",
+        "fit_notation": "H7/g6_etc_EXACT",
+        "hole_tolerance": "IF_SPECIFIED",
+        "shaft_tolerance": "IF_SPECIFIED"
+      }
+    ]
+  },
 
-                EXTRACTION GUIDELINES:
-                - Scan the entire drawing systematically (top-left to bottom-right)
-                - Extract dimensions from main views, sections, and details
-                - Include all dimension lines, extension lines, and leader callouts
-                - Capture both driven and driving dimensions
-                - Record reference dimensions in parentheses as shown
-                - Extract all text annotations, even if they seem redundant
-                - Include all geometric tolerance callouts with proper symbols
-                - Capture table data exactly as formatted
-                - Note any revision clouds or change indicators
-                - Include all drawing notes, even fine print
+  "specialized_data": {
+    // Only include if present on drawing
+    "gear_specifications": [
+      {
+        "feature_id": "REFERENCE_TO_FEATURE",
+        "parameters": {
+          "module": "VALUE_IF_SHOWN",
+          "teeth_count": "VALUE_IF_SHOWN",
+          "pressure_angle": "VALUE_IF_SHOWN",
+          // ... only parameters explicitly shown
+        }
+      }
+    ],
 
-                QUALITY CHECKS:
-                - Verify all JSON brackets are properly closed
-                - Ensure no truncated or incomplete entries
-                - Check that all visible dimensions are captured
-                - Confirm table data is complete and accurate
-                - Validate that title block information is fully extracted
+    "thread_specifications": [
+      {
+        "feature_id": "REFERENCE_TO_FEATURE", 
+        "thread_callout": "M10x1.5_etc_EXACT",
+        "class": "6H_etc_IF_SHOWN"
+      }
+    ],
 
-                Return ONLY the complete JSON object with all extracted information.
-            """
+    "surface_finish": [
+      {
+        "feature": "FEATURE_NAME",
+        "specification": "Ra_1.6_etc_EXACT",
+        "symbol_location": "WHERE_SHOWN"
+      }
+    ]
+  },
+
+  "calculation_verification": {
+    "total_features_identified": "COUNT",
+    "dimensions_with_tolerances": "COUNT",
+    "dimensions_without_tolerances": "COUNT", 
+    "calculations_performed": "COUNT",
+    "assumptions_made": 0, // Should always be 0
+    "missing_tolerance_features": ["LIST_OF_FEATURES"]
+  }
+}
+```
+
+---
+
+### CRITICAL RULES - NO EXCEPTIONS
+
+#### ❌ NEVER DO:
+- Hardcode tolerance values (±0.1, ±0.3, etc.)
+- Assume general tolerance standards apply
+- Calculate ranges without explicit tolerances
+- Normalize or convert units unless specified
+- Guess missing information
+- Apply standard fit tables without callouts
+
+#### ✅ ALWAYS DO:
+- Extract dimensions exactly as written
+- Preserve all decimal places shown
+- Mark unspecified tolerances clearly
+- Show calculation formulas when computing
+- Maintain original units and notation
+- Reference exact location where dimension appears
+
+---
+
+### TOLERANCE HANDLING LOGIC
+
+```
+IF tolerance_explicitly_shown:
+    EXTRACT exact tolerance notation
+    CALCULATE min/max range
+    SHOW calculation formula
+ELSE:
+    tolerance_notation = "not_specified"
+    calculated_range = "not_calculated"
+    DO NOT assume any tolerance values
+```
+
+### FEATURE IDENTIFICATION PATTERNS
+
+```
+FOR each_visible_shape:
+    IDENTIFY geometric type (circle, rectangle, etc.)
+    GENERATE unique feature_id
+    EXTRACT all associated dimensions
+    GROUP related dimensions together
+    CALCULATE only when tolerances present
+```
+
+---
+
+### QUALITY VERIFICATION
+
+Before outputting results:
+1.  All dimensions extracted exactly as shown?
+2. No hardcoded tolerance assumptions? 
+3. Calculations only where tolerances specified?
+4. All geometric features identified?
+5.  Units preserved exactly?
+6.  Zero assumptions made?
+
+---
+
+### EXAMPLES OF CORRECT EXTRACTION
+
+**Visible: "50.0 ±0.05"**
+```json
+{
+  "nominal_value": "50.0",
+  "tolerance_notation": "±0.05", 
+  "calculated_range": {
+    "max_value": "50.0 + 0.05 = 50.05",
+    "min_value": "50.0 - 0.05 = 49.95",
+    "final_range": "[49.95, 50.05] mm"
+  }
+}
+```
+
+**Visible: "25" (no tolerance shown)**
+```json
+{
+  "nominal_value": "25",
+  "tolerance_notation": "not_specified",
+  "calculated_range": "not_calculated"
+}
+```
+
+**Visible: "⌀20 H7"**
+```json
+{
+  "nominal_value": "20",
+  "tolerance_notation": "H7",
+  "tolerance_type": "fit_designation",
+  "calculated_range": "requires_standard_lookup"
+}
+```
+
+This system ensures complete accuracy by only working with explicitly visible information and performing exact calculations where tolerances are specified.
+"""
+           
             
             # Preprocess image
             image_path = self.preprocess_image(image_path)
@@ -1244,3 +1277,4 @@ class TechnicalDrawingExtractionService:
             lines.append("")
         
         return "\n".join(lines)
+

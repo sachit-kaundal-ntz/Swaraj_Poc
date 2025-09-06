@@ -1,0 +1,805 @@
+{
+  "task_id": "56c987c3-3d6d-4c0e-84d6-8f7fa68aba0d",
+  "filename": "56c987c3-3d6d-4c0e-84d6-8f7fa68aba0d_image.png",
+  "file_size": 3068637,
+  "extracted_data": {
+    "drawing_identification": {
+      "title": "GEAR Z-33 (4TH DRIVER)",
+      "drawing_number": "P50011489B",
+      "revision": "001",
+      "scale": "1:1",
+      "material": "20MnCr5;",
+      "general_tolerance_statement": "ALL DIMENSIONS ARE IN MM UNLESS STATED OTHERWISE. (A) CODE PRACTICE ABBREVIATIONS ETC TO IS:696. (B) WORK TO MEDIUM TOLERANCES OF IS:2102 TABLE-1. (C) PAGE 3 FOR DIMENSIONS OF MACHINED SURFACES WHICH LIMITS HAVE NOT BEEN SPECIFIED."
+    },
+    "geometric_features": [
+      {
+        "feature_id": "F001_MainBody_OverallLength",
+        "feature_type": "length",
+        "feature_description": "Overall length of the top section",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "length": {
+            "nominal_value": "15.2",
+            "tolerance_notation": "±0.1",
+            "unit": "mm",
+            "tolerance_type": "bilateral",
+            "calculated_range": {
+              "max_value": "15.2 + 0.1 = 15.3",
+              "min_value": "15.2 - 0.1 = 15.1",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[15.1, 15.3] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F002_MainBody_StepDepth_Top",
+        "feature_type": "depth",
+        "feature_description": "Step depth from top face",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "depth": {
+            "nominal_value": "24.7",
+            "tolerance_notation": "-0.1",
+            "unit": "mm",
+            "tolerance_type": "unilateral",
+            "calculated_range": {
+              "max_value": "24.7 + 0.0 = 24.7",
+              "min_value": "24.7 - 0.1 = 24.6",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[24.6, 24.7] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F003_MainBody_StepDepth_Bottom_1",
+        "feature_type": "depth",
+        "feature_description": "Step depth from bottom face (left side)",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "depth": {
+            "nominal_value": "2.5",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F004_MainBody_StepDepth_Top_2",
+        "feature_type": "depth",
+        "feature_description": "Step depth from top face (right side)",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "depth": {
+            "nominal_value": "4",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F005_MainBody_StepDepth_Bottom_2",
+        "feature_type": "depth",
+        "feature_description": "Step depth from bottom face (right side)",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "depth": {
+            "nominal_value": "4",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F006_MainBody_SplineDepth",
+        "feature_type": "depth",
+        "feature_description": "Depth of spline feature from bottom face",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "depth": {
+            "nominal_value": "2.75",
+            "tolerance_notation": "±0.1",
+            "unit": "mm",
+            "tolerance_type": "bilateral",
+            "calculated_range": {
+              "max_value": "2.75 + 0.1 = 2.85",
+              "min_value": "2.75 - 0.1 = 2.65",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[2.65, 2.85] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F007_MainBody_Chamfer_Outer",
+        "feature_type": "chamfer",
+        "feature_description": "Outer edge chamfer",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "chamfer_size": {
+            "nominal_value": "1",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          },
+          "chamfer_angle": {
+            "nominal_value": "45",
+            "tolerance_notation": "not_specified",
+            "unit": "degree",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F008_MainBody_Radius_Inner",
+        "feature_type": "radius",
+        "feature_description": "Inner corner radius",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "radius": {
+            "nominal_value": "5",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F009_MainBody_Chamfer_Bore",
+        "feature_type": "chamfer",
+        "feature_description": "Chamfer on central bore",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "chamfer_angle": {
+            "nominal_value": "60",
+            "tolerance_notation": "not_specified",
+            "unit": "degree",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F010_MainBody_Bore_EntryDiameter",
+        "feature_type": "diameter",
+        "feature_description": "Entry diameter of the central bore",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "diameter": {
+            "nominal_value": "46",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F011_MainBody_Spline_PCD",
+        "feature_type": "pitch_circle_diameter",
+        "feature_description": "Pitch Circle Diameter for the internal spline",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "pcd": {
+            "nominal_value": "42",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F012_MainBody_Hub_Diameter",
+        "feature_type": "diameter",
+        "feature_description": "Outer diameter of the central hub",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "diameter": {
+            "nominal_value": "58",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F013_MainBody_GearBody_Diameter",
+        "feature_type": "diameter",
+        "feature_description": "Outer diameter of the main gear body",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "diameter": {
+            "nominal_value": "90",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F014_GearTeeth_BaseDiameter",
+        "feature_type": "diameter",
+        "feature_description": "Base diameter of the gear teeth",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "diameter": {
+            "nominal_value": "120.417",
+            "tolerance_notation": "-0.3",
+            "unit": "mm",
+            "tolerance_type": "unilateral",
+            "calculated_range": {
+              "max_value": "120.417 + 0.0 = 120.417",
+              "min_value": "120.417 - 0.3 = 120.117",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[120.117, 120.417] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F015_GearTeeth_PCD",
+        "feature_type": "pitch_circle_diameter",
+        "feature_description": "Pitch Circle Diameter of the gear teeth",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "pcd": {
+            "nominal_value": "125.016",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F016_GearTeeth_OuterDiameter",
+        "feature_type": "diameter",
+        "feature_description": "Outer diameter (addendum diameter) of the gear teeth",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "diameter": {
+            "nominal_value": "136.2",
+            "tolerance_notation": "-0.1",
+            "unit": "mm",
+            "tolerance_type": "unilateral",
+            "calculated_range": {
+              "max_value": "136.2 + 0.0 = 136.2",
+              "min_value": "136.2 - 0.1 = 136.1",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[136.1, 136.2] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F017_MainBody_IdentificationGroove",
+        "feature_type": "groove",
+        "feature_description": "Identification groove on outer face",
+        "location_reference": "Section B-B",
+        "dimensions": {
+          "groove_diameter": {
+            "nominal_value": "0.8",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          },
+          "groove_depth": {
+            "nominal_value": "0.3",
+            "tolerance_notation": "not_specified",
+            "unit": "mm",
+            "tolerance_type": "not_specified",
+            "calculated_range": "not_calculated"
+          }
+        }
+      },
+      {
+        "feature_id": "F018_GearTeeth_LeadCrowning",
+        "feature_type": "crowning",
+        "feature_description": "Lead crowning depth",
+        "location_reference": "Lead Crowning Detail",
+        "dimensions": {
+          "crowning_depth": {
+            "nominal_value": "0.005-0.015",
+            "tolerance_notation": "0.005-0.015",
+            "unit": "mm",
+            "tolerance_type": "limit",
+            "calculated_range": {
+              "max_value": "0.015",
+              "min_value": "0.005",
+              "calculation_formula": "Direct limit values",
+              "final_range": "[0.005, 0.015] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F019_GearTeeth_EdgeChamfer",
+        "feature_type": "chamfer",
+        "feature_description": "Gear tooth edge chamfer",
+        "location_reference": "Gear Tooth Edge Chamfer Detail",
+        "dimensions": {
+          "chamfer_size": {
+            "nominal_value": "0.3-1.0",
+            "tolerance_notation": "0.3-1.0",
+            "unit": "mm",
+            "tolerance_type": "limit",
+            "calculated_range": {
+              "max_value": "1.0",
+              "min_value": "0.3",
+              "calculation_formula": "Direct limit values",
+              "final_range": "[0.3, 1.0] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F020_GearTeeth_TipChamfer_Height",
+        "feature_type": "chamfer",
+        "feature_description": "Gear tip chamfer height",
+        "location_reference": "Gear Tip Chamfer Detail",
+        "dimensions": {
+          "chamfer_height": {
+            "nominal_value": "0.35",
+            "tolerance_notation": "±0.1",
+            "unit": "mm",
+            "tolerance_type": "bilateral",
+            "calculated_range": {
+              "max_value": "0.35 + 0.1 = 0.45",
+              "min_value": "0.35 - 0.1 = 0.25",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[0.25, 0.45] mm"
+            }
+          }
+        }
+      },
+      {
+        "feature_id": "F021_GearTeeth_TipChamfer_Width",
+        "feature_type": "chamfer",
+        "feature_description": "Gear tip chamfer width",
+        "location_reference": "Gear Tip Chamfer Detail",
+        "dimensions": {
+          "chamfer_width": {
+            "nominal_value": "0.35",
+            "tolerance_notation": "±0.1",
+            "unit": "mm",
+            "tolerance_type": "bilateral",
+            "calculated_range": {
+              "max_value": "0.35 + 0.1 = 0.45",
+              "min_value": "0.35 - 0.1 = 0.25",
+              "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+              "final_range": "[0.25, 0.45] mm"
+            }
+          }
+        }
+      }
+    ],
+    "tolerance_specifications": {
+      "general_tolerances": {
+        "statement": "ALL DIMENSIONS ARE IN MM UNLESS STATED OTHERWISE. (A) CODE PRACTICE ABBREVIATIONS ETC TO IS:696. (B) WORK TO MEDIUM TOLERANCES OF IS:2102 TABLE-1. (C) PAGE 3 FOR DIMENSIONS OF MACHINED SURFACES WHICH LIMITS HAVE NOT BEEN SPECIFIED.",
+        "standard_reference": "IS:696, IS:2102 TABLE-1",
+        "applied": true
+      },
+      "geometric_tolerances": [
+        {
+          "feature": "SPLINE PITCH CYLINDER",
+          "tolerance_value": "0.070",
+          "tolerance_symbol": "Runout",
+          "datum_references": "Face A & B",
+          "type": "runout"
+        },
+        {
+          "feature": "Gear Pitch Crown",
+          "tolerance_value": "0.032",
+          "tolerance_symbol": "Runout",
+          "datum_references": "not_specified",
+          "type": "runout"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.036",
+          "tolerance_symbol": "Permissible Double Flank Total Error Range",
+          "datum_references": "not_specified",
+          "type": "total_error"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.016",
+          "tolerance_symbol": "Permissible Double Flank Tooth to Tooth Error Range",
+          "datum_references": "not_specified",
+          "type": "tooth_to_tooth_error"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.007",
+          "tolerance_symbol": "Tooth Trace Form Deviation",
+          "datum_references": "not_specified",
+          "type": "form_deviation"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.011",
+          "tolerance_symbol": "Permissible Tooth Alignment Error Over Face Width",
+          "datum_references": "not_specified",
+          "type": "alignment_error"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.013",
+          "tolerance_symbol": "Tooth Trace Total Deviation",
+          "datum_references": "not_specified",
+          "type": "total_deviation"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.011",
+          "tolerance_symbol": "Profile Form Deviation",
+          "datum_references": "not_specified",
+          "type": "form_deviation"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.009",
+          "tolerance_symbol": "Profile Angle Deviation",
+          "datum_references": "not_specified",
+          "type": "angle_deviation"
+        },
+        {
+          "feature": "Gear Teeth",
+          "tolerance_value": "0.014",
+          "tolerance_symbol": "Total Profile Deviation",
+          "datum_references": "not_specified",
+          "type": "total_deviation"
+        }
+      ],
+      "fit_designations": []
+    },
+    "specialized_data": {
+      "gear_specifications": [
+        {
+          "feature_id": "F015_GearTeeth_PCD",
+          "parameters": {
+            "module": {
+              "nominal_value": "3.5",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "teeth_count": {
+              "nominal_value": "33",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "pressure_angle": {
+              "nominal_value": "20",
+              "tolerance_notation": "not_specified",
+              "unit": "degree",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "helix_angle": {
+              "nominal_value": "22.5",
+              "tolerance_notation": "not_specified",
+              "unit": "degree",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "direction_of_helix": {
+              "nominal_value": "LEFT",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "coefficient_of_correction": {
+              "nominal_value": "0.5930",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "span_measurement_over_teeth": {
+              "nominal_value": "5",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "span_measurement": {
+              "nominal_value": "49.942",
+              "tolerance_notation": "-0.074 / -0.118",
+              "unit": "mm",
+              "tolerance_type": "limit",
+              "calculated_range": {
+                "max_value": "49.942 - 0.074 = 49.868",
+                "min_value": "49.942 - 0.118 = 49.824",
+                "calculation_formula": "Nominal - Lower_Limit / Nominal - Upper_Limit",
+                "final_range": "[49.824, 49.868] mm"
+              }
+            },
+            "quality_of_tolerance_zone": {
+              "nominal_value": "7",
+              "tolerance_notation": "DIN 7",
+              "unit": "not_specified",
+              "tolerance_type": "standard_designation",
+              "calculated_range": "not_calculated"
+            },
+            "meshes_with_gear": {
+              "nominal_value": "P50001751D",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "center_distance": {
+              "nominal_value": "103.0",
+              "tolerance_notation": "±0.05",
+              "unit": "mm",
+              "tolerance_type": "bilateral",
+              "calculated_range": {
+                "max_value": "103.0 + 0.05 = 103.05",
+                "min_value": "103.0 - 0.05 = 102.95",
+                "calculation_formula": "Nominal + Upper_Tolerance / Nominal - Lower_Tolerance",
+                "final_range": "[102.95, 103.05] mm"
+              }
+            },
+            "pitch_circle_diameter": {
+              "nominal_value": "125.016",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "base_diameter": {
+              "nominal_value": "116.315",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "pin_diameter": {
+              "nominal_value": "6.5",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "sap": {
+              "nominal_value": "122.842",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "eap": {
+              "nominal_value": "135.2",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "max_true_involute_form_dia_tif": {
+              "nominal_value": "122.381",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "operating_pcd": {
+              "nominal_value": "125.889",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "measurement_over_pins_alternate": {
+              "nominal_value": "138.339",
+              "tolerance_notation": "-0.169 / -0.269",
+              "unit": "mm",
+              "tolerance_type": "limit",
+              "calculated_range": {
+                "max_value": "138.339 - 0.169 = 138.170",
+                "min_value": "138.339 - 0.269 = 138.070",
+                "calculation_formula": "Nominal - Lower_Limit / Nominal - Upper_Limit",
+                "final_range": "[138.070, 138.170] mm"
+              }
+            }
+          }
+        }
+      ],
+      "thread_specifications": [],
+      "surface_finish": [],
+      "material_properties": [
+        {
+          "property": "Normalized Hardness",
+          "value": "155-185 BHN",
+          "unit": "BHN",
+          "type": "limit",
+          "location_reference": "FORGING DETAILS"
+        },
+        {
+          "property": "Grain Size",
+          "value": "5 to 8 ASTM",
+          "unit": "ASTM",
+          "type": "limit",
+          "location_reference": "FORGING DETAILS"
+        },
+        {
+          "property": "Bainite Content",
+          "value": "UP TO 5%",
+          "unit": "%",
+          "type": "limit",
+          "location_reference": "FORGING DETAILS"
+        },
+        {
+          "property": "Case Carburized Depth",
+          "value": "0.9-1.2",
+          "unit": "mm",
+          "type": "limit",
+          "location_reference": "HEAT TREATMENT"
+        },
+        {
+          "property": "Case Hardness",
+          "value": "58-62 HRC",
+          "unit": "HRC",
+          "type": "limit",
+          "location_reference": "HEAT TREATMENT"
+        },
+        {
+          "property": "Core Hardness",
+          "value": "32-42 HRC",
+          "unit": "HRC",
+          "type": "limit",
+          "location_reference": "HEAT TREATMENT"
+        },
+        {
+          "property": "Shot Size",
+          "value": "≤ 1MM",
+          "unit": "mm",
+          "type": "limit",
+          "location_reference": "SURFACE TREATMENT"
+        }
+      ],
+      "spline_specifications": [
+        {
+          "feature_id": "F011_MainBody_Spline_PCD",
+          "parameters": {
+            "standard": {
+              "nominal_value": "DIN 5480",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "fit": {
+              "nominal_value": "SIDE FIT",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "no_of_teeth": {
+              "nominal_value": "21",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "module": {
+              "nominal_value": "2.0",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "pressure_angle": {
+              "nominal_value": "30",
+              "tolerance_notation": "not_specified",
+              "unit": "degree",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "measurement_between_pins": {
+              "nominal_value": "37.603",
+              "tolerance_notation": "+0.217 / +0.117",
+              "unit": "mm",
+              "tolerance_type": "limit",
+              "calculated_range": {
+                "max_value": "37.603 + 0.217 = 37.820",
+                "min_value": "37.603 + 0.117 = 37.720",
+                "calculation_formula": "Nominal + Lower_Limit / Nominal + Upper_Limit",
+                "final_range": "[37.720, 37.820] mm"
+              }
+            },
+            "pin_diameter": {
+              "nominal_value": "3.5",
+              "tolerance_notation": "not_specified",
+              "unit": "not_specified",
+              "tolerance_type": "not_specified",
+              "calculated_range": "not_calculated"
+            },
+            "major_diameter": {
+              "nominal_value": "45.0",
+              "tolerance_notation": "+0.62 / +0.25",
+              "unit": "mm",
+              "tolerance_type": "limit",
+              "calculated_range": {
+                "max_value": "45.0 + 0.62 = 45.62",
+                "min_value": "45.0 + 0.25 = 45.25",
+                "calculation_formula": "Nominal + Lower_Limit / Nominal + Upper_Limit",
+                "final_range": "[45.25, 45.62] mm"
+              }
+            },
+            "minor_diameter": {
+              "nominal_value": "41.0",
+              "tolerance_notation": "+0.16 / 0.0",
+              "unit": "mm",
+              "tolerance_type": "unilateral",
+              "calculated_range": {
+                "max_value": "41.0 + 0.16 = 41.16",
+                "min_value": "41.0 + 0.0 = 41.0",
+                "calculation_formula": "Nominal + Lower_Tolerance / Nominal + Upper_Tolerance",
+                "final_range": "[41.0, 41.16] mm"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "calculation_verification": {
+      "total_features_identified": 21,
+      "dimensions_with_tolerances": 13,
+      "dimensions_without_tolerances": 14,
+      "calculations_performed": 13,
+      "assumptions_made": 0,
+      "missing_tolerance_features": [
+        "F003_MainBody_StepDepth_Bottom_1",
+        "F004_MainBody_StepDepth_Top_2",
+        "F005_MainBody_StepDepth_Bottom_2",
+        "F007_MainBody_Chamfer_Outer",
+        "F008_MainBody_Radius_Inner",
+        "F009_MainBody_Chamfer_Bore",
+        "F010_MainBody_Bore_EntryDiameter",
+        "F011_MainBody_Spline_PCD",
+        "F012_MainBody_Hub_Diameter",
+        "F013_MainBody_GearBody_Diameter",
+        "F017_MainBody_IdentificationGroove"
+      ]
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 1951,
+        "image_tokens": 774,
+        "total_input_tokens": 2725
+      },
+      "output_tokens": 8298,
+      "output_token_limit": 15000,
+      "total_tokens": 11023,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 9355,
+        "height": 6615,
+        "total_pixels": 61883325,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-05T15:12:39.806870"
+}

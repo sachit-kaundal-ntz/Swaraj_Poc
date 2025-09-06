@@ -1,0 +1,21 @@
+{
+  "mass_kg": 1.1,
+  "volume_cm3": 140.47,
+  "intermediate_calculations": {
+    "tip_diameter_mm": 136.2,
+    "gear_body_diameter_mm": 90.0,
+    "hub_diameter_mm": 58.0,
+    "spline_major_diameter_max_mm": 45.62,
+    "face_width_mm": 15.2,
+    "volume_solid_cm3": 196.61,
+    "tooth_space_volume_cm3": 56.14,
+    "density_kg_per_cm3": 0.00785
+  },
+  "calculation_method": "Solid volume minus tooth space volume approximation",
+  "assumptions": [
+    "Tooth space volume estimated as 45% of tip-to-body volume",
+    "Used maximum spline major diameter (+0.62 tolerance)",
+    "Material density: 7.85 g/cm\u00b3 for 20MnCr5 steel",
+    "Based on gear body diameter instead of calculated root diameter"
+  ]
+}
