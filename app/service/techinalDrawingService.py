@@ -2141,7 +2141,7 @@ class TechnicalDrawingExtractionService:
             - Each dimension must have unique descriptive ID.
             - Include measurement start/end point descriptions where identifiable.
             - **MANDATORY**: Ensure hub_height > face_width in final output
-"""         
+"""  
             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path)
             logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, Image: {input_token_info['image_tokens']}, Total: {input_token_info['total_input_tokens']}")
             
