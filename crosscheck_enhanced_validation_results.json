@@ -1,0 +1,254 @@
+{
+  "validation_timestamp": "2025-09-06T13:27:09.939151",
+  "json_file": "crosscheck.json",
+  "image_file": "image2.jpeg",
+  "enhanced_gear_classification_applied": true,
+  "dimension_id_focused_validation": true,
+  "summary": {
+    "total_checks": 20,
+    "passed": 19,
+    "failed": 0,
+    "warnings": 1,
+    "missing": 0,
+    "pass_rate": 95.0,
+    "average_confidence": 0.9949999999999999,
+    "category_breakdown": {
+      "dimensions": {
+        "pass": 5,
+        "fail": 0,
+        "warning": 0,
+        "missing": 0
+      },
+      "critical_dimensions": {
+        "pass": 5,
+        "fail": 0,
+        "warning": 0,
+        "missing": 0
+      },
+      "tables": {
+        "pass": 2,
+        "fail": 0,
+        "warning": 0,
+        "missing": 0
+      },
+      "metadata": {
+        "pass": 3,
+        "fail": 0,
+        "warning": 1,
+        "missing": 0
+      },
+      "features": {
+        "pass": 4,
+        "fail": 0,
+        "warning": 0,
+        "missing": 0
+      }
+    },
+    "dimension_analysis": {
+      "total_dimensions_validated": 10,
+      "dimension_pass_rate": 100.0
+    }
+  },
+  "detailed_results": [
+    {
+      "category": "dimensions",
+      "item_id": "dim_outer_dia",
+      "description": "Located in the section view (SEC A-A), the dimension ⌀202.8 is clearly visible as the outermost diameter, defining the tip of the gear teeth, consistent with the definition of Outer Diameter. The value, unit (implied mm), and symbol '⌀' match exactly.",
+      "json_value": "{'value': 202.8, 'unit': 'mm', 'symbol': '⌀', 'tolerance': None}",
+      "image_value": "⌀202.8",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "Located in the section view (SEC A-A), the dimension ⌀202.8 is clearly visible as the outermost diameter, defining the tip of the gear teeth, consistent with the definition of Outer Diameter. The value, unit (implied mm), and symbol '⌀' match exactly."
+    },
+    {
+      "category": "dimensions",
+      "item_id": "dim_hub_dia",
+      "description": "Found in the section view (SEC A-A), the dimension ⌀120 corresponds to the largest diameter of the hub, distinct from the main gear rim. This matches the definition of Hub Diameter. The value, unit (implied mm), and symbol '⌀' match exactly.",
+      "json_value": "{'value': 120, 'unit': 'mm', 'symbol': '⌀', 'tolerance': None}",
+      "image_value": "⌀120",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "Found in the section view (SEC A-A), the dimension ⌀120 corresponds to the largest diameter of the hub, distinct from the main gear rim. This matches the definition of Hub Diameter. The value, unit (implied mm), and symbol '⌀' match exactly."
+    },
+    {
+      "category": "dimensions",
+      "item_id": "dim_face_width",
+      "description": "Identified in the section view (SEC A-A), the axial dimension '45' represents the width of the main gear rim section, which aligns with the definition of Face Width. The value and unit (implied mm) match exactly, and no symbol or tolerance is specified or present.",
+      "json_value": "{'value': 45, 'unit': 'mm', 'symbol': None, 'tolerance': None}",
+      "image_value": "45",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "Identified in the section view (SEC A-A), the axial dimension '45' represents the width of the main gear rim section, which aligns with the definition of Face Width. The value and unit (implied mm) match exactly, and no symbol or tolerance is specified or present."
+    },
+    {
+      "category": "dimensions",
+      "item_id": "dim_hub_height",
+      "description": "Located in the section view (SEC A-A), the axial dimension '54' defines the overall length/height of the hub, from face to face, excluding the main gear rim. This precisely matches the definition of Hub Height/Length. The value and unit (implied mm) match exactly, and no symbol or tolerance is specified or present.",
+      "json_value": "{'value': 54, 'unit': 'mm', 'symbol': None, 'tolerance': None}",
+      "image_value": "54",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "Located in the section view (SEC A-A), the axial dimension '54' defines the overall length/height of the hub, from face to face, excluding the main gear rim. This precisely matches the definition of Hub Height/Length. The value and unit (implied mm) match exactly, and no symbol or tolerance is specified or present."
+    },
+    {
+      "category": "dimensions",
+      "item_id": "dim_bore",
+      "description": "Clearly visible in the section view (SEC A-A), the dimension ⌀58 H7 specifies the internal diameter of the gear's bore. This perfectly matches the definition of Bore Diameter, including the value, unit (implied mm), symbol '⌀', and tolerance 'H7'.",
+      "json_value": "{'value': 58, 'unit': 'mm', 'symbol': '⌀', 'tolerance': 'H7'}",
+      "image_value": "⌀58 H7",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "Clearly visible in the section view (SEC A-A), the dimension ⌀58 H7 specifies the internal diameter of the gear's bore. This perfectly matches the definition of Bore Diameter, including the value, unit (implied mm), symbol '⌀', and tolerance 'H7'."
+    },
+    {
+      "category": "critical_dimensions",
+      "item_id": "dim_outer_dia",
+      "description": "The dimension ⌀202.8 mm is clearly visible in the SEC A-A view, extending from tip to tip of the gear teeth, consistent with the definition of Outer Diameter.",
+      "json_value": "{\"id\": \"dim_outer_dia\", \"view_id\": \"view_main\", \"raw_text\": \"⌀202.8\", \"value\": 202.8, \"unit\": \"mm\", \"symbol\": \"⌀\", \"tolerance\": null, \"leaders\": [\"outermost tips of gear teeth in SEC A-A\"]}",
+      "image_value": "⌀202.8",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The dimension ⌀202.8 mm is clearly visible in the SEC A-A view, extending from tip to tip of the gear teeth, consistent with the definition of Outer Diameter."
+    },
+    {
+      "category": "critical_dimensions",
+      "item_id": "dim_hub_dia",
+      "description": "The dimension ⌀120 mm is clearly marked in the SEC A-A view, indicating the largest outer diameter of the hub section, which is distinct from the main gear rim.",
+      "json_value": "{\"id\": \"dim_hub_dia\", \"view_id\": \"view_main\", \"raw_text\": \"⌀120\", \"value\": 120, \"unit\": \"mm\", \"symbol\": \"⌀\", \"tolerance\": null, \"leaders\": [\"largest cylindrical hub section in SEC A-A\"]}",
+      "image_value": "⌀120",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The dimension ⌀120 mm is clearly marked in the SEC A-A view, indicating the largest outer diameter of the hub section, which is distinct from the main gear rim."
+    },
+    {
+      "category": "critical_dimensions",
+      "item_id": "dim_face_width",
+      "description": "The dimension 45 mm is explicitly shown in the SEC A-A view as the axial width of the main gear body/rim section where the teeth are located, matching the definition of Face Width.",
+      "json_value": "{\"id\": \"dim_face_width\", \"view_id\": \"view_main\", \"raw_text\": \"45\", \"value\": 45, \"unit\": \"mm\", \"symbol\": null, \"tolerance\": null, \"leaders\": [\"axial width of gear teeth section in SEC A-A\"]}",
+      "image_value": "45",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The dimension 45 mm is explicitly shown in the SEC A-A view as the axial width of the main gear body/rim section where the teeth are located, matching the definition of Face Width."
+    },
+    {
+      "category": "critical_dimensions",
+      "item_id": "dim_hub_height",
+      "description": "The dimension 54 mm is clearly indicated in the SEC A-A view as the total axial length of the component, spanning the full extent of the hub from face to face, consistent with the description of total axial length or hub height including extensions.",
+      "json_value": "{\"id\": \"dim_hub_height\", \"view_id\": \"view_main\", \"raw_text\": \"54\", \"value\": 54, \"unit\": \"mm\", \"symbol\": null, \"tolerance\": null, \"leaders\": [\"total axial length of gear assembly in SEC A-A\"]}",
+      "image_value": "54",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The dimension 54 mm is clearly indicated in the SEC A-A view as the total axial length of the component, spanning the full extent of the hub from face to face, consistent with the description of total axial length or hub height including extensions."
+    },
+    {
+      "category": "critical_dimensions",
+      "item_id": "dim_bore",
+      "description": "The dimension ⌀58 H7 mm is clearly visible in the SEC A-A view, specifying the central bore diameter with the indicated H7 tolerance, matching the definition of Bore Diameter.",
+      "json_value": "{\"id\": \"dim_bore\", \"view_id\": \"view_main\", \"raw_text\": \"⌀58 H7\", \"value\": 58, \"unit\": \"mm\", \"symbol\": \"⌀\", \"tolerance\": \"H7\", \"leaders\": [\"central bore in SEC A-A\"]}",
+      "image_value": "⌀58 H7",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The dimension ⌀58 H7 mm is clearly visible in the SEC A-A view, specifying the central bore diameter with the indicated H7 tolerance, matching the definition of Bore Diameter."
+    },
+    {
+      "category": "tables",
+      "item_id": "tbl_gear_data",
+      "description": "The value 3.5 mm from JSON matches the 'MODULE' entry (3.5) in the 'GEAR DATA' table on the drawing. Unit 'mm' is implied for Module.",
+      "json_value": "3.5 mm",
+      "image_value": "MODULE: 3.5",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The value 3.5 mm from JSON matches the 'MODULE' entry (3.5) in the 'GEAR DATA' table on the drawing. Unit 'mm' is implied for Module."
+    },
+    {
+      "category": "tables",
+      "item_id": "tbl_spline_data",
+      "description": "The value 'INVOLUTE' from JSON matches the 'TYPE' entry ('INVOLUTE') in the 'SPLINE DATA' table on the drawing.",
+      "json_value": "INVOLUTE",
+      "image_value": "TYPE: INVOLUTE",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The value 'INVOLUTE' from JSON matches the 'TYPE' entry ('INVOLUTE') in the 'SPLINE DATA' table on the drawing."
+    },
+    {
+      "category": "metadata",
+      "item_id": "drawing_no",
+      "description": "The drawing number in the JSON exactly matches the \"DRG NO.\" field in the bottom right corner of the title block.",
+      "json_value": "P10019406A",
+      "image_value": "P10019406A",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The drawing number in the JSON exactly matches the \"DRG NO.\" field in the bottom right corner of the title block."
+    },
+    {
+      "category": "metadata",
+      "item_id": "material",
+      "description": "The \"MATERIAL\" field in the title block (bottom right) lists \"EN43D, 41Cr4\". The JSON includes \"EN43D\" and \"41Cr4\" which match, but also lists \"40Cr4\" which is not present in the drawing's material specification. This indicates a discrepancy in the list of permissible materials.",
+      "json_value": "EN43D, 40Cr4, 41Cr4",
+      "image_value": "EN43D, 41Cr4",
+      "status": "WARNING",
+      "confidence": 0.9,
+      "details": "The \"MATERIAL\" field in the title block (bottom right) lists \"EN43D, 41Cr4\". The JSON includes \"EN43D\" and \"41Cr4\" which match, but also lists \"40Cr4\" which is not present in the drawing's material specification. This indicates a discrepancy in the list of permissible materials."
+    },
+    {
+      "category": "metadata",
+      "item_id": "scale",
+      "description": "The scale in the JSON exactly matches the \"SCALE\" field in the bottom right corner of the title block.",
+      "json_value": "1:1",
+      "image_value": "1:1",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The scale in the JSON exactly matches the \"SCALE\" field in the bottom right corner of the title block."
+    },
+    {
+      "category": "metadata",
+      "item_id": "part_name",
+      "description": "The part name in the JSON exactly matches the \"PART\" field in the bottom right corner of the title block.",
+      "json_value": "BULL GEAR",
+      "image_value": "BULL GEAR",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The part name in the JSON exactly matches the \"PART\" field in the bottom right corner of the title block."
+    },
+    {
+      "category": "features",
+      "item_id": "feat_rim",
+      "description": "The feature type 'cylindrical_rim' accurately describes the main body of the gear with its teeth. The role 'gear_tip' correctly points to the outermost diameter. The associated dimension 'Ø112.55' is clearly marked as the outermost diameter (tip diameter) of the gear teeth, matching the 'Outer Diameter' identification priority. The 'Face Width' rule states \"largest axial dimension (main gear body width)\", which corresponds to the '27' dimension for the rim's axial extent. The 'GEAR DATA' table explicitly details the gear parameters, confirming the 'tbl_gear_data' link.",
+      "json_value": "cylindrical_rim, role: gear_tip",
+      "image_value": "Outermost cylindrical body of the gear, including the gear teeth.",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The feature type 'cylindrical_rim' accurately describes the main body of the gear with its teeth. The role 'gear_tip' correctly points to the outermost diameter. The associated dimension 'Ø112.55' is clearly marked as the outermost diameter (tip diameter) of the gear teeth, matching the 'Outer Diameter' identification priority. The 'Face Width' rule states \"largest axial dimension (main gear body width)\", which corresponds to the '27' dimension for the rim's axial extent. The 'GEAR DATA' table explicitly details the gear parameters, confirming the 'tbl_gear_data' link."
+    },
+    {
+      "category": "features",
+      "item_id": "feat_hub",
+      "description": "The feature is correctly identified as a 'cylindrical_step' extending from the main rim, and its role as 'hub_outer' is accurate for the outer diameter of the hub. The 'dim_hub_dia' corresponds to 'Ø79.9', which is the main hub diameter, aligning with the \"Hub Diameter\" priority. The 'dim_hub_height' matches the '20' axial dimension, which represents the axial extent of the Ø79.9 hub, consistent with the \"Hub Height/Length\" priority, measured between the hub faces and not including the main rim.",
+      "json_value": "cylindrical_step, role: hub_outer",
+      "image_value": "Cylindrical projection/step on either side of the main gear rim, with diameter Ø79.9.",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The feature is correctly identified as a 'cylindrical_step' extending from the main rim, and its role as 'hub_outer' is accurate for the outer diameter of the hub. The 'dim_hub_dia' corresponds to 'Ø79.9', which is the main hub diameter, aligning with the \"Hub Diameter\" priority. The 'dim_hub_height' matches the '20' axial dimension, which represents the axial extent of the Ø79.9 hub, consistent with the \"Hub Height/Length\" priority, measured between the hub faces and not including the main rim."
+    },
+    {
+      "category": "features",
+      "item_id": "feat_bore_main",
+      "description": "The feature is correctly classified as a 'cylindrical_bore' and its role as a 'through_bore' is confirmed by the section view showing it extends through the entire part. The 'dim_bore' correctly links to 'Ø32 H7', which is the internal bore diameter. The 'H7' fit class is explicitly shown on the drawing. The absence of 'length_dim_ids' is appropriate, as per the rule \"Bore subtraction applies through full axial stack\", meaning its length is derived from the overall axial stack rather than an independent dimension for the bore itself.",
+      "json_value": "cylindrical_bore, role: through_bore",
+      "image_value": "The central cylindrical bore passing through the entire component.",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The feature is correctly classified as a 'cylindrical_bore' and its role as a 'through_bore' is confirmed by the section view showing it extends through the entire part. The 'dim_bore' correctly links to 'Ø32 H7', which is the internal bore diameter. The 'H7' fit class is explicitly shown on the drawing. The absence of 'length_dim_ids' is appropriate, as per the rule \"Bore subtraction applies through full axial stack\", meaning its length is derived from the overall axial stack rather than an independent dimension for the bore itself."
+    },
+    {
+      "category": "features",
+      "item_id": "feat_spline",
+      "description": "The feature is correctly identified as an 'internal_spline' within the central bore, matching the 'spline_bore' role. The section view and top view clearly depict an internal spline. The 'SPLINE DATA' table on the drawing provides specific parameters for this spline, confirming the 'tbl_spline_data' link.",
+      "json_value": "internal_spline, role: spline_bore",
+      "image_value": "The internal splined profile within the central bore.",
+      "status": "PASS",
+      "confidence": 1.0,
+      "details": "The feature is correctly identified as an 'internal_spline' within the central bore, matching the 'spline_bore' role. The section view and top view clearly depict an internal spline. The 'SPLINE DATA' table on the drawing provides specific parameters for this spline, confirming the 'tbl_spline_data' link."
+    }
+  ]
+}

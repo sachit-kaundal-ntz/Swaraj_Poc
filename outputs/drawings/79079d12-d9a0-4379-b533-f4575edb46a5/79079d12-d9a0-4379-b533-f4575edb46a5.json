@@ -1,0 +1,425 @@
+{
+  "task_id": "79079d12-d9a0-4379-b533-f4575edb46a5",
+  "filename": "79079d12-d9a0-4379-b533-f4575edb46a5_image2.jpeg",
+  "file_size": 63928,
+  "extracted_data": {
+    "units": "mm",
+    "views": [
+      {
+        "id": "view_main",
+        "name": "SEC A-A",
+        "bbox": null
+      }
+    ],
+    "tables": [
+      {
+        "id": "tbl_gear_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "MODULE",
+            "value": 5.0,
+            "unit": "mm"
+          },
+          {
+            "label": "NO OF TEETH",
+            "value": 34,
+            "unit": null
+          },
+          {
+            "label": "ADDENDUM",
+            "value": 5.0,
+            "unit": "mm"
+          },
+          {
+            "label": "PITCH CIRCLE DIA",
+            "value": 170.0,
+            "unit": "mm"
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": 20.0,
+            "unit": "DEG"
+          },
+          {
+            "label": "DIRECTION OF HELIX",
+            "value": "R.H.",
+            "unit": null
+          },
+          {
+            "label": "BASE ANGLE",
+            "value": 17.92,
+            "unit": "DEG"
+          },
+          {
+            "label": "COEFFICIENT OF CORRECTION",
+            "value": "+0.22",
+            "unit": null
+          },
+          {
+            "label": "SPAN MEASUREMENT OVER 7 TEETH",
+            "value": 116.893,
+            "unit": "mm"
+          },
+          {
+            "label": "QUALITY OF TOLERANCE ZONE",
+            "value": "DIN 8 (DIN 3962)",
+            "unit": null
+          },
+          {
+            "label": "MESHES WITH GEAR (2.121 DMS NO.)",
+            "value": "150019",
+            "unit": null
+          },
+          {
+            "label": "CENTRE DISTANCE",
+            "value": 195.0,
+            "unit": "mm"
+          },
+          {
+            "label": "BACKLASH",
+            "value": 0.05,
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_spline_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "TYPE",
+            "value": "INVOLUTE",
+            "unit": null
+          },
+          {
+            "label": "NO OF TEETH",
+            "value": 23,
+            "unit": null
+          },
+          {
+            "label": "PITCH",
+            "value": 2.5,
+            "unit": "mm"
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": 30.0,
+            "unit": "DEG"
+          },
+          {
+            "label": "MAJOR DIAMETER",
+            "value": 40.0,
+            "unit": "mm"
+          },
+          {
+            "label": "MINOR DIAMETER",
+            "value": 36.0,
+            "unit": "mm"
+          },
+          {
+            "label": "ENGAGEMENT BETWEEN ZONES",
+            "value": "0.50 MM",
+            "unit": null
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "dim_outer_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀192",
+        "value": 192.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀97",
+        "value": 97.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_face_width",
+        "view_id": "view_main",
+        "raw_text": "24",
+        "value": 24.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_height",
+        "view_id": "view_main",
+        "raw_text": "14",
+        "value": 14.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_bore",
+        "view_id": "view_main",
+        "raw_text": "⌀40 H7",
+        "value": 40.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "H7",
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_dia_inner",
+        "view_id": "view_main",
+        "raw_text": "⌀79",
+        "value": 79.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_hub_extension_right",
+        "view_id": "view_main",
+        "raw_text": "14",
+        "value": 14.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_overall_axial_length",
+        "view_id": "view_main",
+        "raw_text": "52",
+        "value": 52.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_pcd_bolt_holes",
+        "view_id": "view_main",
+        "raw_text": "⌀100 P.C.D.",
+        "value": 100.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_bolt_hole_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀10-A HOLES EQUISPACED ON 100 PCD",
+        "value": 10.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "A",
+        "leaders": []
+      },
+      {
+        "id": "dim_chamfer_2x45",
+        "view_id": "view_main",
+        "raw_text": "2-45° BOTH SIDES",
+        "value": 2.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_chamfer_1x45_min",
+        "view_id": "view_main",
+        "raw_text": "1X45° MIN",
+        "value": 1.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_radius_r20_top",
+        "view_id": "view_main",
+        "raw_text": "R20",
+        "value": 20.0,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_radius_r20_bottom",
+        "view_id": "view_main",
+        "raw_text": "R20",
+        "value": 20.0,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_radius_r2_left",
+        "view_id": "view_main",
+        "raw_text": "R2",
+        "value": 2.0,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_radius_r2_right",
+        "view_id": "view_main",
+        "raw_text": "R2",
+        "value": 2.0,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_spline_pcd_note",
+        "view_id": "view_main",
+        "raw_text": "2-SPLINES ON 40 P.C.D.",
+        "value": 40.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_detail_s_r0_5",
+        "view_id": null,
+        "raw_text": "0.5",
+        "value": 0.5,
+        "unit": "mm",
+        "symbol": "R",
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_detail_s_45deg",
+        "view_id": null,
+        "raw_text": "45°",
+        "value": 45.0,
+        "unit": "deg",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      },
+      {
+        "id": "dim_enlarged_view_chamfer",
+        "view_id": null,
+        "raw_text": "0.4X45° BOTH FLANKS",
+        "value": 0.4,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": null,
+        "leaders": []
+      }
+    ],
+    "features": [
+      {
+        "id": "feat_rim",
+        "type": "cylindrical_rim",
+        "role": "gear_tip",
+        "outer_diameter_dim_ids": [
+          "dim_outer_dia"
+        ],
+        "face_width_dim_ids": [
+          "dim_face_width"
+        ],
+        "table_links": [
+          "tbl_gear_data"
+        ]
+      },
+      {
+        "id": "feat_hub",
+        "type": "cylindrical_step",
+        "role": "hub_outer",
+        "diameter_dim_ids": [
+          "dim_hub_dia",
+          "dim_hub_dia_inner"
+        ],
+        "length_dim_ids": [
+          "dim_hub_height",
+          "dim_hub_extension_right",
+          "dim_face_width"
+        ]
+      },
+      {
+        "id": "feat_bore_main",
+        "type": "cylindrical_bore",
+        "role": "through_bore",
+        "diameter_dim_ids": [
+          "dim_bore"
+        ],
+        "length_dim_ids": [
+          "dim_overall_axial_length"
+        ],
+        "fit_class": "H7"
+      },
+      {
+        "id": "feat_spline",
+        "type": "internal_spline",
+        "role": "spline_bore",
+        "table_links": [
+          "tbl_spline_data"
+        ]
+      }
+    ],
+    "assembly_order": [
+      {
+        "op": "revolve",
+        "feature_id": "feat_rim"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_bore_main"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_spline"
+      }
+    ],
+    "metadata": {
+      "title_block": {
+        "drawing_no": "P1001046A",
+        "material": "SN430/ 40Cr4",
+        "scale": null,
+        "part_name": "BULL GEAR"
+      }
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 1982,
+        "image_tokens": 516,
+        "total_input_tokens": 2498
+      },
+      "output_tokens": 3155,
+      "total_tokens": 5653,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 800,
+        "height": 566,
+        "total_pixels": 452800,
+        "format": "JPEG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-06T12:37:39.969538"
+}

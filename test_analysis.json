@@ -1,0 +1,91 @@
+{
+  "file": "test.json",
+  "part_info": {
+    "part_name": "GEAR Z-33 (4TH DRIVER)",
+    "drawing_number": "P50011489B",
+    "revision": "X",
+    "company": "MAHINDRA & MAHINDRA LTD FARM EQUIPMENT SECTOR SWARAJ DIVISION S.A.S. NAGAR"
+  },
+  "specifications": {
+    "material": "20MnCr5; IS:9175",
+    "density_g_cm3": 7.85,
+    "finished_mass_kg": 1.2335066928247804,
+    "outer_diameter_mm": 136.2,
+    "length_mm": 29.7,
+    "complexity": "complex"
+  },
+  "manufacturing_operations": [
+    {
+      "sequence": 1,
+      "operation": "Forging",
+      "evidence": "Material: 20MnCr5; IS:9175, Complex geometry"
+    },
+    {
+      "sequence": 2,
+      "operation": "Hardening and Tempering",
+      "evidence": "Initial heat treatment for machinability"
+    },
+    {
+      "sequence": 3,
+      "operation": "Rough Turning",
+      "evidence": "Cylindrical part OD: 136.2mm"
+    },
+    {
+      "sequence": 4,
+      "operation": "Finish Turning",
+      "evidence": "Achieve final dimensions and tolerances"
+    },
+    {
+      "sequence": 5,
+      "operation": "Broaching",
+      "evidence": "Internal spline/keyway machining"
+    },
+    {
+      "sequence": 6,
+      "operation": "Hobbing",
+      "evidence": "External gear teeth cutting"
+    },
+    {
+      "sequence": 7,
+      "operation": "Gear Tooth Chamfering",
+      "evidence": "Tooth edge chamfering specified"
+    },
+    {
+      "sequence": 8,
+      "operation": "Carburising",
+      "evidence": "CASE CARBURISED TO A DEPTH OF 0.9-1.2 & HARDEN TO 58-62 HRC. CORE HARDNESS 32-42 HRC."
+    },
+    {
+      "sequence": 9,
+      "operation": "Grinding",
+      "evidence": "Post heat-treatment grinding for accuracy"
+    }
+  ],
+  "weight_analysis": {
+    "finished_weight_kg": 1.234,
+    "forged_weight_kg": 1.898,
+    "gross_weight_kg": 2.669,
+    "material_utilization_percent": 46.2,
+    "weight_progression": {
+      "1_finished": 1.234,
+      "2_after_machining": 1.898,
+      "3_with_flash": 2.239,
+      "4_after_heating": 2.309,
+      "5_gross_billet": 2.669
+    },
+    "losses_kg": {
+      "machining": 0.664,
+      "flash": 0.342,
+      "scale": 0.069,
+      "handling": 0.147,
+      "cutting": 0.214,
+      "total": 1.436
+    }
+  },
+  "summary": {
+    "finished_weight_kg": 1.2335066928247804,
+    "gross_weight_kg": 2.669,
+    "material_utilization_percent": 46.2,
+    "total_operations": 9
+  }
+}
