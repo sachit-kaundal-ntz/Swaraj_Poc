@@ -6,3 +6,6 @@ output
 uploads
 logs
 venv/
+pdf
+TestImage
+image.png
