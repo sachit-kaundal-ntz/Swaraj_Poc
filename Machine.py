@@ -6,7 +6,7 @@ from langchain_groq import ChatGroq
 # ---------------------------
 # Make sure you set your API key in environment before running:
 # export GROQ_API_KEY="your_api_key_here"
-GROQ_API_KEY = "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"
+GROQ_API_KEY = 
 client = ChatGroq(model= "llama-3.1-8b-instant", api_key=GROQ_API_KEY)
  
 # ---------------------------
