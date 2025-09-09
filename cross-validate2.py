@@ -1817,4 +1817,3 @@ if __name__ == "__main__":
 
 
 
-     #python cross-validate2.py crosscheck.json image.png --api-key AIzaSyCr9f9e8ns0nvs3dmU2lIA7GdOIRod4n1A
