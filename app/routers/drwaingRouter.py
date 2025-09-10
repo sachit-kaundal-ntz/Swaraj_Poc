@@ -1,6 +1,7 @@
 import os
 import uuid
 import shutil
+import json
 from datetime import datetime
 from typing import Optional, List
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Query
@@ -22,14 +23,12 @@ OUTPUT_DIR = "outputs/drawings"
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".webp"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  
 
-# Ensure directories exist
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 def validate_image_file(file: UploadFile) -> bool:
     """Validate uploaded image file"""
-    # Check file extension
     file_ext = Path(file.filename).suffix.lower()
     if file_ext not in ALLOWED_EXTENSIONS:
         return False
@@ -58,17 +57,14 @@ async def upload_technical_drawing(
     Upload a technical drawing/engineering diagram for processing
     """
     try:
-        # Validate file
         if not validate_image_file(file):
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid file. Allowed formats: {', '.join(ALLOWED_EXTENSIONS)}. Max size: {MAX_FILE_SIZE/1024/1024}MB"
             )
         
-        # Generate task ID
         task_id = str(uuid.uuid4())
         
-        # Read file content
         content = await file.read()
         file_size = len(content)
         
@@ -78,15 +74,12 @@ async def upload_technical_drawing(
                 detail=f"File too large. Maximum size allowed: {MAX_FILE_SIZE/1024/1024}MB"
             )
         
-        # Save uploaded file
         file_path = os.path.join(UPLOAD_DIR, f"{task_id}_{file.filename}")
         with open(file_path, "wb") as f:
             f.write(content)
         
-        # Create output directory for this task
         task_output_dir = os.path.join(OUTPUT_DIR, task_id)
         
-        # Add background task for processing
         background_tasks.add_task(
             process_drawing_background,
             task_id,
@@ -136,7 +129,6 @@ async def get_processing_status(task_id: str):
     except Exception as e:
         logger.error(f"Error getting status for task {task_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Status check failed: {str(e)}")
-
 @router.get("/result/{task_id}", response_model=DrawingProcessingResult)
 async def get_processing_result(
     task_id: str,
@@ -154,19 +146,28 @@ async def get_processing_result(
         if file_info["status"] == "processing":
             raise HTTPException(status_code=202, detail="Processing still in progress")
         
-        # Try to read the JSON result file
-        json_path = f"{file_info['output_path']}.json"
-        csv_path = f"{file_info['output_path']}.csv"
-        
+        json_path = None
         extracted_data = None
-        if include_data and os.path.exists(json_path):
+        
+        if "output_path" in file_info and file_info["output_path"]:
+            json_path = os.path.join(file_info["output_path"], f"{task_id}.json")
+            
+            if not os.path.exists(json_path):
+                json_path = file_info["output_path"]
+        
+        if include_data and json_path and os.path.exists(json_path):
             try:
-                import json
                 with open(json_path, 'r', encoding='utf-8') as f:
                     result_data = json.load(f)
-                    extracted_data = result_data.get("extracted_data")
+                    extracted_data = result_data.get("extracted_data", {})
             except Exception as e:
-                logger.warning(f"Could not read result data: {str(e)}")
+                logger.warning(f"Could not read result data from {json_path}: {str(e)}")
+                extracted_data = {"error": f"Could not read JSON file: {str(e)}"}
+        elif include_data and "extracted_data" in file_info:
+            extracted_data = file_info.get("extracted_data", {})
+        
+        if not json_path and "output_path" in file_info:
+            json_path = file_info["output_path"]
         
         return DrawingProcessingResult(
             task_id=task_id,
@@ -174,7 +175,7 @@ async def get_processing_result(
             status=file_info["status"],
             file_size=file_info["file_size"],
             has_errors=file_info["status"] == "completed_with_errors",
-            json_path=json_path if  os.path.exists(json_path) else None,
+            json_path=json_path if json_path and os.path.exists(json_path) else None,
             extracted_data=extracted_data
         )
         
@@ -224,9 +225,8 @@ async def delete_processed_drawing(task_id: str):
         if not file_info:
             raise HTTPException(status_code=404, detail="Task not found")
         
-        # Delete files
         files_to_delete = [
-            file_info["file_path"],  # Original uploaded file
+            file_info["file_path"],  
             f"{file_info['output_path']}.json",
             f"{file_info['output_path']}.csv"
         ]
@@ -236,15 +236,13 @@ async def delete_processed_drawing(task_id: str):
                 os.remove(file_path)
                 logger.info(f"Deleted file: {file_path}")
         
-        # Delete output directory if empty
         output_dir = os.path.dirname(file_info['output_path'])
         try:
             if os.path.exists(output_dir) and not os.listdir(output_dir):
                 os.rmdir(output_dir)
         except OSError:
-            pass  # Directory not empty or other issue, ignore
+            pass  
         
-        # Remove from memory
         drawing_service.delete_file_info(task_id)
         
         return {"message": f"Technical drawing {task_id} deleted successfully"}
@@ -265,7 +263,7 @@ async def batch_upload_drawings(
     Upload multiple technical drawings for batch processing
     """
     try:
-        if len(files) > 10:  # Limit batch size
+        if len(files) > 10:  
             raise HTTPException(
                 status_code=400,
                 detail="Maximum 10 files allowed in batch upload"
@@ -275,7 +273,6 @@ async def batch_upload_drawings(
         
         for file in files:
             try:
-                # Validate each file
                 if not validate_image_file(file):
                     responses.append(DrawingUploadResponse(
                         task_id="",
@@ -286,10 +283,8 @@ async def batch_upload_drawings(
                     ))
                     continue
                 
-                # Generate task ID
                 task_id = str(uuid.uuid4())
                 
-                # Read file content
                 content = await file.read()
                 file_size = len(content)
                 
@@ -303,15 +298,12 @@ async def batch_upload_drawings(
                     ))
                     continue
                 
-                # Save uploaded file
                 file_path = os.path.join(UPLOAD_DIR, f"{task_id}_{file.filename}")
                 with open(file_path, "wb") as f:
                     f.write(content)
                 
-                # Create output directory for this task
                 task_output_dir = os.path.join(OUTPUT_DIR, task_id)
                 
-                # Add background task for processing
                 background_tasks.add_task(
                     process_drawing_background,
                     task_id,
@@ -327,7 +319,6 @@ async def batch_upload_drawings(
                     message="File uploaded successfully and is being processed"
                 ))
                 
-                # Reset file pointer for next iteration
                 await file.seek(0)
                 
             except Exception as e:
@@ -347,83 +338,3 @@ async def batch_upload_drawings(
     except Exception as e:
         logger.error(f"Error in batch upload: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Batch upload failed: {str(e)}")
-
-# @router.get("/stats")
-# async def get_processing_stats():
-#     """
-#     Get processing statistics
-#     """
-#     try:
-#         all_files = drawing_service.get_all_processed_files()
-        
-#         stats = {
-#             "total_files": len(all_files),
-#             "completed": 0,
-#             "processing": 0,
-#             "failed": 0,
-#             "completed_with_errors": 0,
-#             "total_size_mb": 0
-#         }
-        
-#         for file_info in all_files.values():
-#             status = file_info["status"]
-#             if status == "completed":
-#                 stats["completed"] += 1
-#             elif status == "processing":
-#                 stats["processing"] += 1
-#             elif status == "failed":
-#                 stats["failed"] += 1
-#             elif status == "completed_with_errors":
-#                 stats["completed_with_errors"] += 1
-            
-#             stats["total_size_mb"] += file_info["file_size"] / 1024 / 1024
-        
-#         stats["total_size_mb"] = round(stats["total_size_mb"], 2)
-        
-#         return stats
-        
-#     except Exception as e:
-#         logger.error(f"Error getting stats: {str(e)}")
-#         raise HTTPException(status_code=500, detail=f"Stats retrieval failed: {str(e)}")
-
-# @router.post("/reprocess/{task_id}")
-# async def reprocess_drawing(task_id: str, background_tasks: BackgroundTasks):
-#     """
-#     Reprocess a technical drawing
-#     """
-#     try:
-#         file_info = drawing_service.get_file_info(task_id)
-        
-#         if not file_info:
-#             raise HTTPException(status_code=404, detail="Task not found")
-        
-#         if not os.path.exists(file_info["file_path"]):
-#             raise HTTPException(status_code=404, detail="Original file not found")
-        
-#         # Update status to processing
-#         drawing_service.update_file_status(task_id, "processing")
-        
-#         # Create output directory for this task
-#         task_output_dir = os.path.join(OUTPUT_DIR, task_id)
-        
-#         # Add background task for reprocessing
-#         background_tasks.add_task(
-#             process_drawing_background,
-#             task_id,
-#             file_info["file_path"],
-#             task_output_dir
-#         )
-        
-#         return {
-#             "message": f"Reprocessing started for task {task_id}",
-#             "task_id": task_id,
-#             "status": "processing"
-#         }
-        
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         logger.error(f"Error reprocessing task {task_id}: {str(e)}")
-#         raise HTTPException(status_code=500, detail=f"Reprocessing failed: {str(e)}")
-
-
