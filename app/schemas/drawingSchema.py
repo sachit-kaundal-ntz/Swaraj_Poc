@@ -26,7 +26,7 @@ class DrawingProcessingResult(BaseModel):
     file_size: int
     has_errors: bool
     json_path: Optional[str] = None
-    csv_path: Optional[str] = None
+    csv_path: Optional[str] = None  # Add this field
     extracted_data: Optional[dict] = None
 
 class ErrorResponse(BaseModel):
