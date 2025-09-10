@@ -1,0 +1,525 @@
+{
+  "task_id": "5a3dd29a-5b4e-4f98-9a72-7e99032b814a",
+  "filename": "5a3dd29a-5b4e-4f98-9a72-7e99032b814a_image.png",
+  "file_size": 8499810,
+  "extracted_data": {
+    "units": "mm",
+    "views": [
+      {
+        "id": "view_main",
+        "name": "SECTION A-A",
+        "bbox": null
+      }
+    ],
+    "tables": [
+      {
+        "id": "tbl_gear_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "MODULE",
+            "value": 5.5,
+            "unit": "mm"
+          },
+          {
+            "label": "NO OF TEETH",
+            "value": 58,
+            "unit": null
+          },
+          {
+            "label": "ADDENDUM",
+            "value": null,
+            "unit": "mm",
+            "source": "missing_on_drawing"
+          },
+          {
+            "label": "ADDENDUM CORRECTION",
+            "value": 0.22,
+            "unit": "mm"
+          },
+          {
+            "label": "HELIX ANGLE",
+            "value": null,
+            "unit": "°",
+            "source": "missing_on_drawing"
+          },
+          {
+            "label": "DIRECTION OF HELIX",
+            "value": null,
+            "unit": null,
+            "source": "missing_on_drawing"
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": 20,
+            "unit": "°"
+          },
+          {
+            "label": "COEFFICIENT OF CORRECTION",
+            "value": 0.22,
+            "unit": null
+          },
+          {
+            "label": "SPAN MEASUREMENT OVER 7 TEETH",
+            "value": 110.834,
+            "unit": "mm",
+            "tolerance": "-0.075 -0.175"
+          },
+          {
+            "label": "QUALITY OF TOLERANCE ZONE",
+            "value": "DIN 9 (DIN 3962-63)",
+            "unit": null
+          },
+          {
+            "label": "MESHES WITH GEAR (Z=12) DWG NO.",
+            "value": "759018",
+            "unit": null
+          },
+          {
+            "label": "CENTRE DISTANCE",
+            "value": 195.75,
+            "unit": "mm",
+            "tolerance": "±0.112"
+          }
+        ]
+      },
+      {
+        "id": "tbl_spline_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "TYPE",
+            "value": "INVOLUTE",
+            "unit": null
+          },
+          {
+            "label": "NO. OFF TEETH",
+            "value": 22,
+            "unit": null
+          },
+          {
+            "label": "MODULE",
+            "value": 2.5,
+            "unit": "mm"
+          },
+          {
+            "label": "PRESSURE ANGLE",
+            "value": 30,
+            "unit": "°"
+          },
+          {
+            "label": "MEASUREMENT BETWEEN PINS",
+            "value": 50.552,
+            "unit": "mm",
+            "tolerance": "+0.158 +0.093"
+          },
+          {
+            "label": "PIN DIAMETER",
+            "value": 4.5,
+            "unit": "mm"
+          },
+          {
+            "label": "MAJOR DIAMETER",
+            "value": 60,
+            "unit": "mm"
+          },
+          {
+            "label": "MINOR DIAMETER",
+            "value": 55,
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_permissible_deviations",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "REFERENCE",
+            "value": "SPLINE PITCH CYLINDER",
+            "unit": null
+          },
+          {
+            "label": "RADIAL RUNOUT OF GEAR PITCH CYLINDER",
+            "value": 0.1,
+            "unit": null
+          },
+          {
+            "label": "RADIAL RUNOUT OF FACES A & B",
+            "value": 0.1,
+            "unit": null
+          },
+          {
+            "label": "RADIAL RUNOUT OF FACES C & D",
+            "value": 0.5,
+            "unit": "MAX."
+          },
+          {
+            "label": "DOUBLE FLANK TOTAL ERROR RANGE F_i\"",
+            "value": 0.09,
+            "unit": null
+          },
+          {
+            "label": "DOUBLE FLANK TOOTH TO TOOTH ERROR RANGE f_i\"",
+            "value": 0.04,
+            "unit": null
+          },
+          {
+            "label": "TOOTH ALIGNMENT ERROR OVER FACE WIDTH f_HB",
+            "value": 0.028,
+            "unit": null
+          },
+          {
+            "label": "PROFILE FORM DEVIATION f_f",
+            "value": 0.028,
+            "unit": null
+          }
+        ]
+      },
+      {
+        "id": "tbl_heat_treatment",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "TEETH HARDNESS",
+            "value": "53-58",
+            "unit": "HRC"
+          },
+          {
+            "label": "INDUCTION HARDENING PATTERN",
+            "value": "CENTRALISED W.R.T TOOTH",
+            "unit": null
+          }
+        ]
+      },
+      {
+        "id": "tbl_forging_parameters",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "NORMALISATION",
+            "value": "170-210",
+            "unit": "BHN"
+          },
+          {
+            "label": "GRAIN SIZE",
+            "value": "5-8",
+            "unit": "ASTM"
+          }
+        ]
+      },
+      {
+        "id": "tbl_case_depth",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "S.NO.",
+            "value": 1,
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "B-B",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "45-50 RC",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "X = 1.4 - 7.0 (ABOVE ROOT DIA)",
+            "unit": null
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-2",
+            "unit": null
+          },
+          {
+            "label": "S.NO.",
+            "value": 2,
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "A-A & C-C",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "45-50 RC",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "Y1 = 1.5 - 5.6 (BELOW ROOT DIA)",
+            "unit": null
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-3",
+            "unit": null
+          },
+          {
+            "label": "S.NO.",
+            "value": 3,
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "B-B",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH SPACE",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "50-55 OHV",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "Y = 0.8 - 6.6 (BELOW ROOT DIA)",
+            "unit": null
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-2",
+            "unit": null
+          },
+          {
+            "label": "S.NO.",
+            "value": 4,
+            "unit": null
+          },
+          {
+            "label": "SECTION",
+            "value": "A-A & C-C",
+            "unit": null
+          },
+          {
+            "label": "DESCRIPTION",
+            "value": "MIDDLE OF TOOTH SPACE",
+            "unit": null
+          },
+          {
+            "label": "HARDNESS",
+            "value": "50-55 OHV",
+            "unit": null
+          },
+          {
+            "label": "CASE DEPTH",
+            "value": "Y = 1.3 - 7.1 (BELOW ROOT DIA)",
+            "unit": null
+          },
+          {
+            "label": "REF DIAGRAM",
+            "value": "DIG-3",
+            "unit": null
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "dim_outer_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀332 ±0.1",
+        "value": 332,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "±0.1",
+        "leaders": [
+          "tip of gear teeth (left)",
+          "tip of gear teeth (right)"
+        ]
+      },
+      {
+        "id": "dim_hub_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀82",
+        "value": 82,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": [
+          "outer cylindrical surface of hub (left)",
+          "outer cylindrical surface of hub (right)"
+        ]
+      },
+      {
+        "id": "dim_face_width",
+        "view_id": "view_main",
+        "raw_text": "45 +0 -1",
+        "value": 45,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+0 -1",
+        "leaders": [
+          "left face of gear rim",
+          "right face of gear rim"
+        ]
+      },
+      {
+        "id": "dim_hub_height",
+        "view_id": "view_main",
+        "raw_text": "54 ±0.2",
+        "value": 54,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.2",
+        "leaders": [
+          "leftmost end face of hub",
+          "rightmost end face of hub"
+        ]
+      },
+      {
+        "id": "dim_bore",
+        "view_id": "view_main",
+        "raw_text": "⌀55 -0 -0.19",
+        "value": 55,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "-0 -0.19",
+        "leaders": [
+          "internal bore surface (left)",
+          "internal bore surface (right)"
+        ]
+      },
+      {
+        "id": "dim_pitch_circle_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀319 P.C.D",
+        "value": 319,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": [
+          "pitch circle diameter"
+        ]
+      }
+    ],
+    "features": [
+      {
+        "id": "feat_rim",
+        "type": "cylindrical_rim",
+        "role": "gear_tip",
+        "outer_diameter_dim_ids": [
+          "dim_outer_dia"
+        ],
+        "face_width_dim_ids": [
+          "dim_face_width"
+        ],
+        "table_links": [
+          "tbl_gear_data"
+        ]
+      },
+      {
+        "id": "feat_hub",
+        "type": "cylindrical_step",
+        "role": "hub_outer",
+        "diameter_dim_ids": [
+          "dim_hub_dia"
+        ],
+        "length_dim_ids": [
+          "dim_hub_height"
+        ]
+      },
+      {
+        "id": "feat_bore_main",
+        "type": "cylindrical_bore",
+        "role": "through_bore",
+        "diameter_dim_ids": [
+          "dim_bore"
+        ],
+        "length_dim_ids": [],
+        "fit_class": null
+      },
+      {
+        "id": "feat_spline",
+        "type": "internal_spline",
+        "role": "spline_bore",
+        "table_links": [
+          "tbl_spline_data"
+        ]
+      }
+    ],
+    "assembly_order": [
+      {
+        "op": "revolve",
+        "feature_id": "feat_rim"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_bore_main"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_spline"
+      }
+    ],
+    "metadata": {
+      "title_block": {
+        "drawing_no": "P10019486A",
+        "material": "EN43D; BS970",
+        "scale": "1:2",
+        "part_name": "BULL GEAR",
+        "weight": "14.86 kg"
+      }
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 4728,
+        "image_tokens": 500,
+        "total_input_tokens": 5228
+      },
+      "output_tokens": 3567,
+      "total_tokens": 8795,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "error": "Could not read image dimensions"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-10T12:35:03.919681",
+  "token_usage": {
+    "input_tokens": {
+      "prompt_tokens": 4728,
+      "image_tokens": 500,
+      "total_input_tokens": 5228
+    },
+    "output_tokens": 3567,
+    "total_tokens": 8795,
+    "token_counting_method": "gemini_api_with_estimation_fallback",
+    "image_dimensions": {
+      "error": "Could not read image dimensions"
+    }
+  },
+  "database_saved": true,
+  "database_info": {
+    "document_id": "None",
+    "document_task_id": "5a3dd29a-5b4e-4f98-9a72-7e99032b814a",
+    "stored_filename": "5a3dd29a-5b4e-4f98-9a72-7e99032b814a_5a3dd29a-5b4e-4f98-9a72-7e99032b814a_image.png",
+    "total_pages": 1
+  }
+}
