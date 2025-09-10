@@ -14,7 +14,6 @@ class DrawingProcessingResult(Base):
     file_size = Column(Integer, nullable=False)
     has_errors = Column(Boolean, default=False)
     json_path = Column(String, nullable=True)
-    csv_path = Column(String, nullable=True)
     extracted_data = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
