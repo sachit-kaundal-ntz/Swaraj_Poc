@@ -1,0 +1,205 @@
+{
+  "task_id": "9cb4fe03-da16-4da6-b779-402e7ecc7948",
+  "filename": "9cb4fe03-da16-4da6-b779-402e7ecc7948_P10019486AS001 (Induction Hardening)_p0.png",
+  "file_size": 3216120,
+  "extracted_data": {
+    "units": "mm",
+    "views": [
+      {
+        "id": "view_main",
+        "name": "SEC A-A",
+        "bbox": null
+      }
+    ],
+    "tables": [
+      {
+        "id": "tbl_gear_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "MODULE",
+            "value": 5.5,
+            "unit": "mm"
+          },
+          {
+            "label": "NO OF TEETH",
+            "value": 58,
+            "unit": null
+          },
+          {
+            "label": "ADDENDUM",
+            "value": null,
+            "unit": "mm"
+          }
+        ]
+      },
+      {
+        "id": "tbl_spline_data",
+        "view_id": null,
+        "cells": [
+          {
+            "label": "MAJOR DIAMETER",
+            "value": null,
+            "unit": "mm"
+          },
+          {
+            "label": "MINOR DIAMETER",
+            "value": null,
+            "unit": "mm"
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "dim_outer_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀332 ±0.1",
+        "value": 332.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "±0.1",
+        "leaders": [
+          "outermost tip of gear teeth"
+        ]
+      },
+      {
+        "id": "dim_hub_dia",
+        "view_id": "view_main",
+        "raw_text": "⌀82",
+        "value": 82.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": null,
+        "leaders": [
+          "outer diameter of hub extension"
+        ]
+      },
+      {
+        "id": "dim_face_width",
+        "view_id": "view_main",
+        "raw_text": "45 +0 -1",
+        "value": 45.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "+0 -1",
+        "leaders": [
+          "axial width of gear teeth section"
+        ]
+      },
+      {
+        "id": "dim_hub_height",
+        "view_id": "view_main",
+        "raw_text": "54 ±0.2",
+        "value": 54.0,
+        "unit": "mm",
+        "symbol": null,
+        "tolerance": "±0.2",
+        "leaders": [
+          "total axial length of gear assembly"
+        ]
+      },
+      {
+        "id": "dim_bore",
+        "view_id": "view_main",
+        "raw_text": "⌀55 -0",
+        "value": 55.0,
+        "unit": "mm",
+        "symbol": "⌀",
+        "tolerance": "+0 -0",
+        "leaders": [
+          "internal diameter of cylindrical bore"
+        ]
+      }
+    ],
+    "features": [
+      {
+        "id": "feat_rim",
+        "type": "cylindrical_rim",
+        "role": "gear_tip",
+        "outer_diameter_dim_ids": [
+          "dim_outer_dia"
+        ],
+        "face_width_dim_ids": [
+          "dim_face_width"
+        ],
+        "table_links": [
+          "tbl_gear_data"
+        ]
+      },
+      {
+        "id": "feat_hub",
+        "type": "cylindrical_step",
+        "role": "hub_outer",
+        "diameter_dim_ids": [
+          "dim_hub_dia"
+        ],
+        "length_dim_ids": [
+          "dim_hub_height"
+        ]
+      },
+      {
+        "id": "feat_bore_main",
+        "type": "cylindrical_bore",
+        "role": "through_bore",
+        "diameter_dim_ids": [
+          "dim_bore"
+        ],
+        "length_dim_ids": [],
+        "fit_class": null
+      },
+      {
+        "id": "feat_spline",
+        "type": "internal_spline",
+        "role": "spline_bore",
+        "table_links": [
+          "tbl_spline_data"
+        ]
+      }
+    ],
+    "assembly_order": [
+      {
+        "op": "revolve",
+        "feature_id": "feat_rim"
+      },
+      {
+        "op": "revolve",
+        "feature_id": "feat_hub"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_bore_main"
+      },
+      {
+        "op": "subtract",
+        "feature_id": "feat_spline"
+      }
+    ],
+    "metadata": {
+      "title_block": {
+        "drawing_no": "P10019486A",
+        "material": "EN43D; BS970",
+        "scale": "1:2",
+        "part_name": "BULL GEAR"
+      }
+    },
+    "token_usage": {
+      "input_tokens": {
+        "prompt_tokens": 3785,
+        "image_tokens": 774,
+        "total_input_tokens": 4559
+      },
+      "output_tokens": 1332,
+      "total_tokens": 5891,
+      "token_counting_method": "gemini_api_with_estimation_fallback",
+      "image_dimensions": {
+        "width": 9355,
+        "height": 6615,
+        "total_pixels": 61883325,
+        "format": "PNG"
+      }
+    }
+  },
+  "status": "completed",
+  "timestamp": "2025-09-06T13:02:23.307977"
+}
