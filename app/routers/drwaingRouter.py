@@ -87,7 +87,7 @@ async def upload_technical_drawing(
             task_output_dir
         )
         
-        logger.info(f"Technical drawing uploaded successfully: {file.filename}, Task ID: {task_id}")
+        logger.info(f"Technical drawing uploaded successfully: {file.filename}, Task ID: {task_id}")         
         
         return DrawingUploadResponse(
             task_id=task_id,
@@ -102,7 +102,8 @@ async def upload_technical_drawing(
     except Exception as e:
         logger.error(f"Error uploading technical drawing: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
-
+ 
+   
 @router.get("/status/{task_id}", response_model=DrawingProcessingStatus)
 async def get_processing_status(task_id: str):
     """
@@ -129,6 +130,8 @@ async def get_processing_status(task_id: str):
     except Exception as e:
         logger.error(f"Error getting status for task {task_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Status check failed: {str(e)}")
+    
+    
 @router.get("/result/{task_id}", response_model=DrawingProcessingResult)
 async def get_processing_result(
     task_id: str,
@@ -283,7 +286,7 @@ async def batch_upload_drawings(
                     ))
                     continue
                 
-                task_id = str(uuid.uuid4())
+                task_id = str(uuid.uuid4()) 
                 
                 content = await file.read()
                 file_size = len(content)

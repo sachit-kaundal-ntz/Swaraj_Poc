@@ -9,8 +9,7 @@ import google.generativeai as genai
 from typing import Dict, List, Optional, Any
 from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-
+from sqlalchemy.future import select  
 from app.log.logger import get_logger
 from app.models.drawingModel import DrawingProcessingResult
 from app.prompt.drawingPrompt import DRAWINGPROMPT
@@ -274,7 +273,7 @@ class TechnicalDrawingExtractionService:
             return None
 
     async def process_image_file(
-        self,
+        self,        
         task_id: str,
         file_path: str,
         output_dir: str = None
@@ -577,8 +576,7 @@ class TechnicalDrawingExtractionService:
                     await self.db_session.commit()
                     deleted = True
                     logger.info(f"Deleted record from database: {task_id}")
-            
-            # Delete from memory
+                        # Delete from memory
             if task_id in self.processed_files:
                 del self.processed_files[task_id]
                 deleted = True
@@ -633,7 +631,7 @@ class TechnicalDrawingExtractionService:
                             "feature": dimension.get("id", "unknown"),
                             "value": dimension.get("value"),
                             "unit": dimension.get("unit", ""),
-                            "tolerance": dimension.get("tolerance", ""),
+                            "tolerance": dimension.get("tolerance", ""), 
                             "symbol": dimension.get("symbol", "")
                         })
             
