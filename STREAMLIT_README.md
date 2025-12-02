@@ -1,9 +1,13 @@
 Streamlit UI for Technical Drawing Extraction
 
-This repository contains a simple Streamlit app to run the `TechnicalDrawingExtractionService` in `app/service/techinalDrawingService.py`.
-
 Files added
 - `streamlit_app.py` — Streamlit front-end to upload an image, run extraction, and download outputs.
+
+Add keys in folder 
+
+```bash
+.streamlit/secrets.toml
+```
 
 Requirements
 - Python 3.8+ (project uses 3.12 in the venv here)
