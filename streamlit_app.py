@@ -1,8 +1,4 @@
 
-###########################################ratelimit###########################################
-
-
-
 import os
 import uuid
 import json
@@ -15,15 +11,24 @@ from typing import Dict, List, Optional, Any
 from PIL import Image
 import base64
 import io
+import streamlit as st
+import pandas as pd
+import time
 
-from app.log.logger import get_logger
+# Set page config
+st.set_page_config(
+    page_title="Technical Drawing Extraction",
+    page_icon="📐",
+    layout="wide"
+)
 
-logger = get_logger(__name__)
+# Load environment variables
 load_dotenv()
+
 # Ensure the Google API key is provided via environment variable and is not empty.
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
-    raise RuntimeError(
+    st.error(
         "GOOGLE_API_KEY is not set.\n"
         "Steps to fix:\n"
         "1) Rotate the leaked API key in Google Cloud Console (disable/delete the exposed key).\n"
@@ -31,7 +36,9 @@ if not GOOGLE_API_KEY:
         "3) Set the new key in environment variable GOOGLE_API_KEY (do NOT commit it).\n"
         "4) For local dev, add it to your shell profile or a local .env (ensure .env is in .gitignore).\n"
     )
-genai.configure(api_key=GOOGLE_API_KEY)
+    st.stop()
+
+genai.configure(api_key=st.secrets.get("GOOGLE_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 class TechnicalDrawingExtractionService:
@@ -65,7 +72,7 @@ class TechnicalDrawingExtractionService:
             return token_count.total_tokens
             
         except Exception as e:
-            logger.warning(f"Failed to get accurate token count, using estimation: {str(e)}")
+            st.warning(f"Failed to get accurate token count, using estimation: {str(e)}")
             return self.estimate_tokens(text)
     
     def estimate_tokens(self, text: str) -> int:
@@ -111,7 +118,7 @@ class TechnicalDrawingExtractionService:
                 return 774  
                 
         except Exception as e:
-            logger.warning(f"Could not estimate image tokens: {str(e)}")
+            st.warning(f"Could not estimate image tokens: {str(e)}")
             return 500  
     
     def count_total_tokens_for_request(self, prompt: str, image_path: str = None) -> Dict[str, int]:
@@ -127,10 +134,10 @@ class TechnicalDrawingExtractionService:
             "total_input_tokens": prompt_tokens + image_tokens
         }
 
-    async def upload_image_to_gemini(self, image_path: str) -> Any:
+    def upload_image_to_gemini(self, image_path: str) -> Any:
         """Upload image file to Gemini"""
         try:
-            logger.info(f"Uploading image file to Gemini: {image_path}")
+            st.info(f"Uploading image file to Gemini: {image_path}")
             
             if not os.path.exists(image_path):
                 raise FileNotFoundError(f"Image file not found: {image_path}")
@@ -140,20 +147,19 @@ class TechnicalDrawingExtractionService:
                 raise ValueError("Image file is empty")
                 
             uploaded_file = genai.upload_file(image_path)
-            logger.info(f"Successfully uploaded image to Gemini")
+            st.info(f"Successfully uploaded image to Gemini")
             return uploaded_file
             
         except Exception as e:
-            logger.error(f"Failed to upload image to Gemini: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            st.error(f"Failed to upload image to Gemini: {str(e)}")
+            st.error(f"Traceback: {traceback.format_exc()}")
             raise Exception(f"Image upload failed: {str(e)}")
 
-    async def extract_technical_drawing_data(self, image_path: str) -> Dict:
+    def extract_technical_drawing_data(self, image_path: str) -> Dict:
         """Extract technical drawing data from image using Gemini - Universal Version"""
         try:
-            logger.info(f"Starting technical drawing extraction for: {image_path}")
+            st.info(f"Starting technical drawing extraction for: {image_path}")
             
-
             PROMPT = """
             You are an expert mechanical drawing interpreter. Your role is to extract ONLY the explicitly printed information from a mechanical gear drawing and return a structured JSON.
 
@@ -511,20 +517,22 @@ class TechnicalDrawingExtractionService:
             - **MANDATORY**: Ensure hub_height > face_width in final output
 """  
             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path)
-            logger.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, Image: {input_token_info['image_tokens']}, Total: {input_token_info['total_input_tokens']}")
+            st.info(f"Input tokens - Prompt: {input_token_info['prompt_tokens']}, Image: {input_token_info['image_tokens']}, Total: {input_token_info['total_input_tokens']}")
             
-            uploaded_file = await self.upload_image_to_gemini(image_path)
+            uploaded_file = self.upload_image_to_gemini(image_path)
             
-            response = model.generate_content(
-                [PROMPT, uploaded_file],
-                generation_config={"temperature": 0.0}
-            )
+            with st.spinner("Extracting data from technical drawing..."):
+                response = model.generate_content(
+                    [PROMPT, uploaded_file],
+                    generation_config={"temperature": 0.0}
+                )
+            
             response_text = response.text.strip()
             
             output_tokens = self.count_tokens_accurate(response_text)
             total_tokens = input_token_info['total_input_tokens'] + output_tokens
             
-            logger.info(f"Token usage - Input: {input_token_info['total_input_tokens']}, Output: {output_tokens}, Total: {total_tokens}")
+            st.info(f"Token usage - Input: {input_token_info['total_input_tokens']}, Output: {output_tokens}, Total: {total_tokens}")
             
             if response_text.startswith("```json"):
                 response_text = response_text[7:-3].strip()
@@ -532,7 +540,7 @@ class TechnicalDrawingExtractionService:
                 response_text = response_text[3:-3].strip()
             
             parsed_data = json.loads(response_text)
-            logger.info("Successfully parsed JSON response from Gemini")
+            st.success("Successfully parsed JSON response from Gemini")
             
             parsed_data["token_usage"] = {
                 "input_tokens": {
@@ -549,8 +557,8 @@ class TechnicalDrawingExtractionService:
             return parsed_data
             
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error: {str(e)}")
-            logger.error(f"Response text: {response_text[:1000]}...")
+            st.error(f"JSON parsing error: {str(e)}")
+            st.error(f"Response text: {response_text[:1000]}...")
             
             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path) if 'PROMPT' in locals() else {"prompt_tokens": 0, "image_tokens": 0, "total_input_tokens": 0}
             output_tokens = self.count_tokens_accurate(response_text) if 'response_text' in locals() else 0
@@ -566,8 +574,8 @@ class TechnicalDrawingExtractionService:
                 }
             }
         except Exception as e:
-            logger.error(f"Technical drawing extraction failed: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            st.error(f"Technical drawing extraction failed: {str(e)}")
+            st.error(f"Traceback: {traceback.format_exc()}")
             
             input_token_info = self.count_total_tokens_for_request(PROMPT, image_path) if 'PROMPT' in locals() else {"prompt_tokens": 0, "image_tokens": 0, "total_input_tokens": 0}
             
@@ -595,10 +603,10 @@ class TechnicalDrawingExtractionService:
         except Exception:
             return {"error": "Could not read image dimensions"}
 
-    async def process_all_data(self, data: Dict, filename: str) -> List[Dict]:
+    def process_all_data(self, data: Dict, filename: str) -> List[Dict]:
         """Process all data into a flat structure for CSV output with universal organization"""
         try:
-            logger.info(f"Processing data for CSV output: {filename}")
+            st.info(f"Processing data for CSV output: {filename}")
             
             records = []
             
@@ -745,19 +753,19 @@ class TechnicalDrawingExtractionService:
                 main_record = flatten_dict(data)
                 records.append(main_record)
             
-            logger.info(f"Processed {len(records)} total records")
+            st.info(f"Processed {len(records)} total records")
             return records
             
         except Exception as e:
-            logger.error(f"Data processing error: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            st.error(f"Data processing error: {str(e)}")
+            st.error(f"Traceback: {traceback.format_exc()}")
             return [{
                 "Filename": filename,
                 "Error": f"Data processing error: {str(e)}",
                 "Record_Type": "Error"
             }]
 
-    async def process_image_file(
+    def process_image_file(
         self,
         task_id: str,
         file_path: str,
@@ -765,13 +773,13 @@ class TechnicalDrawingExtractionService:
     ) -> Dict:
         """Process image file using Gemini extraction"""
         try:
-            logger.info(f"Starting image processing for task: {task_id}")
+            st.info(f"Starting image processing for task: {task_id}")
             
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"Image file not found: {file_path}")
                 
             file_size = os.path.getsize(file_path)
-            logger.info(f"File size: {file_size} bytes")
+            st.info(f"File size: {file_size} bytes")
             
             if file_size == 0:
                 raise ValueError("Image file is empty")
@@ -792,7 +800,7 @@ class TechnicalDrawingExtractionService:
             
             self.processed_files[task_id] = file_info
             
-            extracted_data = await self.extract_technical_drawing_data(file_path)
+            extracted_data = self.extract_technical_drawing_data(file_path)
             
             status = "completed" if "error" not in extracted_data else "completed_with_errors"
             self.processed_files[task_id]["status"] = status
@@ -809,10 +817,10 @@ class TechnicalDrawingExtractionService:
             json_file_path = f"{base_filename}.json"
             with open(json_file_path, "w", encoding='utf-8') as f:
                 json.dump(json_output, f, indent=2, ensure_ascii=False)
-            logger.info(f"JSON output saved to: {json_file_path}")
+            st.info(f"JSON output saved to: {json_file_path}")
             
             csv_file_path = f"{base_filename}.csv"
-            processed_data = await self.process_all_data(extracted_data, os.path.basename(file_path))
+            processed_data = self.process_all_data(extracted_data, os.path.basename(file_path))
             
             if processed_data and len(processed_data) > 0:
                 with open(csv_file_path, "w", newline="", encoding='utf-8') as csvfile:
@@ -823,7 +831,7 @@ class TechnicalDrawingExtractionService:
                     writer = csv.DictWriter(csvfile, fieldnames=sorted(fieldnames))
                     writer.writeheader()
                     writer.writerows(processed_data)
-                logger.info(f"CSV output saved to: {csv_file_path}")
+                st.info(f"CSV output saved to: {csv_file_path}")
             
             return {
                 "status": status,
@@ -836,24 +844,24 @@ class TechnicalDrawingExtractionService:
             }
             
         except FileNotFoundError as e:
-            logger.error(f"File not found error: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            st.error(f"File not found error: {str(e)}")
+            st.error(f"Traceback: {traceback.format_exc()}")
             return {
                 "status": "failed",
                 "error": f"File not found: {str(e)}",
                 "error_type": "file_not_found"
             }
         except ValueError as e:
-            logger.error(f"Value error: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            st.error(f"Value error: {str(e)}")
+            st.error(f"Traceback: {traceback.format_exc()}")
             return {
                 "status": "failed",
                 "error": f"Invalid file or data: {str(e)}",
                 "error_type": "invalid_data"
             }
         except Exception as e:
-            logger.error(f"Unexpected error in image processing: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            st.error(f"Unexpected error in image processing: {str(e)}")
+            st.error(f"Traceback: {traceback.format_exc()}")
             return {
                 "status": "failed",
                 "error": f"Processing error: {str(e)}",
@@ -930,7 +938,7 @@ class TechnicalDrawingExtractionService:
             return critical_dims
             
         except Exception as e:
-            logger.warning(f"Error extracting critical dimensions: {str(e)}")
+            st.warning(f"Error extracting critical dimensions: {str(e)}")
             return []
     
     def generate_summary_report(self, extracted_data: Dict, filename: str) -> Dict:
@@ -964,7 +972,7 @@ class TechnicalDrawingExtractionService:
             return summary
             
         except Exception as e:
-            logger.error(f"Error generating summary report: {str(e)}")
+            st.error(f"Error generating summary report: {str(e)}")
             return {
                 "filename": filename,
                 "error": f"Summary generation failed: {str(e)}",
@@ -984,7 +992,7 @@ class TechnicalDrawingExtractionService:
                 return "Unsupported format type"
                 
         except Exception as e:
-            logger.error(f"Export format error: {str(e)}")
+            st.error(f"Export format error: {str(e)}")
             return f"Export failed: {str(e)}"
     
     def _create_inspection_sheet_format(self, data: Dict) -> str:
@@ -1044,3 +1052,303 @@ class TechnicalDrawingExtractionService:
         
         return "\n".join(lines)
 
+# Streamlit UI
+def main():
+    st.title("📐 Technical Drawing Extraction Service")
+    st.markdown("Extract technical data from gear drawings using Gemini AI")
+    
+    # Initialize service
+    if 'service' not in st.session_state:
+        st.session_state.service = TechnicalDrawingExtractionService()
+    if 'processed_files' not in st.session_state:
+        st.session_state.processed_files = {}
+    
+    # Sidebar
+    with st.sidebar:
+        st.header("Settings")
+        output_dir = st.text_input("Output Directory", value="./output")
+        
+        st.header("File Management")
+        if st.button("Clear All Processed Files"):
+            st.session_state.processed_files = {}
+            st.session_state.service = TechnicalDrawingExtractionService()
+            st.rerun()
+    
+    # Main content
+    tab1, tab2, tab3 = st.tabs(["Upload & Process", "View Results", "Export Data"])
+    
+    with tab1:
+        st.header("Upload Technical Drawing")
+        
+        uploaded_file = st.file_uploader(
+            "Choose an image file", 
+            type=['png', 'jpg', 'jpeg', 'bmp', 'tiff'],
+            help="Upload a technical drawing image for data extraction"
+        )
+        
+        if uploaded_file is not None:
+            # Display image
+            col1, col2 = st.columns(2)
+            with col1:
+                st.image(uploaded_file, caption="Uploaded Drawing", use_container_width=True)
+            
+            with col2:
+                file_details = {
+                    "Filename": uploaded_file.name,
+                    "File size": f"{uploaded_file.size / 1024:.2f} KB",
+                    "File type": uploaded_file.type
+                }
+                st.write("File Details:")
+                st.json(file_details)
+            
+            # Process button
+            if st.button("Extract Data from Drawing", type="primary"):
+                with st.spinner("Processing..."):
+                    # Save uploaded file temporarily
+                    temp_dir = "./temp"
+                    os.makedirs(temp_dir, exist_ok=True)
+                    temp_path = os.path.join(temp_dir, uploaded_file.name)
+                    
+                    with open(temp_path, "wb") as f:
+                        f.write(uploaded_file.getbuffer())
+                    
+                    # Generate task ID
+                    task_id = str(uuid.uuid4())[:8]
+                    
+                    # Process file
+                    result = st.session_state.service.process_image_file(
+                        task_id=task_id,
+                        file_path=temp_path,
+                        output_dir=output_dir
+                    )
+                    
+                    # Store result
+                    st.session_state.processed_files[task_id] = {
+                        **result,
+                        "filename": uploaded_file.name,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    
+                    # Display result
+                    if result["status"] == "completed":
+                        st.success("✅ Data extraction completed successfully!")
+                    elif result["status"] == "completed_with_errors":
+                        st.warning("⚠️ Data extraction completed with some errors")
+                    else:
+                        st.error("❌ Data extraction failed")
+                    
+                    # Show file paths
+                    st.info(f"JSON Output: `{result.get('json_path', 'N/A')}`")
+                    st.info(f"CSV Output: `{result.get('csv_path', 'N/A')}`")
+                    
+                    # Clean up temp file
+                    try:
+                        os.remove(temp_path)
+                    except:
+                        pass
+    
+    with tab2:
+        st.header("View Extracted Data")
+        
+        if not st.session_state.processed_files:
+            st.info("No processed files yet. Upload a file in the first tab.")
+        else:
+            # File selection
+            file_options = {
+                f"{task_id} - {info.get('filename', 'Unknown')}": task_id
+                for task_id, info in st.session_state.processed_files.items()
+            }
+            
+            selected_file = st.selectbox(
+                "Select a processed file:",
+                options=list(file_options.keys())
+            )
+            
+            if selected_file:
+                task_id = file_options[selected_file]
+                file_info = st.session_state.processed_files[task_id]
+                
+                # Display file info
+                st.subheader("File Information")
+                info_cols = st.columns(4)
+                with info_cols[0]:
+                    st.metric("Status", file_info.get("status", "Unknown"))
+                with info_cols[1]:
+                    st.metric("File Size", f"{file_info.get('file_size', 0) / 1024:.1f} KB")
+                with info_cols[2]:
+                    has_errors = file_info.get("has_errors", False)
+                    st.metric("Has Errors", "Yes" if has_errors else "No")
+                with info_cols[3]:
+                    if file_info.get("token_usage"):
+                        total_tokens = file_info["token_usage"].get("total_tokens", 0)
+                        st.metric("Total Tokens", total_tokens)
+                
+                # Load and display extracted data
+                json_path = file_info.get("json_path")
+                if json_path and os.path.exists(json_path):
+                    try:
+                        with open(json_path, 'r', encoding='utf-8') as f:
+                            extracted_data = json.load(f)
+                        
+                        # Create tabs for different data views
+                        view_tabs = st.tabs(["JSON View", "Summary", "Dimensions", "Tables", "Features"])
+                        
+                        with view_tabs[0]:
+                            st.subheader("Full JSON Data")
+                            st.json(extracted_data)
+                        
+                        with view_tabs[1]:
+                            st.subheader("Summary Report")
+                            summary = st.session_state.service.generate_summary_report(
+                                extracted_data.get("extracted_data", {}),
+                                file_info.get("filename", "Unknown")
+                            )
+                            st.json(summary)
+                            
+                            # Critical dimensions
+                            critical_dims = st.session_state.service.get_critical_dimensions(
+                                extracted_data.get("extracted_data", {})
+                            )
+                            if critical_dims:
+                                st.subheader("Critical Dimensions")
+                                dim_df = pd.DataFrame(critical_dims)
+                                st.dataframe(dim_df, use_container_width=True)
+                        
+                        with view_tabs[2]:
+                            if "extracted_data" in extracted_data and "dimensions" in extracted_data["extracted_data"]:
+                                st.subheader("Dimensions")
+                                dims = extracted_data["extracted_data"]["dimensions"]
+                                if dims:
+                                    dim_df = pd.DataFrame(dims)
+                                    st.dataframe(dim_df, use_container_width=True)
+                                else:
+                                    st.info("No dimensions extracted")
+                            else:
+                                st.info("No dimensions data available")
+                        
+                        with view_tabs[3]:
+                            if "extracted_data" in extracted_data and "tables" in extracted_data["extracted_data"]:
+                                st.subheader("Tables")
+                                tables = extracted_data["extracted_data"]["tables"]
+                                for table in tables:
+                                    with st.expander(f"Table: {table.get('id', 'Unknown')}"):
+                                        if "cells" in table:
+                                            table_df = pd.DataFrame(table["cells"])
+                                            st.dataframe(table_df, use_container_width=True)
+                            else:
+                                st.info("No table data available")
+                        
+                        with view_tabs[4]:
+                            if "extracted_data" in extracted_data and "features" in extracted_data["extracted_data"]:
+                                st.subheader("Features")
+                                features = extracted_data["extracted_data"]["features"]
+                                if features:
+                                    feat_df = pd.DataFrame(features)
+                                    st.dataframe(feat_df, use_container_width=True)
+                                else:
+                                    st.info("No features extracted")
+                            else:
+                                st.info("No features data available")
+                        
+                        # Download buttons
+                        st.subheader("Download Data")
+                        col1, col2, col3 = st.columns(3)
+                        
+                        with col1:
+                            if os.path.exists(json_path):
+                                with open(json_path, 'rb') as f:
+                                    st.download_button(
+                                        label="Download JSON",
+                                        data=f,
+                                        file_name=f"{task_id}_extracted_data.json",
+                                        mime="application/json"
+                                    )
+                        
+                        with col2:
+                            csv_path = file_info.get("csv_path")
+                            if csv_path and os.path.exists(csv_path):
+                                with open(csv_path, 'rb') as f:
+                                    st.download_button(
+                                        label="Download CSV",
+                                        data=f,
+                                        file_name=f"{task_id}_processed_data.csv",
+                                        mime="text/csv"
+                                    )
+                        
+                        with col3:
+                            # Generate summary text
+                            summary_text = st.session_state.service.export_to_specific_format(
+                                extracted_data.get("extracted_data", {}),
+                                "inspection_sheet"
+                            )
+                            st.download_button(
+                                label="Download Inspection Sheet",
+                                data=summary_text,
+                                file_name=f"{task_id}_inspection_sheet.txt",
+                                mime="text/plain"
+                            )
+                    
+                    except Exception as e:
+                        st.error(f"Error loading data: {str(e)}")
+                else:
+                    st.warning("JSON output file not found")
+    
+    with tab3:
+        st.header("Export Data Formats")
+        
+        if not st.session_state.processed_files:
+            st.info("No processed files to export. Upload a file in the first tab.")
+        else:
+            # Format selection
+            export_format = st.selectbox(
+                "Select export format:",
+                ["inspection_sheet", "cad_import", "manufacturing_sheet"]
+            )
+            
+            # File selection for export
+            export_options = {
+                f"{task_id} - {info.get('filename', 'Unknown')}": task_id
+                for task_id, info in st.session_state.processed_files.items()
+            }
+            
+            selected_export = st.selectbox(
+                "Select file to export:",
+                options=list(export_options.keys())
+            )
+            
+            if selected_export and export_format:
+                task_id = export_options[selected_export]
+                file_info = st.session_state.processed_files[task_id]
+                json_path = file_info.get("json_path")
+                
+                if json_path and os.path.exists(json_path):
+                    with open(json_path, 'r', encoding='utf-8') as f:
+                        extracted_data = json.load(f)
+                    
+                    # Generate export
+                    export_text = st.session_state.service.export_to_specific_format(
+                        extracted_data.get("extracted_data", {}),
+                        export_format
+                    )
+                    
+                    st.subheader(f"{export_format.replace('_', ' ').title()} Preview")
+                    st.code(export_text, language="text")
+                    
+                    # Download button
+                    format_names = {
+                        "inspection_sheet": "Inspection_Sheet",
+                        "cad_import": "CAD_Import",
+                        "manufacturing_sheet": "Manufacturing_Sheet"
+                    }
+                    
+                    st.download_button(
+                        label=f"Download {format_names[export_format]}",
+                        data=export_text,
+                        file_name=f"{task_id}_{format_names[export_format]}.txt",
+                        mime="text/plain"
+                    )
+                else:
+                    st.warning("Could not load data for export")
+
+if __name__ == "__main__":
+    main()

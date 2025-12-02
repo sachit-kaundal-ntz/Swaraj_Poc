@@ -17,7 +17,18 @@ from app.log.logger import get_logger
 
 logger = get_logger(__name__)
 load_dotenv()
-genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+# Ensure the Google API key is provided via environment variable and is not empty.
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise RuntimeError(
+        "GOOGLE_API_KEY is not set.\n"
+        "Steps to fix:\n"
+        "1) Rotate the leaked API key in Google Cloud Console (disable/delete the exposed key).\n"
+        "2) Create a new API key and restrict it (HTTP referrers, IPs, and enabled APIs).\n"
+        "3) Set the new key in environment variable GOOGLE_API_KEY (do NOT commit it).\n"
+        "4) For local dev, add it to your shell profile or a local .env (ensure .env is in .gitignore).\n"
+    )
+genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-pro')
 
 class PDFExtractionService:

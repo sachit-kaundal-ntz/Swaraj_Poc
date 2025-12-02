@@ -10,3 +10,4 @@ google-generativeai
 pydantic
 python-multipart  
 aiofiles 
+streamlit

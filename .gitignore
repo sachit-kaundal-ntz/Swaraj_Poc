@@ -7,3 +7,6 @@ uploads
 logs
 venv/
 .tests/
+temp
+.streamlit 
+outputs
