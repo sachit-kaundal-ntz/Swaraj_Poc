@@ -1051,6 +1051,117 @@ class TechnicalDrawingExtractionService:
             lines.append("")
         
         return "\n".join(lines)
+    
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+import numpy as np
+
+class ConfusionMatrixGenerator:
+    def __init__(self, output_dir="./evaluation"):
+        self.output_dir = output_dir
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+    
+    def _parse_predictions(self, extracted_data: Dict) -> Dict[str, int]:
+        """
+        Parses the Gemini JSON response to determine which features were detected.
+        Returns a binary dictionary (1 = Detected/Value Found, 0 = Not Detected/Null).
+        """
+        # Define the critical dimension IDs based on your PROMPT schema
+        critical_ids = [
+            "dim_outer_dia", 
+            "dim_hub_dia", 
+            "dim_face_width", 
+            "dim_hub_height", 
+            "dim_bore"
+        ]
+        
+        # Initialize all predictions to 0 (not detected)
+        predictions = {k: 0 for k in critical_ids}
+        
+        try:
+            # Check if we have extracted data
+            if "extracted_data" not in extracted_data:
+                return predictions
+            
+            data = extracted_data["extracted_data"]
+            
+            # Check dimensions
+            if "dimensions" in data and isinstance(data["dimensions"], list):
+                for dim in data["dimensions"]:
+                    if isinstance(dim, dict):
+                        dim_id = dim.get("id")
+                        value = dim.get("value")
+                        
+                        # Check if this is a critical dimension and has a valid value
+                        if dim_id in critical_ids and value is not None:
+                            # Also check if it's not an empty string or "null"
+                            if str(value).strip().lower() not in ["", "null", "none"]:
+                                predictions[dim_id] = 1
+        except Exception as e:
+            st.warning(f"Error parsing predictions: {str(e)}")
+        
+        return predictions
+    
+    def generate_and_save_matrix(self, extracted_data: Dict, ground_truth: Dict[str, int], filename_prefix: str):
+        """
+        Generates a Confusion Matrix comparing Extracted Data vs Ground Truth.
+        
+        Args:
+            extracted_data: The full JSON output from the Gemini model.
+            ground_truth: A dictionary indicating if features REALLY exist in the image.
+                          Example: {"dim_outer_dia": 1, "dim_hub_dia": 0, ...}
+            filename_prefix: String to prefix the saved image file.
+        """
+        try:
+            # 1. Get Predictions vector
+            preds_dict = self._parse_predictions(extracted_data)
+            
+            # 2. Ensure we have the same keys in both dictionaries
+            all_keys = set(list(preds_dict.keys()) + list(ground_truth.keys()))
+            
+            # Use sorted keys for consistency
+            keys = sorted(all_keys)
+            y_pred = [preds_dict.get(k, 0) for k in keys]
+            y_true = [ground_truth.get(k, 0) for k in keys]
+            
+            # 3. Generate Confusion Matrix
+            # Labels: [0=Not Detected, 1=Detected]
+            cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+            
+            # 4. Plotting
+            plt.figure(figsize=(8, 6))
+            sns.heatmap(
+                cm, 
+                annot=True, 
+                fmt='d', 
+                cmap='Blues',
+                xticklabels=['Predicted Absent', 'Predicted Present'],
+                yticklabels=['Actually Absent', 'Actually Present'],
+                cbar_kws={'label': 'Count'}
+            )
+            
+            # Add accuracy score
+            accuracy = np.trace(cm) / np.sum(cm) if np.sum(cm) > 0 else 0
+            plt.title(f'Feature Detection Confusion Matrix\n{filename_prefix}\nAccuracy: {accuracy:.2%}')
+            plt.ylabel('Actual (Ground Truth)')
+            plt.xlabel('Predicted (Model)')
+            
+            plt.tight_layout()
+            
+            # 5. Save to System
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_filename = "".join(c for c in filename_prefix if c.isalnum() or c in ('-', '_')).rstrip()
+            save_path = os.path.join(self.output_dir, f"conf_matrix_{safe_filename}_{timestamp}.png")
+            plt.savefig(save_path, dpi=150, bbox_inches='tight')
+            plt.close()
+            
+            return save_path
+            
+        except Exception as e:
+            st.error(f"Failed to generate confusion matrix: {str(e)}")
+            return None
 
 # Streamlit UI
 def main():
@@ -1191,7 +1302,9 @@ def main():
                             extracted_data = json.load(f)
                         
                         # Create tabs for different data views
-                        view_tabs = st.tabs(["JSON View", "Summary", "Dimensions", "Tables", "Features"])
+                        # view_tabs = st.tabs(["JSON View", "Summary", "Dimensions", "Tables", "Features"])
+                        view_tabs = st.tabs(["JSON View", "Summary", "Dimensions", "Tables", "Features", "Evaluation"])
+
                         
                         with view_tabs[0]:
                             st.subheader("Full JSON Data")
@@ -1249,7 +1362,44 @@ def main():
                                     st.info("No features extracted")
                             else:
                                 st.info("No features data available")
-                        
+
+                        # Add a new tab for Evaluation
+                        with view_tabs[5]:
+                            with st.expander("📊 Generate Confusion Matrix (Validation)"):
+                                st.write("Compare model results against actual image features.")
+                                
+                                # Create a form to input Ground Truth (what actually exists in the image)
+                                with st.form("ground_truth_form"):
+                                    st.write("Check the features that are visible in the drawing:")
+                                    col_a, col_b = st.columns(2)
+                                    gt_inputs = {}
+                                    with col_a:
+                                        gt_inputs["dim_outer_dia"] = st.checkbox("Outer Diameter (Tip)", value=True)
+                                        gt_inputs["dim_hub_dia"] = st.checkbox("Hub Diameter", value=True)
+                                        gt_inputs["dim_bore"] = st.checkbox("Bore Diameter", value=True)
+                                    with col_b:
+                                        gt_inputs["dim_face_width"] = st.checkbox("Face Width", value=True)
+                                        gt_inputs["dim_hub_height"] = st.checkbox("Hub Height", value=True)
+                                    
+                                    submit_matrix = st.form_submit_button("Generate & Save Matrix")
+                                    
+                                    if submit_matrix:
+                                        # Convert booleans to 1/0
+                                        ground_truth = {k: 1 if v else 0 for k, v in gt_inputs.items()}
+                                        
+                                        # Initialize generator
+                                        cm_gen = ConfusionMatrixGenerator(output_dir="./output/matrices")
+                                        
+                                        # Generate
+                                        saved_path = cm_gen.generate_and_save_matrix(
+                                            extracted_data, 
+                                            ground_truth, 
+                                            file_info.get('filename', 'unknown')
+                                        )
+                                        
+                                        if saved_path:
+                                            st.image(saved_path, caption="Confusion Matrix", width=500)
+                            
                         # Download buttons
                         st.subheader("Download Data")
                         col1, col2, col3 = st.columns(3)
