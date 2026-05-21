@@ -194,7 +194,7 @@ def main(argv):
     if len(argv) >= 2:
         json_path = argv[1]
     else:
-        json_path = r"F:\pocSwaraj\test6.json"  # default fallback
+        json_path = r"D:\swaraj\Gear-Cost\Swaraj_Poc\outputs\drawings\f3febbf9-10fc-438b-bf88-4843d2bee9a0\test.json"  # default fallback
 
     try:
         data = load_json_file(json_path)
