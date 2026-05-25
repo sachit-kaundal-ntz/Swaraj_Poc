@@ -1,0 +1,150 @@
+<div class="dashboard">
+
+  <!-- Header -->
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <a class="dash-brand" routerLink="/">
+        <span class="dash-brand__icon">⚙</span>
+        GearForge<span class="dash-brand__ai">AI</span>
+      </a>
+      <span class="dash-header__sep">/</span>
+      <span class="dash-header__page">Dashboard</span>
+    </div>
+    <div class="dash-header__right">
+      <a routerLink="/upload" class="btn btn--primary btn--sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload Drawing
+      </a>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-card__label">Total Analyses</span>
+        <span class="stat-card__value">{{ stats.total }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Completed</span>
+        <span class="stat-card__value stat-card__value--green">{{ stats.completed }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Processing</span>
+        <span class="stat-card__value stat-card__value--blue">{{ stats.processing }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Gear Families</span>
+        <span class="stat-card__value stat-card__value--amber">{{ stats.gearFamilies }}</span>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+      <div class="table-section__header">
+        <h2 class="table-section__title">Your Analyses</h2>
+        <div class="table-section__actions">
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              type="text"
+              placeholder="Search by filename..."
+              [(ngModel)]="searchTerm"
+              class="search-box__input"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredAnalyses.length === 0 && !isLoading">
+        <div class="empty-state__icon">📂</div>
+        <h3 class="empty-state__title">{{ searchTerm ? 'No results found' : 'No analyses yet' }}</h3>
+        <p class="empty-state__sub">{{ searchTerm ? 'Try a different search term' : 'Upload your first gear drawing to get started' }}</p>
+        <a routerLink="/upload" class="btn btn--primary btn--sm" *ngIf="!searchTerm">Upload Drawing</a>
+      </div>
+
+      <!-- Loading Skeleton -->
+      <div class="skeleton-rows" *ngIf="isLoading">
+        <div class="skeleton-row" *ngFor="let i of [1,2,3]"></div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap" *ngIf="filteredAnalyses.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Drawing</th>
+              <th>Gear Family</th>
+              <th>Status</th>
+              <th>Est. Cost</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="data-table__row"
+              *ngFor="let analysis of filteredAnalyses"
+              (click)="goToDetail(analysis.id)"
+            >
+              <td class="data-table__cell data-table__cell--file">
+                <div class="file-info">
+                  <div class="file-info__icon">
+                    {{ getFileIcon(analysis.filename) }}
+                  </div>
+                  <div class="file-info__meta">
+                    <span class="file-info__name">{{ analysis.filename }}</span>
+                    <span class="file-info__detail">
+                      {{ analysis.uploadDate | date: 'MMM d, y' }} · {{ formatSize(analysis.fileSize) }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td class="data-table__cell">
+                <span class="gear-family-tag">{{ analysis.specs?.gear_family || '—' }}</span>
+              </td>
+              <td class="data-table__cell">
+                <span class="status-badge" [ngClass]="getStatusClass(analysis.status)">
+                  {{ analysis.status }}
+                </span>
+              </td>
+              <td class="data-table__cell data-table__cell--cost">
+                {{ analysis.cost_breakdown.total_cost != null
+                    ? (analysis.cost_breakdown.total_cost | currency:'USD':'symbol':'1.2-2')
+                    : '—' }}
+              </td>
+              <td class="data-table__cell" (click)="$event.stopPropagation()">
+                <div class="row-actions">
+                  <button
+                    class="icon-btn icon-btn--danger"
+                    title="Delete"
+                    (click)="confirmDelete(analysis.id, $event)"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  </button>
+                  <button class="icon-btn" title="View" (click)="goToDetail(analysis.id)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" *ngIf="deleteTargetId" (click)="cancelDelete()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">🗑️</div>
+      <h3 class="modal__title">Delete Analysis?</h3>
+      <p class="modal__body">This action cannot be undone. The analysis and all extracted data will be permanently removed.</p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost btn--sm" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn--danger btn--sm" (click)="deleteAnalysis()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+</div>

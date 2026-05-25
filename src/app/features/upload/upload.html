@@ -1,0 +1,162 @@
+<div class="analyser-root">
+
+  <!-- Hero Header -->
+  <div class="hero-header">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      AI-Powered
+    </div>
+    <h1 class="hero-title">Technical Drawing<br>Analyser</h1>
+    <p class="hero-subtitle">Upload engineering drawings for instant automated extraction of dimensions, gear data, tolerances, and GD&T callouts.</p>
+  </div>
+
+  <!-- Upload Zone -->
+  <div class="upload-section">
+    <div
+      class="drop-zone"
+      [class.drag-over]="isDragOver"
+      [class.has-file]="selectedFile && !isProcessing && !taskId"
+      [class.processing]="isProcessing"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="!isProcessing && fileInput.click()"
+    >
+      <input
+        #fileInput
+        type="file"
+        accept="image/*,.png,.jpg,.jpeg,.webp"
+        (change)="onFileSelected($event)"
+        style="display:none"
+      />
+
+      <!-- Idle State -->
+      <!-- <ng-container *ngIf="!selectedFile && !isProcessing">
+        <div class="drop-icon-wrap">
+          <svg class="drop-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="8" width="40" height="32" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <path d="M24 30V18M24 18L19 23M24 18L29 23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 36h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <p class="drop-title">Drop your technical drawing here</p>
+        <p class="drop-sub">or <span class="drop-link">browse files</span></p>
+        <div class="drop-formats">
+          <span class="format-tag">PNG</span>
+          <span class="format-tag">JPG</span>
+          <span class="format-tag">WEBP</span>
+        </div>
+      </ng-container> -->
+
+
+<!-- Idle State -->
+<!-- Idle State -->
+<ng-container *ngIf="!selectedFile && !isProcessing">
+  <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+    <div class="drop-icon-wrap">
+      <svg class="drop-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="40" height="32" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <path d="M24 30V18M24 18L19 23M24 18L29 23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 36h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      </svg>
+    </div>
+    <p class="drop-title">Drop your technical drawing here</p>
+    <p class="drop-sub">or <span class="drop-link">browse files</span></p>
+    <div class="drop-formats">
+      <span class="format-tag">PNG</span>
+      <span class="format-tag">JPG</span>
+      <span class="format-tag">WEBP</span>
+    </div>
+  </div>
+</ng-container>
+
+      <!-- File Selected State -->
+      <ng-container *ngIf="selectedFile && !isProcessing && !taskId">
+        <div class="file-preview">
+          <div class="file-thumb">
+            <img *ngIf="previewUrl" [src]="previewUrl" alt="Drawing preview" />
+            <div class="file-thumb-placeholder" *ngIf="!previewUrl">
+              <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="2" width="20" height="28" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10h12M8 14h12M8 18h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/></svg>
+            </div>
+          </div>
+          <div class="file-meta">
+            <p class="file-name">{{ selectedFile.name }}</p>
+            <p class="file-size">{{ formatFileSize(selectedFile.size) }}</p>
+          </div>
+          <button class="file-remove" (click)="clearFile($event)" title="Remove file">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Processing State -->
+      <ng-container *ngIf="isProcessing">
+        <div class="processing-state">
+          <div class="processing-ring">
+            <svg class="ring-svg" viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="24" fill="none" stroke="var(--ring-track)" stroke-width="2.5"/>
+              <circle cx="30" cy="30" r="24" fill="none" stroke="var(--ring-active)" stroke-width="2.5"
+                stroke-dasharray="150.796" [attr.stroke-dashoffset]="ringOffset" stroke-linecap="round"
+                style="transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 0.4s ease;"/>
+            </svg>
+            <span class="ring-pct">{{ uploadProgress }}%</span>
+          </div>
+          <p class="processing-label">{{ processingMessage }}</p>
+          <p class="processing-sub" *ngIf="taskId">Task ID: {{ taskId }}</p>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- Error Banner -->
+   <!-- Toast Notification -->
+<div class="toast" *ngIf="toastMessage" [class.toast--error]="toastType === 'error'" [class.toast--success]="toastType === 'success'">
+  <svg viewBox="0 0 16 16" fill="none" class="toast-icon">
+    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <span>{{ toastMessage }}</span>
+  <button (click)="toastMessage = ''" class="toast-dismiss">✕</button>
+</div>
+
+    <!-- Action Button -->
+    <button
+      class="analyse-btn"
+      [class.ready]="selectedFile && !isProcessing && !taskId"
+      [class.loading]="isProcessing"
+      [disabled]="!selectedFile || isProcessing"
+      (click)="uploadAndAnalyse()"
+    >
+      <span *ngIf="!isProcessing">
+        <svg viewBox="0 0 20 20" fill="none" class="btn-icon"><path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>
+        Analyse Drawing
+      </span>
+      <span *ngIf="isProcessing">Processing…</span>
+    </button>
+  </div>
+
+  <!-- Capability Strip -->
+  <div class="capability-strip" *ngIf="!taskId">
+    <div class="cap-item">
+      <svg viewBox="0 0 20 20" fill="none" class="cap-icon"><rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M6 10h8M6 6h5M6 14h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <span>Gear Data Tables</span>
+    </div>
+    <div class="cap-item">
+      <svg viewBox="0 0 20 20" fill="none" class="cap-icon"><path d="M4 10h12M10 4v12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.2"/></svg>
+      <span>Dimensions & Tolerances</span>
+    </div>
+    <div class="cap-item">
+      <svg viewBox="0 0 20 20" fill="none" class="cap-icon"><path d="M3 6l7-3 7 3v8l-7 3-7-3V6z" stroke="currentColor" stroke-width="1.2"/><path d="M10 3v14M3 6l7 3 7-3" stroke="currentColor" stroke-width="1.2"/></svg>
+      <span>Spline &amp; Feature Data</span>
+    </div>
+    <div class="cap-item">
+      <svg viewBox="0 0 20 20" fill="none" class="cap-icon"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.2"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Heat Treatment Specs</span>
+    </div>
+    <div class="cap-item">
+      <svg viewBox="0 0 20 20" fill="none" class="cap-icon"><path d="M4 16V6l6-3 6 3v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><rect x="7" y="11" width="6" height="5" rx="0.5" stroke="currentColor" stroke-width="1.2"/></svg>
+      <span>Export JSON / CSV</span>
+    </div>
+  </div>
+
+</div>

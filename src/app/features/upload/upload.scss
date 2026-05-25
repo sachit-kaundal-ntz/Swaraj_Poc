@@ -1,0 +1,499 @@
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+$accent:        #0F6E56;
+$accent-light:  #E1F5EE;
+$accent-mid:    #1D9E75;
+$danger:        #E24B4A;
+$danger-light:  #FCEBEB;
+$text-primary:  #1a1a1a;
+$text-secondary:#5a5a5a;
+$text-muted:    #9a9a9a;
+$border:        rgba(0,0,0,0.10);
+$border-strong: rgba(0,0,0,0.18);
+$surface:       #ffffff;
+$bg-page:       #F6F7F5;
+$ring-track:    rgba(15,110,86,0.15);
+$ring-active:   #0F6E56;
+
+// ─── Root ─────────────────────────────────────────────────────────────────────
+.analyser-root {
+  font-family: 'DM Sans', 'Inter', sans-serif;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  color: $text-primary;
+}
+
+// ─── Hero Header ──────────────────────────────────────────────────────────────
+.hero-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: $accent-light;
+  color: $accent;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $accent-mid;
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.hero-title {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+  margin: 0 0 16px;
+
+  @media (max-width: 480px) { font-size: 30px; }
+}
+
+.hero-subtitle {
+  font-size: 16px;
+  color: $text-secondary;
+  line-height: 1.65;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+// ─── Upload Section ────────────────────────────────────────────────────────────
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ─── Drop Zone ────────────────────────────────────────────────────────────────
+.drop-zone {
+  position: relative;
+  background: $surface;
+  border: 1.5px dashed $border-strong;
+  border-radius: 20px;
+  padding: 56px 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    border-color: $accent-mid;
+    background: rgba($accent-light, 0.4);
+  }
+
+  &.drag-over {
+    border-color: $accent;
+    background: rgba($accent-light, 0.6);
+    transform: scale(1.01);
+  }
+
+  &.has-file {
+    padding: 28px 32px;
+    border-style: solid;
+    border-color: $accent;
+    background: rgba($accent-light, 0.25);
+    cursor: default;
+  }
+
+  &.processing {
+    cursor: default;
+    border-style: solid;
+    border-color: rgba($accent, 0.3);
+  }
+}
+
+// ─── Drop Icon ────────────────────────────────────────────────────────────────
+.drop-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: $accent-light;
+  border-radius: 18px;
+  margin: 0 auto 20px;
+  color: $accent;
+}
+
+.drop-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.drop-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 6px;
+}
+
+.drop-sub {
+  font-size: 14px;
+  color: $text-secondary;
+  margin: 0 0 18px;
+}
+
+.drop-link {
+  color: $accent;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.15s;
+
+  &:hover { text-decoration-color: $accent; }
+}
+
+.drop-formats {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.format-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  background: $bg-page;
+  color: $text-muted;
+  border-radius: 6px;
+  border: 1px solid $border;
+}
+
+// ─── File Preview ─────────────────────────────────────────────────────────────
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.file-thumb {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: $accent-light;
+  border: 1px solid rgba($accent, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.file-thumb-placeholder {
+  color: $accent;
+  svg { width: 28px; height: 28px; }
+}
+
+.file-meta {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 13px;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.file-remove {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid $border-strong;
+  border-radius: 8px;
+  background: $surface;
+  color: $text-secondary;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover {
+    background: $danger-light;
+    border-color: $danger;
+    color: $danger;
+  }
+}
+
+// ─── Processing State ─────────────────────────────────────────────────────────
+.processing-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.processing-ring {
+  position: relative;
+  width: 60px;
+  height: 60px;
+
+  --ring-track: #{$ring-track};
+  --ring-active: #{$ring-active};
+}
+
+.ring-svg {
+  width: 60px;
+  height: 60px;
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ring-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: $accent;
+}
+
+.processing-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+  animation: labelFade 0.3s ease;
+}
+
+@keyframes labelFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.processing-sub {
+  font-size: 12px;
+  color: $text-muted;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+}
+
+// ─── Error Banner ─────────────────────────────────────────────────────────────
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: $danger-light;
+  border: 1px solid rgba($danger, 0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: $danger;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.error-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.error-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: $danger;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.6;
+
+  &:hover { opacity: 1; }
+}
+
+// ─── Analyse Button ───────────────────────────────────────────────────────────
+.analyse-btn {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  opacity: 0.35;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &.ready {
+    opacity: 1;
+    background: $accent;
+
+    &:hover {
+      background: darken($accent, 6%);
+      transform: translateY(-1px);
+    }
+
+    &:active { transform: translateY(0); }
+  }
+
+  &.loading {
+    opacity: 1;
+    background: rgba($accent, 0.6);
+    cursor: not-allowed;
+  }
+
+  &:disabled:not(.loading):not(.ready) {
+    cursor: not-allowed;
+  }
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+// ─── Capability Strip ─────────────────────────────────────────────────────────
+.capability-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.cap-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
+  flex: 1 1 auto;
+  min-width: fit-content;
+}
+
+.cap-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: $accent;
+}
+
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 300px;
+  max-width: 480px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  z-index: 9999;
+  animation: slideUp 0.25s ease;
+
+  &--error {
+    background: $danger-light;
+    border: 1px solid rgba($danger, 0.25);
+    color: $danger;
+  }
+
+  &--success {
+    background: $accent-light;
+    border: 1px solid rgba($accent, 0.25);
+    color: $accent;
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.toast-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  opacity: 0.6;
+  color: inherit;
+  line-height: 1;
+
+  &:hover { opacity: 1; }
+}
