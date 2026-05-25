@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Any, Dict, Optional
 
-from app.service.VolumeCalculationService import VolumeCalculationService
+from app.service.volume_calculation_service import compute_volume
 #from app.service.techinalDrawingService import TechnicalDrawingExtractionService
 from app.log.logger import get_logger
 
@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/google", tags=["GOOGLE Technical Drawings"])
 
-volume_service = VolumeCalculationService()
+volume_service = compute_volume()
 #drawing_service = TechnicalDrawingExtractionService()
 
 OUTPUT_DIR = "outputs/drawings"
