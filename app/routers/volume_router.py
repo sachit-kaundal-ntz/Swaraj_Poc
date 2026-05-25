@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Any, Dict, Optional
 
-from app.service.volume_calculation_service import compute_volume
+from app.service.VolumeCalculationService import VolumeCalculationService
 #from app.service.techinalDrawingService import TechnicalDrawingExtractionService
 from app.log.logger import get_logger
 
@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/google", tags=["GOOGLE Technical Drawings"])
 
-volume_service = compute_volume()
+volume_service = VolumeCalculationService()
 #drawing_service = TechnicalDrawingExtractionService()
 
 OUTPUT_DIR = "outputs/drawings"
@@ -139,3 +139,168 @@ async def get_volume_summary(task_id: str):
             "bore_diameter_mm": dims["bore_diameter_mm"],
         },
     }
+
+# import os
+# import json
+
+# from fastapi import APIRouter, HTTPException, Query
+# from pydantic import BaseModel
+# from typing import Any, Dict, Optional
+
+# from app.service.VolumeCalculationService import compute_volume
+# from app.log.logger import get_logger
+# from app.dependencies import drawing_service
+
+# logger = get_logger(__name__)
+
+# router = APIRouter(
+#     prefix="/api/google",
+#     tags=["GOOGLE Technical Drawings"]
+# )
+
+# OUTPUT_DIR = "outputs/drawings"
+
+
+# # ─────────────────────────────────────────────────────────────────────────────
+# # Request / Response schemas
+# # ─────────────────────────────────────────────────────────────────────────────
+
+# class VolumeFromDataRequest(BaseModel):
+#     extracted_data: Dict[str, Any]
+
+
+# class VolumeResult(BaseModel):
+#     status: str
+#     task_id: Optional[str] = None
+#     filename: Optional[str] = None
+#     volume_result: Optional[Dict[str, Any]] = None
+#     error: Optional[str] = None
+
+
+# # ─────────────────────────────────────────────────────────────────────────────
+# # Endpoints
+# # ─────────────────────────────────────────────────────────────────────────────
+
+# @router.get("/volume/{task_id}", response_model=VolumeResult)
+# async def calculate_volume_for_task(task_id: str):
+#     """
+#     Calculate volume using extracted JSON from processed drawing task.
+#     """
+
+#     file_info = drawing_service.get_file_info(task_id)
+
+#     if not file_info:
+#         raise HTTPException(status_code=404, detail="Task not found")
+
+#     if file_info["status"] == "processing":
+#         raise HTTPException(
+#             status_code=202,
+#             detail="Extraction still in progress"
+#         )
+
+#     json_path = f"{file_info['output_path']}.json"
+
+#     if not os.path.exists(json_path):
+#         raise HTTPException(
+#             status_code=404,
+#             detail="Extracted JSON file not found"
+#         )
+
+#     try:
+#         with open(json_path, "r") as f:
+#             extracted_data = json.load(f)
+
+#         logger.info(f"Computing volume for task {task_id}")
+
+#         result = compute_volume(extracted_data)
+
+#         return VolumeResult(
+#             status="success",
+#             task_id=task_id,
+#             filename=file_info["original_filename"],
+#             volume_result=result,
+#         )
+
+#     except Exception as e:
+#         logger.exception("Volume calculation failed")
+
+#         return VolumeResult(
+#             status="error",
+#             task_id=task_id,
+#             filename=file_info["original_filename"],
+#             error=str(e),
+#         )
+
+
+# @router.post("/volume/calculate", response_model=VolumeResult)
+# async def calculate_volume_from_data(body: VolumeFromDataRequest):
+#     """
+#     Calculate volume directly from extracted_data payload.
+#     """
+
+#     try:
+#         logger.info("Computing volume from inline extracted_data payload")
+
+#         result = compute_volume(body.extracted_data)
+
+#         return VolumeResult(
+#             status="success",
+#             volume_result=result
+#         )
+
+#     except Exception as e:
+#         logger.exception("Inline volume calculation failed")
+
+#         return VolumeResult(
+#             status="error",
+#             error=str(e)
+#         )
+
+
+# @router.get("/volume/{task_id}/summary")
+# async def get_volume_summary(task_id: str):
+#     """
+#     Compact volume summary endpoint.
+#     """
+
+#     file_info = drawing_service.get_file_info(task_id)
+
+#     if not file_info:
+#         raise HTTPException(status_code=404, detail="Task not found")
+
+#     if file_info["status"] == "processing":
+#         raise HTTPException(
+#             status_code=202,
+#             detail="Extraction still in progress"
+#         )
+
+#     json_path = f"{file_info['output_path']}.json"
+
+#     if not os.path.exists(json_path):
+#         raise HTTPException(
+#             status_code=404,
+#             detail="Extracted JSON file not found"
+#         )
+
+#     try:
+#         with open(json_path, "r") as f:
+#             extracted_data = json.load(f)
+
+#         result = compute_volume(extracted_data)
+
+#         return {
+#             "task_id": task_id,
+#             "filename": file_info["original_filename"],
+#             "net_volume_mm3": result["net_volume_mm3"],
+#             "net_volume_cm3": result["net_volume_cm3"],
+#             "method": result["method"],
+#             "feature_count": len(result["feature_breakdown"]),
+#         }
+
+#     except Exception as e:
+#         logger.exception("Volume summary failed")
+
+#         raise HTTPException(
+#             status_code=500,
+#             detail=str(e)
+#         )

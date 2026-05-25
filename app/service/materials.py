@@ -1,131 +1,231 @@
+# """
+# materials.py
+# Material catalogue — density (g/cm³) + rate ($/kg) for 15 materials.
+# Location: app/service/materials.py
+
+# Used by cost_service.match_material() via:  from .materials import MATERIAL_PROPERTIES
+# """
+
+# MATERIAL_PROPERTIES = {
+#     "alloy-steel": {
+#         "density": 7.85,
+#         "rate": 4.50,
+#         "patterns": [
+#             "20mncr", "16mncr", "4140", "4340", "en36",
+#             "scm", "8620", "alloy steel", "alloy-steel",
+#             "en353", "527m20", "18crnimo",
+#         ],
+#     },
+#     "carbon-steel": {
+#         "density": 7.85,
+#         "rate": 3.00,
+#         "patterns": [
+#             "c45", "c35", "en8", "1045", "s45c",
+#             "mild steel", "carbon steel", "en9", "c60",
+#             "s50c", "ck45",
+#         ],
+#     },
+#     "stainless-steel": {
+#         "density": 8.00,
+#         "rate": 8.50,
+#         "patterns": [
+#             "stainless", "ss304", "ss316", "aisi 316", "aisi 304",
+#             "304l", "316l", "17-4", "ph17", "en58",
+#         ],
+#     },
+#     "cast-iron": {
+#         "density": 7.20,
+#         "rate": 2.50,
+#         "patterns": [
+#             "cast iron", "gg25", "ggg40", "fc25", "sg iron",
+#             "grey iron", "ductile iron", "nodular iron",
+#             "gci", "en-gjl",
+#         ],
+#     },
+#     "aluminium": {
+#         "density": 2.70,
+#         "rate": 6.50,
+#         "patterns": [
+#             "aluminium", "aluminum", "6061", "7075",
+#             "al6061", "al7075", "2024", "5052",
+#             "a380", "lm6",
+#         ],
+#     },
+#     "bronze": {
+#         "density": 8.80,
+#         "rate": 14.00,
+#         "patterns": [
+#             "bronze", "phos bronze", "phosphor bronze",
+#             "cusn", "c93200", "pb2", "tin bronze", "gunmetal",
+#         ],
+#     },
+#     "brass": {
+#         "density": 8.50,
+#         "rate": 11.00,
+#         "patterns": [
+#             "brass", "cuzn", "c36000", "free cutting brass",
+#             "c26000", "cartridge brass", "naval brass",
+#         ],
+#     },
+#     "nylon": {
+#         "density": 1.14,
+#         "rate": 6.00,
+#         "patterns": [
+#             "nylon", "pa6", "pa66", "polyamide",
+#             "pa12", "nylon 6", "nylon 66",
+#         ],
+#     },
+#     "peek": {
+#         "density": 1.31,
+#         "rate": 110.00,
+#         "patterns": [
+#             "peek", "polyetheretherketone",
+#             "poly ether ether ketone",
+#         ],
+#     },
+#     "sintered-steel": {
+#         "density": 6.80,
+#         "rate": 5.50,
+#         "patterns": [
+#             "sintered steel", "powder metal", "pm steel",
+#             "sintered iron", "metal powder", "p/m",
+#         ],
+#     },
+#     "tool-steel": {
+#         "density": 7.85,
+#         "rate": 12.00,
+#         "patterns": [
+#             "d2", "h13", "m2", "tool steel", "hss",
+#             "high speed steel", "d3", "o1", "a2",
+#         ],
+#     },
+#     "titanium": {
+#         "density": 4.51,
+#         "rate": 35.00,
+#         "patterns": [
+#             "titanium", "ti-6al-4v", "grade 5", "ti64",
+#             "grade 2", "astm b265",
+#         ],
+#     },
+#     "copper": {
+#         "density": 8.96,
+#         "rate": 9.50,
+#         "patterns": [
+#             "copper", "pure copper", "cu-ehc", "c10100",
+#             "electrolytic copper",
+#         ],
+#     },
+#     "inconel": {
+#         "density": 8.44,
+#         "rate": 55.00,
+#         "patterns": [
+#             "inconel", "625", "718", "nickel alloy",
+#             "nimonic", "hastelloy",
+#         ],
+#     },
+#     "default-steel": {
+#         "density": 7.85,
+#         "rate": 4.00,
+#         "patterns": [],   # fallback — matched last
+#     },
+# }
+
 """
 materials.py
-Material catalogue — density (g/cm³) + rate ($/kg) for 15 materials.
+Material catalogue: density (g/cm³) + rate (INR/kg) for 11 materials.
+All USD rates from spec converted at USD_TO_INR = 84.
 Location: app/service/materials.py
-
-Used by cost_service.match_material() via:  from .materials import MATERIAL_PROPERTIES
 """
 
-MATERIAL_PROPERTIES = {
+USD_TO_INR: float = 84.0          # keep in sync with gear_rule.py
+
+
+def _inr(usd: float) -> float:
+    """Convert USD rate to INR rate."""
+    return round(usd * USD_TO_INR, 2)
+
+
+MATERIAL_PROPERTIES: dict = {
+    # ── Steels ────────────────────────────────────────────────────────────────
     "alloy-steel": {
-        "density": 7.85,
-        "rate": 4.50,
+        "density": 7.85,          # g/cm³
+        "rate":    _inr(4.50),    # ₹378.00 / kg  (spec: $4.50/kg)
         "patterns": [
-            "20mncr", "16mncr", "4140", "4340", "en36",
-            "scm", "8620", "alloy steel", "alloy-steel",
-            "en353", "527m20", "18crnimo",
+            "20mncr", "16mncr", "18crnimo", "42crmo",
+            "4140", "4340", "en36", "scm", "8620",
+            "alloy steel", "alloy-steel",
         ],
     },
     "carbon-steel": {
         "density": 7.85,
-        "rate": 3.00,
+        "rate":    _inr(3.00),    # ₹252.00 / kg  (spec: $3.00/kg)
         "patterns": [
             "c45", "c35", "en8", "1045", "s45c",
-            "mild steel", "carbon steel", "en9", "c60",
-            "s50c", "ck45",
+            "mild steel", "carbon steel", "carbon-steel",
         ],
     },
     "stainless-steel": {
         "density": 8.00,
-        "rate": 8.50,
+        "rate":    _inr(8.50),    # ₹714.00 / kg  (spec: $8.50/kg)
         "patterns": [
-            "stainless", "ss304", "ss316", "aisi 316", "aisi 304",
-            "304l", "316l", "17-4", "ph17", "en58",
+            "stainless", "ss304", "ss316",
+            "aisi 316", "aisi316", "304", "316",
         ],
     },
     "cast-iron": {
         "density": 7.20,
-        "rate": 2.50,
+        "rate":    _inr(2.50),    # ₹210.00 / kg  (spec: $2.50/kg)
         "patterns": [
-            "cast iron", "gg25", "ggg40", "fc25", "sg iron",
-            "grey iron", "ductile iron", "nodular iron",
-            "gci", "en-gjl",
+            "cast iron", "gg25", "ggg40", "fc25",
+            "sg iron", "cast-iron", "castiron",
         ],
     },
+    # ── Non-ferrous metals ────────────────────────────────────────────────────
     "aluminium": {
         "density": 2.70,
-        "rate": 6.50,
+        "rate":    _inr(6.50),    # ₹546.00 / kg  (spec: $6.50/kg)
         "patterns": [
             "aluminium", "aluminum", "6061", "7075",
-            "al6061", "al7075", "2024", "5052",
-            "a380", "lm6",
+            "al6061", "al7075",
         ],
     },
     "bronze": {
         "density": 8.80,
-        "rate": 14.00,
+        "rate":    _inr(14.00),   # ₹1176.00 / kg (spec: $14.00/kg)
         "patterns": [
-            "bronze", "phos bronze", "phosphor bronze",
-            "cusn", "c93200", "pb2", "tin bronze", "gunmetal",
+            "bronze", "phos bronze", "cusn", "c93200",
+            "phosphor bronze",
         ],
     },
     "brass": {
         "density": 8.50,
-        "rate": 11.00,
-        "patterns": [
-            "brass", "cuzn", "c36000", "free cutting brass",
-            "c26000", "cartridge brass", "naval brass",
-        ],
+        "rate":    _inr(11.00),   # ₹924.00 / kg  (spec: $11.00/kg)
+        "patterns": ["brass", "cuzn", "c36000"],
     },
+    # ── Plastics / polymer ────────────────────────────────────────────────────
     "nylon": {
         "density": 1.14,
-        "rate": 6.00,
-        "patterns": [
-            "nylon", "pa6", "pa66", "polyamide",
-            "pa12", "nylon 6", "nylon 66",
-        ],
+        "rate":    _inr(6.00),    # ₹504.00 / kg  (spec: $6.00/kg)
+        "patterns": ["nylon", "pa6", "pa66", "polyamide"],
     },
     "peek": {
         "density": 1.31,
-        "rate": 110.00,
-        "patterns": [
-            "peek", "polyetheretherketone",
-            "poly ether ether ketone",
-        ],
+        "rate":    _inr(110.00),  # ₹9240.00 / kg (spec: $110.00/kg)
+        "patterns": ["peek", "polyetheretherketone"],
     },
+    # ── Powder / sintered ─────────────────────────────────────────────────────
     "sintered-steel": {
         "density": 6.80,
-        "rate": 5.50,
+        "rate":    _inr(5.50),    # ₹462.00 / kg  (spec: $5.50/kg)
         "patterns": [
-            "sintered steel", "powder metal", "pm steel",
-            "sintered iron", "metal powder", "p/m",
+            "sintered steel", "powder metal",
+            "pm steel", "sintered-steel",
         ],
     },
-    "tool-steel": {
-        "density": 7.85,
-        "rate": 12.00,
-        "patterns": [
-            "d2", "h13", "m2", "tool steel", "hss",
-            "high speed steel", "d3", "o1", "a2",
-        ],
-    },
-    "titanium": {
-        "density": 4.51,
-        "rate": 35.00,
-        "patterns": [
-            "titanium", "ti-6al-4v", "grade 5", "ti64",
-            "grade 2", "astm b265",
-        ],
-    },
-    "copper": {
-        "density": 8.96,
-        "rate": 9.50,
-        "patterns": [
-            "copper", "pure copper", "cu-ehc", "c10100",
-            "electrolytic copper",
-        ],
-    },
-    "inconel": {
-        "density": 8.44,
-        "rate": 55.00,
-        "patterns": [
-            "inconel", "625", "718", "nickel alloy",
-            "nimonic", "hastelloy",
-        ],
-    },
+    # ── Fallback ──────────────────────────────────────────────────────────────
     "default-steel": {
         "density": 7.85,
-        "rate": 4.00,
-        "patterns": [],   # fallback — matched last
+        "rate":    _inr(4.00),    # ₹336.00 / kg  (spec: $4.00/kg)
+        "patterns": [],           # never matched by text — only used as fallback
     },
 }

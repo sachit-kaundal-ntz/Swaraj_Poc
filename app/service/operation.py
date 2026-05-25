@@ -157,20 +157,29 @@ operation.py
 Location: app/service/operation.py
 
 Implements:
-  - OPERATION_MACHINE_MAP   : all operations → available machines
-  - KEYWORDS_TO_OPERATIONS  : keyword → operation name (for scan_and_find_operations)
-  - OPERATION_COST_TEMPLATES: per-operation time + rate (from spec Step 4)
-  - scan_and_find_operations(): scans extracted_data JSON → found operations dict
-  - get_operation_cost()       : returns cost for a single operation name
-  - build_operations_with_costs(): merges gear_rule ops + feature_map ops → full list with costs
-  - FEATURE_PROCESS_MAP     : feature type + role → operations implied (Source B, spec Step 4)
+  - OPERATION_MACHINE_MAP    : all operations → available machines
+  - KEYWORDS_TO_OPERATIONS   : keyword → operation name
+  - OPERATION_COST_TEMPLATES : per-operation time + rate  ← ALL RATES IN INR
+  - FEATURE_PROCESS_MAP      : feature type + role → operations implied
+  - scan_and_find_operations()
+  - get_feature_operations()
+  - get_operation_cost()
+  - build_operations_with_costs()
+
+All USD rates from spec converted at USD_TO_INR = 84.
 """
 
 from typing import Any
 
+USD_TO_INR: float = 84.0
+
+
+def _inr(usd: float) -> float:
+    return round(usd * USD_TO_INR, 2)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # OPERATION → MACHINE MAP
-# Every operation name maps to the list of machines that can perform it.
 # ─────────────────────────────────────────────────────────────────────────────
 OPERATION_MACHINE_MAP: dict[str, list[str]] = {
     "Forging":                   ["Forging Complex ( Stg arms )", "Forging Symmetrical ( Round Gears & Shafts)"],
@@ -216,9 +225,7 @@ OPERATION_MACHINE_MAP: dict[str, list[str]] = {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# KEYWORD → OPERATION  (used by scan_and_find_operations — Source A)
-# Scans every string value in extracted_data for these keywords.
-# Spec Step 1 / Step 4 Source A — "context-aware inference from drawing text"
+# KEYWORD → OPERATION  (Source A — context-aware keyword scan)
 # ─────────────────────────────────────────────────────────────────────────────
 KEYWORDS_TO_OPERATIONS: dict[str, str] = {
     # geometry / family
@@ -260,62 +267,59 @@ KEYWORDS_TO_OPERATIONS: dict[str, str] = {
     "drill":          "Drilling / Boring",
     "inspect":        "Final Inspection",
     "cmm":            "Final Inspection",
-    "din":            "Gear Grinding",       # DIN quality class → grinding confirmed
+    "din":            "Gear Grinding",   # DIN quality class → grinding confirmed
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# OPERATION COST TEMPLATES  (spec Step 4 / gear_ops.py standard templates)
-# time_min  → estimated_time_min
-# rate      → rate_per_hour  (USD)
-# cost      → (time_min / 60) × rate  — pre-calculated for reference
+# OPERATION COST TEMPLATES  ← ALL RATES IN INR/hr  (spec rates × 84)
+# cost = (time_min / 60) × rate_INR_per_hr
 # ─────────────────────────────────────────────────────────────────────────────
 OPERATION_COST_TEMPLATES: dict[str, dict] = {
-    "Forging":               {"time_min": 15,  "rate": 60.00},
-    "Gear Hobbing":          {"time_min": 25,  "rate": 95.00},
-    "Helical Hobbing":       {"time_min": 35,  "rate": 105.00},
-    "Gear Tooth Chamfering": {"time_min": 8,   "rate": 45.00},
-    "Chamfering":            {"time_min": 8,   "rate": 45.00},
-    "Carburising":           {"time_min": 90,  "rate": 55.00},
-    "Carbonitriding":        {"time_min": 90,  "rate": 55.00},
-    "Quenching":             {"time_min": 30,  "rate": 55.00},
-    "Tempering":             {"time_min": 60,  "rate": 55.00},
-    "Hardening & Tempering": {"time_min": 90,  "rate": 55.00},
-    "Nitriding":             {"time_min": 120, "rate": 55.00},
-    "Induction Hardening":   {"time_min": 20,  "rate": 75.00},
-    "Normalising":           {"time_min": 60,  "rate": 45.00},
-    "Annealing":             {"time_min": 60,  "rate": 45.00},
-    "Isothermal Annealing":  {"time_min": 90,  "rate": 45.00},
-    "Gear Grinding":         {"time_min": 30,  "rate": 120.00},
-    "Grinding - Gear":       {"time_min": 30,  "rate": 120.00},
-    "Grinding - CNC":        {"time_min": 30,  "rate": 120.00},
-    "Internal Grinding":     {"time_min": 30,  "rate": 120.00},
-    "Grinding":              {"time_min": 25,  "rate": 100.00},
-    "Gear Shaping":          {"time_min": 55,  "rate": 110.00},
-    "Gear Shaving":          {"time_min": 20,  "rate": 95.00},
-    "Broaching":             {"time_min": 10,  "rate": 70.00},
-    "Rough Turning":         {"time_min": 18,  "rate": 75.00},
-    "Finish Turning":        {"time_min": 12,  "rate": 80.00},
-    "Turning":               {"time_min": 15,  "rate": 75.00},
-    "Drilling / Boring":     {"time_min": 10,  "rate": 70.00},
-    "Drilling":              {"time_min": 10,  "rate": 70.00},
-    "Gun Drilling":          {"time_min": 20,  "rate": 85.00},
-    "Threading":             {"time_min": 10,  "rate": 70.00},
-    "Shot Peening":          {"time_min": 15,  "rate": 50.00},
-    "Shot Blasting":         {"time_min": 10,  "rate": 40.00},
-    "Deburring":             {"time_min": 6,   "rate": 40.00},
-    "Final Inspection":      {"time_min": 15,  "rate": 85.00},
-    "Inspection":            {"time_min": 15,  "rate": 85.00},
-    "Phosphating":           {"time_min": 20,  "rate": 35.00},
-    "Plating":               {"time_min": 30,  "rate": 40.00},
-    "Blackodizing":          {"time_min": 20,  "rate": 35.00},
-    "Powder Coating":        {"time_min": 25,  "rate": 40.00},
-    "Primer Coating / Painting": {"time_min": 20, "rate": 35.00},
+    "Forging":                   {"time_min": 15,  "rate": _inr(60.00)},   # ₹5040/hr
+    "Gear Hobbing":              {"time_min": 25,  "rate": _inr(95.00)},   # ₹7980/hr
+    "Helical Hobbing":           {"time_min": 35,  "rate": _inr(105.00)},  # ₹8820/hr
+    "Gear Tooth Chamfering":     {"time_min": 8,   "rate": _inr(45.00)},   # ₹3780/hr
+    "Chamfering":                {"time_min": 8,   "rate": _inr(45.00)},
+    "Carburising":               {"time_min": 90,  "rate": _inr(55.00)},   # ₹4620/hr
+    "Carbonitriding":            {"time_min": 90,  "rate": _inr(55.00)},
+    "Quenching":                 {"time_min": 30,  "rate": _inr(55.00)},
+    "Tempering":                 {"time_min": 60,  "rate": _inr(55.00)},
+    "Hardening & Tempering":     {"time_min": 90,  "rate": _inr(55.00)},
+    "Nitriding":                 {"time_min": 120, "rate": _inr(55.00)},
+    "Induction Hardening":       {"time_min": 20,  "rate": _inr(75.00)},   # ₹6300/hr  (spec: $90 in gear_rule; $75 in op.py — using op.py)
+    "Normalising":               {"time_min": 60,  "rate": _inr(45.00)},
+    "Annealing":                 {"time_min": 60,  "rate": _inr(45.00)},
+    "Isothermal Annealing":      {"time_min": 90,  "rate": _inr(45.00)},
+    "Gear Grinding":             {"time_min": 30,  "rate": _inr(120.00)},  # ₹10080/hr
+    "Grinding - Gear":           {"time_min": 30,  "rate": _inr(120.00)},
+    "Grinding - CNC":            {"time_min": 30,  "rate": _inr(120.00)},
+    "Internal Grinding":         {"time_min": 30,  "rate": _inr(120.00)},
+    "Grinding":                  {"time_min": 25,  "rate": _inr(100.00)},  # ₹8400/hr
+    "Gear Shaping":              {"time_min": 55,  "rate": _inr(110.00)},  # ₹9240/hr
+    "Gear Shaving":              {"time_min": 20,  "rate": _inr(95.00)},
+    "Broaching":                 {"time_min": 10,  "rate": _inr(70.00)},   # ₹5880/hr
+    "Rough Turning":             {"time_min": 18,  "rate": _inr(75.00)},   # ₹6300/hr
+    "Finish Turning":            {"time_min": 12,  "rate": _inr(80.00)},   # ₹6720/hr
+    "Turning":                   {"time_min": 15,  "rate": _inr(75.00)},
+    "Drilling / Boring":         {"time_min": 10,  "rate": _inr(70.00)},
+    "Drilling":                  {"time_min": 10,  "rate": _inr(70.00)},
+    "Gun Drilling":              {"time_min": 20,  "rate": _inr(85.00)},   # ₹7140/hr
+    "Threading":                 {"time_min": 10,  "rate": _inr(70.00)},
+    "Shot Peening":              {"time_min": 15,  "rate": _inr(50.00)},   # ₹4200/hr
+    "Shot Blasting":             {"time_min": 10,  "rate": _inr(40.00)},   # ₹3360/hr
+    "Deburring":                 {"time_min": 6,   "rate": _inr(40.00)},
+    "Final Inspection":          {"time_min": 15,  "rate": _inr(85.00)},   # ₹7140/hr
+    "Inspection":                {"time_min": 15,  "rate": _inr(85.00)},
+    "Phosphating":               {"time_min": 20,  "rate": _inr(35.00)},   # ₹2940/hr
+    "Plating":                   {"time_min": 30,  "rate": _inr(40.00)},
+    "Blackodizing":              {"time_min": 20,  "rate": _inr(35.00)},
+    "Powder Coating":            {"time_min": 25,  "rate": _inr(40.00)},
+    "Primer Coating / Painting": {"time_min": 20,  "rate": _inr(35.00)},
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# FEATURE → PROCESS MAP  (spec Step 4 Source B — structural/geometry inference)
+# FEATURE → PROCESS MAP  (Source B — structural/geometry inference)
 # key: (feature_type, role)  — use "*" as wildcard for role
-# value: list of operation names implied by that feature
 # ─────────────────────────────────────────────────────────────────────────────
 FEATURE_PROCESS_MAP: dict[tuple[str, str], list[str]] = {
     ("cylindrical_rim",  "gear_tip"):     ["Gear Hobbing", "Gear Tooth Chamfering"],
@@ -354,7 +358,7 @@ def scan_and_find_operations(extracted_data: dict) -> dict[str, dict]:
                 if keyword in lower_val and operation not in found:
                     found[operation] = {
                         "machines": OPERATION_MACHINE_MAP.get(operation, []),
-                        "reason": f"Keyword '{keyword}' found in: '{obj[:80]}'"
+                        "reason":   f"Keyword '{keyword}' found in: '{obj[:80]}'"
                     }
 
     _scan(extracted_data)
@@ -364,9 +368,7 @@ def scan_and_find_operations(extracted_data: dict) -> dict[str, dict]:
 def get_feature_operations(features: list[dict]) -> dict[str, dict]:
     """
     Source B — structural inference from features[].
-    Walks each feature's type + role and maps to implied operations.
-    Returns same shape as scan_and_find_operations().
-    Also handles H7/H8 bore fit → adds Internal Grinding.
+    Also handles H7/H8 bore fit → Internal Grinding.
     """
     found: dict[str, dict] = {}
 
@@ -375,7 +377,6 @@ def get_feature_operations(features: list[dict]) -> dict[str, dict]:
         role      = feat.get("role", "").lower()
         fit       = feat.get("fit", "")
 
-        # Try exact (type, role) match first, then wildcard role
         ops = (
             FEATURE_PROCESS_MAP.get((feat_type, role))
             or FEATURE_PROCESS_MAP.get((feat_type, "*"))
@@ -389,7 +390,6 @@ def get_feature_operations(features: list[dict]) -> dict[str, dict]:
                     "reason":   f"Feature type='{feat_type}' role='{role}'"
                 }
 
-        # H7 / H8 bore fit → add Internal Grinding (spec §2.1)
         if feat_type == "cylindrical_bore" and fit.upper() in ("H7", "H8"):
             op = "Internal Grinding"
             if op not in found:
@@ -404,10 +404,12 @@ def get_feature_operations(features: list[dict]) -> dict[str, dict]:
 def get_operation_cost(operation_name: str) -> dict:
     """
     Returns cost dict for a single operation name.
-    { "time_min": int, "rate": float, "cost": float }
-    Falls back to time=15, rate=60 if not in templates.
+    { "time_min": int, "rate": float [INR/hr], "cost": float [INR] }
+    Falls back to time=15, rate=₹5040/hr if not in templates.
     """
-    template = OPERATION_COST_TEMPLATES.get(operation_name, {"time_min": 15, "rate": 60.00})
+    template = OPERATION_COST_TEMPLATES.get(
+        operation_name, {"time_min": 15, "rate": _inr(60.00)}
+    )
     time_min = template["time_min"]
     rate     = template["rate"]
     cost     = round((time_min / 60.0) * rate, 2)
@@ -419,24 +421,20 @@ def build_operations_with_costs(
     source_b_ops: dict[str, dict],   # from get_feature_operations()
 ) -> list[dict]:
     """
-    Spec Step 4: Merges Source A (gear_rule/keyword) + Source B (feature_map).
-    Deduplicates by operation name — Source A takes priority for 'reason'.
-    Returns ordered list:
+    Spec Step 4: Merges Source A (keyword) + Source B (feature_map).
+    Source A takes priority on duplicates.
+    All costs in INR.
+
+    Returns:
     [
       {
-        "step": 1,
-        "operation": "Forging",
-        "time_min": 15,
-        "rate_per_hour": 60.0,
-        "cost": 15.0,
-        "machine_options": [...],
-        "source": "keyword_scan | feature_map | both",
-        "reason": "..."
+        "step", "operation", "time_min",
+        "rate_per_hour" [INR/hr], "cost" [INR],
+        "machine_options", "source", "reason"
       },
       ...
     ]
     """
-    # Merge — Source A wins on duplicate
     merged: dict[str, dict] = {}
 
     for op_name, info in source_b_ops.items():
@@ -445,23 +443,22 @@ def build_operations_with_costs(
     for op_name, info in source_a_ops.items():
         if op_name in merged:
             merged[op_name]["source"] = "both"
-            merged[op_name]["reason"] = info["reason"]   # Source A reason wins
+            merged[op_name]["reason"] = info["reason"]
         else:
             merged[op_name] = {"source": "keyword_scan", **info}
 
-    # Build final list with cost details
     result = []
     for step_num, (op_name, info) in enumerate(merged.items(), start=1):
         cost_info = get_operation_cost(op_name)
         result.append({
-            "step":           step_num,
-            "operation":      op_name,
-            "time_min":       cost_info["time_min"],
-            "rate_per_hour":  cost_info["rate_per_hour"],
-            "cost":           cost_info["cost"],
+            "step":            step_num,
+            "operation":       op_name,
+            "time_min":        cost_info["time_min"],
+            "rate_per_hour":   cost_info["rate_per_hour"],   # INR/hr
+            "cost":            cost_info["cost"],            # INR
             "machine_options": info.get("machines", []),
-            "source":         info.get("source", "unknown"),
-            "reason":         info.get("reason", ""),
+            "source":          info.get("source", "unknown"),
+            "reason":          info.get("reason", ""),
         })
 
     return result
