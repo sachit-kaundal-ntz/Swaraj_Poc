@@ -1,0 +1,296 @@
+<div class="results-root">
+
+  <!-- Top Bar -->
+  <div class="results-topbar">
+    <button class="back-btn" (click)="onBack()">
+      <svg viewBox="0 0 16 16" fill="none">
+        <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      New Analysis
+    </button>
+    <div class="topbar-meta">
+      <span class="meta-filename">{{ result.filename }}</span>
+      <span class="status-badge" [class.completed]="!hasExtractionError" [class.error]="hasExtractionError">
+        <span class="status-dot"></span>
+        {{ hasExtractionError ? 'Completed with errors' : 'Completed' }}
+      </span>
+    </div>
+    <div class="topbar-actions">
+      <button class="action-btn" (click)="downloadJSON()" title="Download JSON">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        JSON
+      </button>
+      <button class="action-btn" (click)="downloadCSV()" title="Download CSV">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        CSV
+      </button>
+      <button class="action-btn accent" (click)="reprocess()" [class.spinning]="isReprocessing" title="Reprocess">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M13 8A5 5 0 1 1 8 3a5 5 0 0 1 3.5 1.5L13 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M13 3v3h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ isReprocessing ? 'Reprocessing…' : 'Reprocess' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <p class="sc-label">Tables Extracted</p>
+      <p class="sc-value">{{ tableCount }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="sc-label">Dimensions Found</p>
+      <p class="sc-value">{{ dimensionCount }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="sc-label">Features Identified</p>
+      <p class="sc-value">{{ featureCount }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="sc-label">Drawing Views</p>
+      <p class="sc-value">{{ viewCount }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="sc-label">File Size</p>
+      <p class="sc-value">{{ formatFileSize(result.file_size) }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="sc-label">Units</p>
+      <p class="sc-value">{{ data?.units || '—' }}</p>
+    </div>
+  </div>
+
+  <!-- Extraction Error Banner -->
+  <div class="extraction-error" *ngIf="hasExtractionError">
+    <div class="ee-icon-wrap">
+      <svg viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10 6v5M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="ee-content">
+      <p class="ee-title">Extraction Failed</p>
+      <p class="ee-message">{{ extractionError }}</p>
+    </div>
+    <button class="action-btn accent" (click)="reprocess()" [class.spinning]="isReprocessing">
+      <svg viewBox="0 0 16 16" fill="none">
+        <path d="M13 8A5 5 0 1 1 8 3a5 5 0 0 1 3.5 1.5L13 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M13 3v3h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ isReprocessing ? 'Reprocessing…' : 'Try Again' }}
+    </button>
+  </div>
+
+  <!-- Tabs — only shown when no extraction error -->
+  <ng-container *ngIf="!hasExtractionError">
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav" role="tablist">
+      <button
+        *ngFor="let tab of tabs"
+        class="tab-btn"
+        [class.active]="activeTab === tab.id"
+        (click)="activeTab = tab.id"
+        role="tab"
+      >
+        <span class="tab-icon" [innerHTML]="tab.icon"></span>
+        {{ tab.label }}
+        <span class="tab-count" *ngIf="tab.count > 0">{{ tab.count }}</span>
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- ── TABLES TAB ──────────────────────────────────────────────────── -->
+      <ng-container *ngIf="activeTab === 'tables'">
+        <div *ngIf="!data?.tables?.length" class="empty-state">
+          <p>No tables were extracted from this drawing.</p>
+        </div>
+        <div class="table-group" *ngFor="let tbl of data?.tables">
+          <div class="tg-header">
+            <h3 class="tg-title">{{ formatTableId(tbl.id) }}</h3>
+            <span class="tg-count">{{ tbl.cells?.length || 0 }} fields</span>
+          </div>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Value</th>
+                  <th>Unit</th>
+                  <th>Tolerance</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cell of tbl.cells" [class.missing]="cell.source === 'missing_on_drawing'">
+                  <td class="param-label">{{ cell.label }}</td>
+                  <td class="param-value">{{ cell.value ?? '—' }}</td>
+                  <td class="param-unit">{{ cell.unit ?? '—' }}</td>
+                  <td class="param-tol">{{ cell.tolerance ?? '—' }}</td>
+                  <td>
+                    <span class="source-chip" [class.missing]="cell.source === 'missing_on_drawing'">
+                      {{ cell.source === 'missing_on_drawing' ? 'Not found' : cell.source }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ── DIMENSIONS TAB ─────────────────────────────────────────────── -->
+      <ng-container *ngIf="activeTab === 'dimensions'">
+        <div *ngIf="!data?.dimensions?.length" class="empty-state">
+          <p>No dimensions were extracted from this drawing.</p>
+        </div>
+        <div class="dim-grid">
+          <div class="dim-card" *ngFor="let dim of data?.dimensions" [class.missing]="dim.source === 'missing_on_drawing'">
+            <div class="dim-card-head">
+              <span class="dim-symbol" *ngIf="dim.symbol">{{ dim.symbol }}</span>
+              <span class="dim-id">{{ formatDimId(dim.id) }}</span>
+              <span class="source-chip sm" [class.missing]="dim.source === 'missing_on_drawing'">
+                {{ dim.source === 'missing_on_drawing' ? 'Not found' : 'Extracted' }}
+              </span>
+            </div>
+            <div class="dim-value-row">
+              <span class="dim-value">{{ dim.value ?? '—' }}</span>
+              <span class="dim-unit" *ngIf="dim.unit">{{ dim.unit }}</span>
+            </div>
+            <div class="dim-tol" *ngIf="dim.tolerance">± {{ dim.tolerance }}</div>
+            <div class="dim-meta">
+              <span class="dim-view" *ngIf="dim.view_id">
+                <svg viewBox="0 0 12 12" fill="none" style="width:10px;height:10px;vertical-align:-1px;margin-right:4px">
+                  <rect x="1" y="1" width="10" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+                {{ dim.view_id }}
+              </span>
+            </div>
+            <p class="dim-note" *ngIf="dim.note">{{ dim.note }}</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ── FEATURES TAB ───────────────────────────────────────────────── -->
+      <ng-container *ngIf="activeTab === 'features'">
+        <div *ngIf="!data?.features?.length" class="empty-state">
+          <p>No features were identified in this drawing.</p>
+        </div>
+        <div class="features-list">
+          <div class="feature-row" *ngFor="let feat of data?.features">
+            <div class="feat-icon-wrap">
+              <svg viewBox="0 0 20 20" fill="none" class="feat-icon">
+                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="feat-content">
+              <p class="feat-name">{{ formatFeatureId(feat.id) }}</p>
+              <p class="feat-sub">{{ feat.type }} · {{ feat.role }}</p>
+            </div>
+            <div class="feat-tags">
+              <span class="feat-tag" *ngIf="feat.view_id">{{ feat.view_id }}</span>
+              <span class="feat-tag" *ngIf="feat.fit_class">{{ feat.fit_class }}</span>
+            </div>
+            <span class="source-chip" [class.missing]="feat.source === 'missing_on_drawing'">
+              {{ feat.source === 'missing_on_drawing' ? 'Not found' : 'Extracted' }}
+            </span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ── METADATA TAB ───────────────────────────────────────────────── -->
+      <ng-container *ngIf="activeTab === 'metadata'">
+        <div class="meta-section">
+          <h3 class="meta-heading">Title Block</h3>
+          <div class="meta-grid">
+            <div *ngIf="!titleBlockEntries.length" class="empty-state">
+              <p>No title block data available.</p>
+            </div>
+            <ng-container *ngFor="let kv of titleBlockEntries">
+              <div class="meta-row">
+                <span class="meta-key">{{ kv.key }}</span>
+                <span class="meta-val" [class.empty]="!kv.value || kv.value === 'missing_on_drawing'">
+                  {{ (!kv.value || kv.value === 'missing_on_drawing') ? 'Not specified' : kv.value }}
+                </span>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="meta-section" *ngIf="data?.token_usage">
+          <h3 class="meta-heading">Processing Stats</h3>
+          <div class="meta-grid">
+            <div class="meta-row">
+              <span class="meta-key">Total Tokens Used</span>
+              <span class="meta-val">{{ data.token_usage.total_tokens | number }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-key">Input Tokens</span>
+              <span class="meta-val">{{ data.token_usage.input_tokens?.total_input_tokens | number }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-key">Output Tokens</span>
+              <span class="meta-val">{{ data.token_usage.output_tokens | number }}</span>
+            </div>
+            <div class="meta-row" *ngIf="data.token_usage.image_dimensions">
+              <span class="meta-key">Image Resolution</span>
+              <span class="meta-val">
+                {{ data.token_usage.image_dimensions?.width }}×{{ data.token_usage.image_dimensions?.height }}
+                ({{ data.token_usage.image_dimensions?.format }})
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta-section" *ngIf="data?.views?.length">
+          <h3 class="meta-heading">Views Detected</h3>
+          <div class="views-list">
+            <div class="view-pill" *ngFor="let view of data?.views">
+              <span class="view-id">{{ view.id }}</span>
+              <span class="source-chip sm" [class.missing]="view.source === 'missing_on_drawing'">
+                {{ view.source === 'missing_on_drawing' ? 'Not found' : 'Found' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta-section" *ngIf="data?.assembly_order?.length">
+          <h3 class="meta-heading">Assembly Order</h3>
+          <div class="assembly-list">
+            <div class="asm-step" *ngFor="let step of data?.assembly_order; let i = index">
+              <span class="asm-num">{{ i + 1 }}</span>
+              <span class="asm-op">{{ step.op }}</span>
+              <span class="asm-feat">{{ step.feature_id }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-info-box">
+          <p class="ti-label">Task ID</p>
+          <code class="ti-val">{{ result.task_id }}</code>
+          <button class="ti-copy" (click)="copyTaskId()" title="Copy task ID">
+            <svg viewBox="0 0 14 14" fill="none">
+              <rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M2 10V2h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            {{ copied ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      </ng-container>
+
+    </div>
+
+  </ng-container>
+
+</div>

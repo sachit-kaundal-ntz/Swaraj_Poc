@@ -1,0 +1,143 @@
+<div class="landing">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__icon">⚙</span>
+      <span class="nav__name">GearForge<span class="nav__ai">AI</span></span>
+    </div>
+    <div class="nav__actions">
+      <a class="nav__link" (click)="navigate()">{{ isLoggedIn ? 'Dashboard' : 'Sign In' }}</a>
+      <button class="btn btn--primary btn--sm" (click)="navigate()">
+        {{ isLoggedIn ? 'Open App' : 'Get Started' }}
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__bg">
+      <div class="hero__grid"></div>
+      <div class="hero__glow"></div>
+    </div>
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        AI-Powered Gear Analysis
+      </div>
+      <h1 class="hero__title">
+        Extract. Analyze.<br>
+        <span class="hero__title-accent">Manufacture.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Upload any gear drawing — DWG, DXF, or image — and get instant cost estimates,
+        tolerances, GD&amp;T callouts, and full manufacturing routings in seconds.
+      </p>
+      <div class="hero__cta">
+        <button class="btn btn--primary btn--lg" (click)="navigate()">
+          <span>Start Analyzing</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn btn--ghost btn--lg">View Demo</button>
+      </div>
+
+      <!-- Mock Analysis Card -->
+      <div class="hero__card">
+        <div class="hero__card-header">
+          <div class="hero__card-title">
+            <span class="hero__card-icon">📐</span>
+            helical_gear_ASSY_v3.dwg
+          </div>
+          <span class="status-badge status-badge--completed">Completed</span>
+        </div>
+        <div class="hero__card-grid">
+          <div class="hero__card-stat">
+            <span class="hero__card-label">Gear Family</span>
+            <span class="hero__card-value">HELICAL</span>
+          </div>
+          <div class="hero__card-stat">
+            <span class="hero__card-label">Module</span>
+            <span class="hero__card-value">2.5</span>
+          </div>
+          <div class="hero__card-stat">
+            <span class="hero__card-label">Teeth (Z)</span>
+            <span class="hero__card-value">48</span>
+          </div>
+          <div class="hero__card-stat">
+            <span class="hero__card-label">Est. Cost</span>
+            <span class="hero__card-value hero__card-value--accent">$342.80</span>
+          </div>
+        </div>
+        <div class="hero__card-bar">
+          <div class="hero__card-bar-label">
+            <span>Extraction Complete</span>
+            <span>100%</span>
+          </div>
+          <div class="hero__card-progress">
+            <div class="hero__card-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section__container">
+      <div class="section__header">
+        <span class="section__eyebrow">Process</span>
+        <h2 class="section__title">How It Works</h2>
+        <p class="section__subtitle">Four steps from drawing to detailed manufacturing quote</p>
+      </div>
+      <div class="steps">
+        <div class="step" *ngFor="let step of steps; let i = index">
+          <div class="step__number">{{ i + 1 }}</div>
+          <div class="step__connector" *ngIf="i < steps.length - 1"></div>
+          <div class="step__icon">{{ step.icon }}</div>
+          <h3 class="step__title">{{ step.title }}</h3>
+          <p class="step__desc">{{ step.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section class="section section--dark">
+    <div class="section__container">
+      <div class="section__header">
+        <span class="section__eyebrow">Capabilities</span>
+        <h2 class="section__title">What Gets Extracted</h2>
+        <p class="section__subtitle">Our AI reads your drawings like a seasoned engineer</p>
+      </div>
+      <div class="caps-grid">
+        <div class="cap" *ngFor="let cap of capabilities">
+          <div class="cap__icon">{{ cap.icon }}</div>
+          <h3 class="cap__title">{{ cap.title }}</h3>
+          <p class="cap__desc">{{ cap.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="cta-section">
+    <div class="cta-section__glow"></div>
+    <div class="cta-section__content">
+      <h2 class="cta-section__title">Ready to forge your first analysis?</h2>
+      <p class="cta-section__sub">No setup. No CAD software required. Just upload and go.</p>
+      <button class="btn btn--primary btn--lg" (click)="navigate()">
+        <span>{{ isLoggedIn ? 'Go to Dashboard' : 'Create Free Account' }}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="nav__icon">⚙</span>
+    <span>GearForge AI &copy; 2025</span>
+    <span class="footer__sep">·</span>
+    <span>Built for precision engineers</span>
+  </footer>
+
+</div>
