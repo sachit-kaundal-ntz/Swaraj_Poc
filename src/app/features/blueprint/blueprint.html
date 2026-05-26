@@ -1,0 +1,532 @@
+<div class="blueprint-analyzer-container">
+
+  <!-- Toast -->
+  <div class="toast" *ngIf="toastMessage" [class.toast--error]="toastType === 'error'" [class.toast--success]="toastType === 'success'">
+    <svg viewBox="0 0 16 16" fill="none" class="toast-icon">
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
+      <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <span>{{ toastMessage }}</span>
+    <button (click)="toastMessage = ''" class="toast-dismiss">✕</button>
+  </div>
+
+  <!-- UPLOAD VIEW -->
+  <ng-container *ngIf="currentView === 'upload'">
+    <div class="upload-view-wrap">
+      <div class="hero-header">
+        <div class="hero-badge"><span class="badge-dot"></span>AI Blueprint Engine</div>
+        <h1 class="hero-title">Technical Drawing <span class="accent-gradient">Analyser</span></h1>
+        <p class="hero-subtitle">Instantly extract dimensions, tolerances, GD&T, BOM tables, and metadata from engineering drawings.</p>
+      </div>
+
+      <div class="upload-full-layout">
+        <div class="upload-content-area">
+
+          <div class="drop-zone"
+               [class.drag-over]="isDragOver"
+               [class.has-file]="selectedFile"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)"
+               (click)="fileInput.click()">
+            <input #fileInput type="file" accept="image/*,application/pdf" (change)="onFileSelected($event)" style="display: none;" />
+
+            <ng-container *ngIf="!selectedFile">
+              <div class="drop-icon-box">
+                <svg viewBox="0 0 48 48" fill="none" class="drop-svg">
+                  <path d="M12 28v6a4 4 0 004 4h16a4 4 0 004-4v-6M24 8v20M16 16l8-8 8 8"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <p class="drop-title">Drag and drop drawing files here</p>
+              <p class="drop-sub">PNG, JPG, PDF supported</p>
+              <div class="drop-link-btn">Browse Files</div>
+            </ng-container>
+
+            <ng-container *ngIf="selectedFile">
+              <div class="file-preview-card" (click)="$event.stopPropagation()">
+                <div class="preview-thumbnail">
+                  <img *ngIf="previewUrl" [src]="previewUrl" alt="Preview" />
+                  <div class="file-generic-icon" *ngIf="!previewUrl">📄</div>
+                </div>
+                <div class="file-details">
+                  <p class="file-name">{{ selectedFile?.name }}</p>
+                  <p class="file-size">{{ formatFileSize(selectedFile?.size) }}</p>
+                </div>
+                <button class="remove-file-btn" (click)="clearFile($event)">✕</button>
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="action-footer" *ngIf="selectedFile">
+            <button class="primary-analyse-btn" (click)="uploadAndAnalyse()">
+              Analyse Loaded Document
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- LOADING VIEW -->
+  <ng-container *ngIf="currentView === 'loading'">
+    <div class="loading-state-view">
+      <div class="loading-glass-card">
+
+        <div class="spinning-ring-wrap">
+          <svg class="dual-ring-svg" viewBox="0 0 88 88" fill="none">
+            <circle cx="44" cy="44" r="38" stroke="#e2e8f0" stroke-width="6"/>
+            <circle cx="44" cy="44" r="38"
+              stroke="#4f46e5" stroke-width="6"
+              stroke-linecap="round"
+              stroke-dasharray="239"
+              [attr.stroke-dashoffset]="239 - (239 * pollingProgress / 100)"
+              style="transition: stroke-dashoffset 0.4s ease; transform: rotate(-90deg); transform-origin: center;"/>
+          </svg>
+          <span class="progress-percent-label">{{ pollingProgress }}%</span>
+        </div>
+
+        <p class="loading-status-title">Analysing Drawing…</p>
+        <p class="loading-sub-details">{{ loadingMessage }}</p>
+
+        <div class="loading-task-badge" *ngIf="taskId">
+          <span class="label">TASK</span>
+          <code>{{ taskId }}</code>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ERROR VIEW -->
+  <ng-container *ngIf="currentView === 'error'">
+    <div class="error-state-view">
+      <div class="error-fallback-card">
+        <div class="error-icon-box">
+          <svg viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="26" stroke="#ef4444" stroke-width="2"/>
+            <path d="M28 18v12M28 34v2" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="error-title">Analysis Failed</p>
+        <p class="error-message-text">{{ errorMessage }}</p>
+        <div class="error-action-row">
+          <button class="back-btn" (click)="onBack()">← Go Back</button>
+          <button class="retry-btn" (click)="onBack()">Try Again</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- RESULT VIEW -->
+  <ng-container *ngIf="currentView === 'result' && result">
+    <div class="results-view-wrap">
+
+      <nav class="sticky-results-topbar">
+        <button class="back-nav-btn" (click)="onBack()">← New Analysis</button>
+        <div class="document-badge-area">
+          <span class="doc-filename">{{ result?.filename }}</span>
+          <span class="extraction-status-badge" [class.partial]="hasExtractionError" [class.perfect]="!hasExtractionError">
+            <span class="badge-dot"></span>
+            {{ hasExtractionError ? 'Partial Extraction' : 'Extraction Optimal' }}
+          </span>
+        </div>
+        <div class="export-actions-row">
+          <button class="export-btn" (click)="downloadJSON()">Export JSON</button>
+          <button class="reprocess-btn" (click)="reprocess()" [class.spinning]="isReprocessing">
+            {{ isReprocessing ? 'Reprocessing…' : 'Reprocess' }}
+          </button>
+        </div>
+      </nav>
+
+      <div class="metrics-grid">
+        <div class="metric-card"><span class="value">{{ tableCount }}</span><span class="label">Tables</span></div>
+        <div class="metric-card"><span class="value">{{ dimensionCount }}</span><span class="label">Dimensions</span></div>
+        <div class="metric-card"><span class="value">{{ featureCount }}</span><span class="label">Features</span></div>
+        <div class="metric-card"><span class="value">{{ viewCount }}</span><span class="label">Views</span></div>
+        <div class="metric-card"><span class="value">{{ data?.units || '—' }}</span><span class="label">Units</span></div>
+        <div class="metric-card"><span class="value">{{ formatFileSize(result?.file_size) }}</span><span class="label">File Size</span></div>
+      </div>
+
+      <div class="extraction-error-banner" *ngIf="hasExtractionError">
+        <svg class="banner-icon" viewBox="0 0 24 24" fill="none">
+          <path d="M12 9v4M12 16h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="banner-body">
+          <p class="banner-title">Partial Extraction</p>
+          <p class="banner-text">{{ extractionError }}</p>
+        </div>
+        <button class="banner-action-btn" (click)="reprocess()">Retry</button>
+      </div>
+
+      <div class="results-tab-bar">
+        <button class="tab-item-btn" [class.active]="activeTab === 'tables'" (click)="activeTab = 'tables'">
+          Tables <span class="badge">{{ tableCount }}</span>
+        </button>
+        <button class="tab-item-btn" [class.active]="activeTab === 'dimensions'" (click)="activeTab = 'dimensions'">
+          Dimensions <span class="badge">{{ dimensionCount }}</span>
+        </button>
+        <button class="tab-item-btn" [class.active]="activeTab === 'features'" (click)="activeTab = 'features'">
+          Features <span class="badge">{{ featureCount }}</span>
+        </button>
+        <button class="tab-item-btn" [class.active]="activeTab === 'volume'" (click)="activeTab = 'volume'">
+          Volume &amp; Mass
+        </button>
+        <button class="tab-item-btn" [class.active]="activeTab === 'cost'" (click)="activeTab = 'cost'">
+          Cost Analysis
+        </button>
+        <button class="tab-item-btn" [class.active]="activeTab === 'metadata'" (click)="activeTab = 'metadata'">
+          Metadata
+        </button>
+      </div>
+
+      <div class="tab-render-frame">
+
+        <!-- TAB: TABLES -->
+        <div *ngIf="activeTab === 'tables'">
+          <ng-container *ngIf="data?.tables?.length; else noTables">
+            <div *ngFor="let table of data?.tables" class="extracted-table-group">
+              <div class="table-group-header">
+                <h3 class="table-id-label">{{ formatTableId(table.id) }}</h3>
+                <span class="fields-indicator-tag">{{ table.cells?.length || 0 }} fields</span>
+              </div>
+              <div class="grid-table-container">
+                <table class="engineered-data-table">
+                  <thead>
+                    <tr>
+                      <th>Label</th>
+                      <th>Value</th>
+                      <th>Unit</th>
+                      <th>Tolerance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let cell of table.cells" [class.row-missing]="cell.value === null || cell.value === undefined">
+                      <td>{{ cell.label }}</td>
+                      <td class="val-cell">
+                        <span *ngIf="cell.value !== null && cell.value !== undefined" class="status-pip">{{ cell.value }}</span>
+                        <span *ngIf="cell.value === null || cell.value === undefined" class="status-pip missing">—</span>
+                      </td>
+                      <td class="unit-cell">{{ cell.unit || '—' }}</td>
+                      <td class="tol-cell">{{ cell.tolerance || '—' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noTables>
+            <div class="no-volume-data">No table data extracted.</div>
+          </ng-template>
+        </div>
+
+        <!-- TAB: DIMENSIONS -->
+        <div *ngIf="activeTab === 'dimensions'">
+          <ng-container *ngIf="data?.dimensions?.length; else noDims">
+            <div class="dimensions-cards-flex">
+              <div *ngFor="let dim of data?.dimensions" class="dim-metric-card">
+                <div class="metric-head">
+                  <span class="dim-character" *ngIf="dim.symbol">{{ dim.symbol }}</span>
+                  <span class="dim-label-id">{{ formatDimId(dim.id) }}</span>
+                </div>
+                <div class="metric-value-row">
+                  <span class="numeric-val">{{ dim.value ?? '—' }}</span>
+                  <span class="unit-text" *ngIf="dim.unit">{{ dim.unit }}</span>
+                </div>
+                <div class="metric-tolerances" *ngIf="dim.tolerance">
+                  <span class="indicator">TOL</span>
+                  <span class="val">{{ dim.tolerance }}</span>
+                </div>
+                <span class="dim-view-tag" *ngIf="dim.view_id">{{ dim.view_id }}</span>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noDims>
+            <div class="no-volume-data">No dimension data extracted.</div>
+          </ng-template>
+        </div>
+
+        <!-- TAB: FEATURES -->
+        <div *ngIf="activeTab === 'features'">
+          <ng-container *ngIf="data?.features?.length; else noFeats">
+            <div class="features-list-rows">
+              <div *ngFor="let feat of data?.features" class="feature-row-element">
+                <div class="row-icon-side">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10 7v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="row-body-info">
+                  <p class="feature-title-text">{{ formatFeatureId(feat.id) }}</p>
+                  <p class="feature-role-meta">
+                    <span class="type-badge">{{ feat.type || 'Unknown' }}</span>
+                    <ng-container *ngIf="feat.role"> · {{ feat.role }}</ng-container>
+                  </p>
+                </div>
+                <div class="row-attributes">
+                  <span class="attr-pill" *ngIf="feat.fit_class">{{ feat.fit_class }}</span>
+                  <span class="attr-pill" *ngIf="feat.view_id">{{ feat.view_id }}</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noFeats>
+            <div class="no-volume-data">No feature data extracted.</div>
+          </ng-template>
+        </div>
+
+        <!-- TAB: VOLUME & MASS -->
+        <div *ngIf="activeTab === 'volume'" class="volume-tab-content">
+
+          <div *ngIf="isVolumeLoading" class="loading-small">Loading volume data...</div>
+          <div *ngIf="volumeError" class="error-banner">{{ volumeError }}</div>
+
+          <div *ngIf="volumeSummary" class="api-section">
+            <h3>📋 Summary</h3>
+            <div class="summary-grid">
+              <p><strong>Mass:</strong> {{ volumeSummary.calculated_mass_kg }} kg ({{ volumeSummary.calculated_mass_g }} g)</p>
+              <p><strong>Volume:</strong> {{ volumeSummary.total_volume_cm3 }} cm³</p>
+              <p><strong>Material:</strong> {{ volumeSummary.material }}</p>
+            </div>
+          </div>
+
+          <div *ngIf="volumeData" class="api-section">
+            <h3>🔍 Detailed Breakdown</h3>
+
+            <h4>Dimensions Used</h4>
+            <div class="dims-grid">
+              <p><strong>Gear Outer Diameter:</strong> {{ volumeData.dimensions_used.gear_outer_diameter_mm }} mm</p>
+              <p><strong>Gear Face Width:</strong> {{ volumeData.dimensions_used.gear_face_width_mm }} mm</p>
+              <p><strong>Hub Outer Diameter:</strong> {{ volumeData.dimensions_used.hub_outer_diameter_mm }} mm</p>
+              <p><strong>Bore Diameter:</strong> {{ volumeData.dimensions_used.bore_diameter_mm }} mm</p>
+              <p><strong>Bore Subtraction Applied:</strong> {{ volumeData.dimensions_used.bore_subtraction_applied ? 'Yes' : 'No' }}</p>
+            </div>
+
+            <h4>Volume Breakdown</h4>
+            <div class="breakdown-grid">
+              <div class="breakdown-item">
+                <strong>Gear Rim Gross</strong>
+                <span>{{ volumeData.volume_breakdown_mm3.gear_rim_gross_mm3.toLocaleString() }} mm³</span>
+              </div>
+              <div class="breakdown-item">
+                <strong>Bore Subtraction</strong>
+                <span class="negative">-{{ volumeData.volume_breakdown_mm3.bore_cylinder_mm3.toLocaleString() }} mm³</span>
+              </div>
+              <div class="breakdown-item total">
+                <strong>Net Volume</strong>
+                <span>{{ volumeData.volume_breakdown_mm3.total_net_mm3.toLocaleString() }} mm³</span>
+              </div>
+            </div>
+
+            <h4>Mass Calculation</h4>
+            <div class="mass-info">
+              <p><strong>Material:</strong> {{ volumeData.mass_calculation.material }}</p>
+              <p><strong>Density:</strong> {{ volumeData.mass_calculation.density_g_per_mm3 }} g/mm³</p>
+              <p><strong>Calculated Mass:</strong> {{ volumeData.mass_calculation.calculated_mass_kg }} kg</p>
+            </div>
+
+            <h4>Calculation Notes</h4>
+            <ul class="notes-list">
+              <li *ngFor="let note of volumeData.calculation_notes">{{ note }}</li>
+            </ul>
+          </div>
+
+          <div *ngIf="!isVolumeLoading && !volumeSummary && !volumeData && !volumeError" class="no-volume-data">
+            Volume data not available for this drawing.
+          </div>
+        </div>
+
+        <!-- TAB: COST ANALYSIS -->
+        <div *ngIf="activeTab === 'cost'" class="cost-tab-content">
+
+          <div *ngIf="isPipelineLoading" class="loading-small">Loading cost analysis...</div>
+          <div *ngIf="pipelineError" class="error-banner">{{ pipelineError }}</div>
+
+          <ng-container *ngIf="pipelineResult && !isPipelineLoading">
+
+            <!-- Confidence Banner -->
+            <div class="confidence-banner"
+                 [class.confidence-low]="pipelineResult.validation_report.confidence_level === 'LOW'"
+                 [class.confidence-med]="pipelineResult.validation_report.confidence_level === 'MEDIUM'"
+                 [class.confidence-high]="pipelineResult.validation_report.confidence_level === 'HIGH'">
+              <div class="confidence-left">
+                <span class="confidence-label">Confidence</span>
+                <span class="confidence-level">{{ pipelineResult.validation_report.confidence_level }}</span>
+                <span class="confidence-score">{{ pipelineResult.validation_report.confidence_score }}%</span>
+              </div>
+              <div class="confidence-right">
+                <span class="conf-pill"
+                      [class.pill-pass]="pipelineResult.validation_report.ready_for_quote"
+                      [class.pill-fail]="!pipelineResult.validation_report.ready_for_quote">
+                  {{ pipelineResult.validation_report.ready_for_quote ? '✓ Ready for Quote' : '✕ Not Ready for Quote' }}
+                </span>
+                <span class="conf-meta">
+                  {{ pipelineResult.validation_report.error_count }} errors · {{ pipelineResult.validation_report.warn_count }} warnings
+                </span>
+              </div>
+            </div>
+
+            <!-- Cost Breakdown -->
+            <div class="cost-section">
+              <h3 class="cost-section-title">
+                Cost Breakdown
+                <span class="gear-family-tag">{{ pipelineResult.gear_family | uppercase }}</span>
+              </h3>
+              <div class="cost-breakdown-grid">
+                <div class="cost-breakdown-row">
+                  <span class="cb-label">Material Cost</span>
+                  <span class="cb-value">${{ pipelineResult.cost_breakdown.material_cost.toFixed(2) }}</span>
+                </div>
+                <div class="cost-breakdown-row">
+                  <span class="cb-label">Operations Cost</span>
+                  <span class="cb-value">${{ pipelineResult.cost_breakdown.operations_cost.toFixed(2) }}</span>
+                </div>
+                <div class="cost-breakdown-row">
+                  <span class="cb-label">Overhead ({{ pipelineResult.cost_breakdown.overhead_pct }}%)</span>
+                  <span class="cb-value">${{ pipelineResult.cost_breakdown.overhead_cost.toFixed(2) }}</span>
+                </div>
+                <div class="cost-breakdown-row subtotal-row">
+                  <span class="cb-label">Subtotal</span>
+                  <span class="cb-value">${{ pipelineResult.cost_breakdown.subtotal.toFixed(2) }}</span>
+                </div>
+                <div class="cost-breakdown-row">
+                  <span class="cb-label">Margin ({{ pipelineResult.cost_breakdown.margin_pct }}%)</span>
+                  <span class="cb-value">${{ pipelineResult.cost_breakdown.margin_cost.toFixed(2) }}</span>
+                </div>
+                <div class="cost-breakdown-row total-row">
+                  <span class="cb-label">Total Cost</span>
+                  <span class="cb-value total-value">
+                    ${{ pipelineResult.cost_breakdown.total_cost.toFixed(2) }}
+                    <span class="currency-tag">{{ pipelineResult.cost_breakdown.currency }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Manufacturing Operations -->
+            <div class="cost-section">
+              <h3 class="cost-section-title">Manufacturing Operations</h3>
+              <div class="grid-table-container">
+                <table class="engineered-data-table ops-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Operation</th>
+                      <th>Description</th>
+                      <th>Time (min)</th>
+                      <th>Rate ($/hr)</th>
+                      <th>Cost</th>
+                      <th>Machines</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let op of pipelineResult.operations_detail">
+                      <td><span class="step-badge">{{ op.step }}</span></td>
+                      <td class="op-name-cell">{{ op.operation }}</td>
+                      <td class="op-desc-cell">{{ op.description }}</td>
+                      <td class="val-cell">{{ op.estimated_time_min }}</td>
+                      <td class="val-cell">${{ op.rate_per_hour }}</td>
+                      <td class="val-cell op-cost">${{ op.cost.toFixed(2) }}</td>
+                      <td>
+                        <div class="machine-pills">
+                          <span *ngFor="let m of op.machine_options" class="machine-pill">{{ m }}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Validation Report -->
+            <div class="cost-section">
+              <h3 class="cost-section-title">Validation Report</h3>
+              <div class="validation-rules-list">
+                <div *ngFor="let rule of pipelineResult.validation_report.rules"
+                     class="rule-row"
+                     [class.rule-pass]="rule.passed"
+                     [class.rule-fail]="!rule.passed">
+                  <span class="rule-id-tag">{{ rule.rule_id }}</span>
+                  <span class="rule-severity" [class]="'sev-' + rule.severity.toLowerCase()">{{ rule.severity }}</span>
+                  <span class="rule-message">{{ rule.message }}</span>
+                  <span class="rule-status-icon">{{ rule.passed ? '✓' : '✕' }}</span>
+                </div>
+              </div>
+            </div>
+
+          </ng-container>
+
+          <div *ngIf="!isPipelineLoading && !pipelineResult && !pipelineError" class="no-volume-data">
+            Cost analysis data not available for this drawing.
+          </div>
+        </div>
+
+        <!-- TAB: METADATA -->
+        <div *ngIf="activeTab === 'metadata'">
+          <div class="two-columns-layout">
+
+            <div class="info-block-card">
+              <h3 class="block-heading">Title Block</h3>
+              <ng-container *ngIf="titleBlockEntries.length; else noTitleBlock">
+                <div class="key-value-list">
+                  <div *ngFor="let entry of titleBlockEntries" class="kv-pair-row">
+                    <span class="kv-key">{{ entry.key }}</span>
+                    <span class="kv-val" [class.empty-text]="!entry.value">{{ entry.value || 'Not specified' }}</span>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #noTitleBlock>
+                <p style="color: #94a3b8; font-size: 0.875rem;">No title block data found.</p>
+              </ng-template>
+            </div>
+
+            <div class="info-block-card">
+              <h3 class="block-heading">Drawing Views</h3>
+              <ng-container *ngIf="data?.views?.length; else noViews">
+                <div class="views-flex-wrap">
+                  <div *ngFor="let view of data?.views" class="projection-block-indicator">
+                    <span class="view-label-name">{{ view.name || view.id }}</span>
+                    <span class="view-status-pill">VIEW</span>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #noViews>
+                <p style="color: #94a3b8; font-size: 0.875rem;">No views found.</p>
+              </ng-template>
+            </div>
+
+            <div class="info-block-card full-width-block" *ngIf="data?.assembly_order?.length">
+              <h3 class="block-heading">Assembly Order</h3>
+              <div class="assembly-flow-stepper">
+                <div *ngFor="let step of data?.assembly_order; let i = index" class="step-card">
+                  <div class="step-indexing-number">{{ i + 1 }}</div>
+                  <div class="step-card-content">
+                    <p class="step-instruction-desc">{{ step.action || step.description || step }}</p>
+                    <span class="reference-feature-tag" *ngIf="step.feature_ref">{{ step.feature_ref }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-block-card full-width-block">
+              <h3 class="block-heading">Task Reference</h3>
+              <div class="task-id-reveal-container">
+                <span class="meta-label">TASK ID</span>
+                <span class="transaction-code">{{ result?.task_id }}</span>
+                <button class="clipboard-copy-btn" (click)="copyTaskId()">
+                  {{ copied ? '✓ Copied' : 'Copy' }}
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+</div>

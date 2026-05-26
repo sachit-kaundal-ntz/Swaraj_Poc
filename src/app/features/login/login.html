@@ -1,0 +1,109 @@
+<!-- <app-loader></app-loader> -->
+
+<div class="main-container">
+  <div class="main-section">
+    <div class="left-section">
+      <div class="top">
+        <div class="header">
+          <img
+            src="assets/images/Netsmartzlatest.png"
+            alt="Netsmartz Logo"
+            class="logo"
+          />
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="illustration static-content">
+           <img
+      src="assets/images/Group (1).png"
+      alt="Illustration"
+      class="illustration-img"
+    />
+    <div class="illustration-text">
+      <h2>GearForge AI</h2>
+      <p>
+        A Netsmartz product powered by the BYT team, designed to empower us to manage our gear more efficiently.
+      </p>
+    </div>
+          <!-- <app-carasoul></app-carasoul> -->
+        </div>
+      </div>
+    </div>
+    <div class="right-section">
+      <div class="login-box">
+        <h1 class="login-title">LOGIN</h1>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="email"> Email </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Type your email here"
+              class="form-control"
+            />
+            <div
+              class="me-2 mt-1"
+              *ngIf="(email?.invalid && email?.touched) || formSubmitted"
+            >
+              <span class="text-danger" *ngIf=" email?.errors?.['required']"
+                >Email is required.</span
+              >
+              <span class="text-danger" *ngIf=" email?.errors?.['pattern']"
+                >Invalid Email.</span
+              >
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label for="password"> Password </label>
+            <div class="password-input">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                placeholder="Type your password here"
+                class="form-control pass"
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                [class.active]="showPassword"
+                (click)="togglePassword()"
+              >
+                <i
+                  [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                ></i>
+              </button>
+            </div>
+           
+
+
+
+
+          </div>
+
+          <div class="form-options">
+             <div style="display: flex">
+              <label class="custom-checkbox">
+                <input type="checkbox" formControlName="rememberMe" />
+                <span class="checkmark"></span>
+                <span class="remember-me">Remember Me?</span>
+              </label>
+             
+             </div>
+     
+          </div>
+         
+          <button type="submit" class="login-button">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="footer">
+    <p>Powered by BYT Strategy Group</p>
+  </div> -->
+</div>
+ 

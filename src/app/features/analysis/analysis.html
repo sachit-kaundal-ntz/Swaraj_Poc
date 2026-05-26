@@ -1,0 +1,356 @@
+<div class="ap">
+
+  <!-- ── LOADING ─────────────────────────────────────────────────────────── -->
+  <div class="ap-loading" *ngIf="loading">
+    <div class="ap-loading__inner">
+      <div class="ap-loading__ring">
+        <svg viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+          <circle cx="32" cy="32" r="28" stroke="url(#lg)" stroke-width="3"
+            stroke-dasharray="175.9" stroke-dashoffset="88" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <p class="ap-loading__label">Processing drawing…</p>
+      <code class="ap-loading__id">{{ taskId }}</code>
+    </div>
+  </div>
+
+  <!-- ── ERROR ──────────────────────────────────────────────────────────── -->
+  <div class="ap-error" *ngIf="!loading && errorMsg">
+    <div class="ap-error__box">
+      <div class="ap-error__icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 7v6M12 15.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Something went wrong</h2>
+      <p>{{ errorMsg }}</p>
+      <div class="ap-error__actions">
+        <button (click)="goBack()">← Back to Upload</button>
+        <button class="primary" (click)="reprocess()">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RESULT ─────────────────────────────────────────────────────────── -->
+  <ng-container *ngIf="!loading && result && !errorMsg">
+
+    <!-- Topbar -->
+    <nav class="ap-nav">
+      <button class="ap-nav__back" (click)="goBack()">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        New Analysis
+      </button>
+      <div class="ap-nav__file">
+        <span class="ap-nav__filename">{{ result.filename }}</span>
+        <span class="ap-nav__badge" [class.ap-nav__badge--ok]="!hasExtractionError" [class.ap-nav__badge--err]="hasExtractionError">
+          <span class="ap-nav__dot"></span>
+          {{ hasExtractionError ? 'Partial' : 'Complete' }}
+        </span>
+      </div>
+      <div class="ap-nav__actions">
+        <button class="ap-nav__btn" (click)="downloadJSON()">
+          <svg viewBox="0 0 16 16" fill="none">
+            <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 13h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          JSON
+        </button>
+        <button class="ap-nav__btn" (click)="downloadCSV()">
+          <svg viewBox="0 0 16 16" fill="none">
+            <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 13h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          CSV
+        </button>
+        <button class="ap-nav__btn ap-nav__btn--accent" (click)="reprocess()">
+          <svg viewBox="0 0 16 16" fill="none">
+            <path d="M13 8A5 5 0 1 1 8 3a5 5 0 0 1 3.5 1.5L13 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M13 3v3h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Reprocess
+        </button>
+      </div>
+    </nav>
+
+    <div class="ap-body">
+
+      <!-- Stats Row -->
+      <div class="ap-stats">
+        <div class="ap-stat">
+          <span class="ap-stat__num">{{ tableCount }}</span>
+          <span class="ap-stat__lbl">Tables</span>
+        </div>
+        <div class="ap-stat">
+          <span class="ap-stat__num">{{ dimensionCount }}</span>
+          <span class="ap-stat__lbl">Dimensions</span>
+        </div>
+        <div class="ap-stat">
+          <span class="ap-stat__num">{{ featureCount }}</span>
+          <span class="ap-stat__lbl">Features</span>
+        </div>
+        <div class="ap-stat">
+          <span class="ap-stat__num">{{ viewCount }}</span>
+          <span class="ap-stat__lbl">Views</span>
+        </div>
+        <div class="ap-stat">
+          <span class="ap-stat__num">{{ formatFileSize(result.file_size) }}</span>
+          <span class="ap-stat__lbl">File Size</span>
+        </div>
+        <div class="ap-stat" *ngIf="data?.units">
+          <span class="ap-stat__num">{{ data.units }}</span>
+          <span class="ap-stat__lbl">Units</span>
+        </div>
+      </div>
+
+      <!-- Extraction Error Banner -->
+      <div class="ap-err-banner" *ngIf="hasExtractionError">
+        <div class="ap-err-banner__icon">
+          <svg viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M10 6v5M10 13.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ap-err-banner__body">
+          <strong>Extraction Failed</strong>
+          <span>{{ extractionError }}</span>
+        </div>
+        <button class="ap-err-banner__btn" (click)="reprocess()">
+          Retry
+        </button>
+      </div>
+
+      <!-- Token Usage (always show if available) -->
+      <div class="ap-token-card" *ngIf="data?.token_usage">
+        <div class="ap-token-card__title">
+          <svg viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M4 8h8M4 5h5M4 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Processing Stats
+        </div>
+        <div class="ap-token-card__grid">
+          <div class="ap-token-card__item">
+            <span class="ap-token-card__val">{{ data.token_usage.total_tokens | number }}</span>
+            <span class="ap-token-card__key">Total Tokens</span>
+          </div>
+          <div class="ap-token-card__item">
+            <span class="ap-token-card__val">{{ data.token_usage.input_tokens?.total_input_tokens | number }}</span>
+            <span class="ap-token-card__key">Input Tokens</span>
+          </div>
+          <div class="ap-token-card__item">
+            <span class="ap-token-card__val">{{ data.token_usage.input_tokens?.image_tokens | number }}</span>
+            <span class="ap-token-card__key">Image Tokens</span>
+          </div>
+          <div class="ap-token-card__item">
+            <span class="ap-token-card__val">{{ data.token_usage.output_tokens | number }}</span>
+            <span class="ap-token-card__key">Output Tokens</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs — only when extraction succeeded -->
+      <ng-container *ngIf="!hasExtractionError">
+
+        <div class="ap-tabs">
+          <button class="ap-tab" [class.ap-tab--active]="activeTab === 'tables'" (click)="activeTab = 'tables'">
+            Tables
+            <span class="ap-tab__badge" *ngIf="tableCount">{{ tableCount }}</span>
+          </button>
+          <button class="ap-tab" [class.ap-tab--active]="activeTab === 'dimensions'" (click)="activeTab = 'dimensions'">
+            Dimensions
+            <span class="ap-tab__badge" *ngIf="dimensionCount">{{ dimensionCount }}</span>
+          </button>
+          <button class="ap-tab" [class.ap-tab--active]="activeTab === 'features'" (click)="activeTab = 'features'">
+            Features
+            <span class="ap-tab__badge" *ngIf="featureCount">{{ featureCount }}</span>
+          </button>
+          <button class="ap-tab" [class.ap-tab--active]="activeTab === 'metadata'" (click)="activeTab = 'metadata'">
+            Metadata
+          </button>
+        </div>
+
+        <!-- TABLES TAB -->
+        <ng-container *ngIf="activeTab === 'tables'">
+          <div class="ap-empty" *ngIf="!tableCount">
+            <svg viewBox="0 0 40 40" fill="none"><rect x="4" y="4" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M14 20h12M14 14h8M14 26h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>
+            <p>No tables extracted from this drawing</p>
+          </div>
+          <div class="ap-table-group" *ngFor="let tbl of data?.tables">
+            <div class="ap-table-group__head">
+              <h3>{{ formatTableId(tbl.id) }}</h3>
+              <span>{{ tbl.cells?.length || 0 }} fields</span>
+            </div>
+            <div class="ap-table-wrap">
+              <table class="ap-table">
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                    <th>Tolerance</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cell of tbl.cells" [class.ap-table__row--missing]="cell.source === 'missing_on_drawing'">
+                    <td class="ap-table__label">{{ cell.label }}</td>
+                    <td class="ap-table__val">{{ cell.value ?? '—' }}</td>
+                    <td class="ap-table__unit">{{ cell.unit ?? '—' }}</td>
+                    <td class="ap-table__tol">{{ cell.tolerance ?? '—' }}</td>
+                    <td>
+                      <span class="ap-chip" [class.ap-chip--missing]="cell.source === 'missing_on_drawing'">
+                        {{ cell.source === 'missing_on_drawing' ? 'Not found' : cell.source }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- DIMENSIONS TAB -->
+        <ng-container *ngIf="activeTab === 'dimensions'">
+          <div class="ap-empty" *ngIf="!dimensionCount">
+            <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M20 14v12M14 20h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>
+            <p>No dimensions extracted from this drawing</p>
+          </div>
+          <div class="ap-dim-grid">
+            <div class="ap-dim-card" *ngFor="let dim of data?.dimensions" [class.ap-dim-card--missing]="dim.source === 'missing_on_drawing'">
+              <div class="ap-dim-card__top">
+                <span class="ap-dim-card__sym" *ngIf="dim.symbol">{{ dim.symbol }}</span>
+                <span class="ap-dim-card__id">{{ formatDimId(dim.id) }}</span>
+                <span class="ap-chip ap-chip--sm" [class.ap-chip--missing]="dim.source === 'missing_on_drawing'">
+                  {{ dim.source === 'missing_on_drawing' ? 'Not found' : 'OK' }}
+                </span>
+              </div>
+              <div class="ap-dim-card__val">
+                {{ dim.value ?? '—' }}
+                <span class="ap-dim-card__unit" *ngIf="dim.unit">{{ dim.unit }}</span>
+              </div>
+              <div class="ap-dim-card__tol" *ngIf="dim.tolerance">± {{ dim.tolerance }}</div>
+              <div class="ap-dim-card__view" *ngIf="dim.view_id">{{ dim.view_id }}</div>
+              <p class="ap-dim-card__note" *ngIf="dim.note">{{ dim.note }}</p>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- FEATURES TAB -->
+        <ng-container *ngIf="activeTab === 'features'">
+          <div class="ap-empty" *ngIf="!featureCount">
+            <svg viewBox="0 0 40 40" fill="none"><path d="M6 10l14-6 14 6v16l-14 6-14-6V10z" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+            <p>No features identified in this drawing</p>
+          </div>
+          <div class="ap-features">
+            <div class="ap-feat" *ngFor="let feat of data?.features">
+              <div class="ap-feat__icon">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="ap-feat__body">
+                <p class="ap-feat__name">{{ formatFeatureId(feat.id) }}</p>
+                <p class="ap-feat__sub">{{ feat.type }}<span *ngIf="feat.role"> · {{ feat.role }}</span></p>
+              </div>
+              <div class="ap-feat__tags">
+                <span class="ap-tag" *ngIf="feat.view_id">{{ feat.view_id }}</span>
+                <span class="ap-tag" *ngIf="feat.fit_class">{{ feat.fit_class }}</span>
+              </div>
+              <span class="ap-chip" [class.ap-chip--missing]="feat.source === 'missing_on_drawing'">
+                {{ feat.source === 'missing_on_drawing' ? 'Not found' : 'Extracted' }}
+              </span>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- METADATA TAB -->
+        <ng-container *ngIf="activeTab === 'metadata'">
+          <div class="ap-meta-grid">
+
+            <!-- Title Block -->
+            <div class="ap-meta-section" *ngIf="titleBlockEntries.length">
+              <h3 class="ap-meta-section__title">Title Block</h3>
+              <div class="ap-kv">
+                <div class="ap-kv__row" *ngFor="let kv of titleBlockEntries">
+                  <span class="ap-kv__key">{{ kv.key }}</span>
+                  <span class="ap-kv__val" [class.ap-kv__val--empty]="!kv.value || kv.value === 'missing_on_drawing'">
+                    {{ (!kv.value || kv.value === 'missing_on_drawing') ? 'Not specified' : kv.value }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Views -->
+            <div class="ap-meta-section" *ngIf="data?.views?.length">
+              <h3 class="ap-meta-section__title">Views Detected</h3>
+              <div class="ap-views">
+                <div class="ap-view-pill" *ngFor="let view of data?.views">
+                  <span>{{ view.id }}</span>
+                  <span class="ap-chip ap-chip--sm" [class.ap-chip--missing]="view.source === 'missing_on_drawing'">
+                    {{ view.source === 'missing_on_drawing' ? 'Not found' : 'Found' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assembly Order -->
+            <div class="ap-meta-section" *ngIf="data?.assembly_order?.length">
+              <h3 class="ap-meta-section__title">Assembly Order</h3>
+              <div class="ap-assembly">
+                <div class="ap-asm-step" *ngFor="let step of data?.assembly_order; let i = index">
+                  <span class="ap-asm-step__num">{{ i + 1 }}</span>
+                  <span class="ap-asm-step__op">{{ step.op }}</span>
+                  <span class="ap-asm-step__feat">{{ step.feature_id }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task Info -->
+            <div class="ap-meta-section">
+              <h3 class="ap-meta-section__title">Task Info</h3>
+              <div class="ap-task-box">
+                <span class="ap-task-box__label">Task ID</span>
+                <code class="ap-task-box__id">{{ taskId }}</code>
+                <button class="ap-task-box__copy" (click)="copyTaskId()">
+                  {{ copied ? '✓ Copied' : 'Copy' }}
+                </button>
+              </div>
+              <div class="ap-kv" style="margin-top:12px">
+                <div class="ap-kv__row">
+                  <span class="ap-kv__key">Filename</span>
+                  <span class="ap-kv__val">{{ result.filename }}</span>
+                </div>
+                <div class="ap-kv__row">
+                  <span class="ap-kv__key">File Size</span>
+                  <span class="ap-kv__val">{{ formatFileSize(result.file_size) }}</span>
+                </div>
+                <div class="ap-kv__row">
+                  <span class="ap-kv__key">Status</span>
+                  <span class="ap-kv__val">{{ result.status }}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+
+      </ng-container>
+      <!-- /tabs -->
+
+    </div>
+    <!-- /ap-body -->
+
+  </ng-container>
+
+</div>
